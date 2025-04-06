@@ -59,14 +59,21 @@ export function SignUpForm() {
       });
 
       // Sign in the user
-      await signIn("credentials", {
+      const signInResult = await signIn("credentials", {
         email: values.email,
         password: values.password,
         redirect: false,
       });
 
-      router.push("/calendar");
-      router.refresh();
+      if (signInResult?.error) {
+        throw new Error(signInResult.error || "Failed to sign in after registration");
+      }
+
+      // Wait a moment to ensure authentication state is updated
+      setTimeout(() => {
+        router.push("/calendar");
+        router.refresh();
+      }, 500);
     } catch (error: any) {
       toast({
         title: "Error",
