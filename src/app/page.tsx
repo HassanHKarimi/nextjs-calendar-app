@@ -1,15 +1,29 @@
+"use client";
+
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default async function Home() {
-  const session = await auth();
+export default function Home() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
-  if (session?.user) {
-    redirect("/calendar");
-  }
+  useEffect(() => {
+    setMounted(true);
+    
+    // Check if user is logged in by looking for session cookie
+    const hasSession = document.cookie.includes('next-auth.session-token') || 
+                     document.cookie.includes('__Secure-next-auth.session-token');
+    
+    if (hasSession) {
+      router.push("/calendar");
+    }
+  }, [router]);
+
+  // Don't render until mounted to avoid hydration issues
+  if (!mounted) return null;
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen py-2">
