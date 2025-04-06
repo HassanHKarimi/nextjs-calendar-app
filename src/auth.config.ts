@@ -2,6 +2,7 @@ import type { NextAuthConfig } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import Google from "next-auth/providers/google"
 import bcrypt from "bcryptjs"
+import { getAuthSecret } from "./lib/auth-utils"
 
 import { LoginSchema } from "@/schemas"
 import { getUserByEmail } from "@/data/user"
@@ -34,4 +35,6 @@ export default {
       }
     })
   ],
+  // Add the secret property using our utility function
+  secret: getAuthSecret(),
 } satisfies NextAuthConfig
