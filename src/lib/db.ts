@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { neonConfig } from "./neon";
 
 // PrismaClient is attached to the `global` object in development to prevent
 // exhausting your database connection limit.
@@ -9,7 +10,17 @@ declare global {
 }
 
 const prismaClientSingleton = () => {
-  return new PrismaClient();
+  return new PrismaClient({
+    // Pass the Neon configuration to Prisma
+    // This is only required when deployed to Vercel
+    datasources: process.env.VERCEL
+      ? {
+          db: {
+            url: neonConfig.connectionString,
+          },
+        }
+      : undefined,
+  });
 };
 
 export const db = globalThis.prisma ?? prismaClientSingleton();
