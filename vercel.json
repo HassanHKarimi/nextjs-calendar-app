@@ -4,25 +4,5 @@
   "framework": "nextjs",
   "outputDirectory": ".next",
   "crons": [],
-  "regions": ["iad1"],
-  "env": {
-    "NEXT_PUBLIC_APP_URL": {
-      "type": "string"
-    },
-    "DATABASE_URL": {
-      "type": "string"
-    },
-    "NEXTAUTH_URL": {
-      "type": "string"
-    },
-    "NEXTAUTH_SECRET": {
-      "type": "string"
-    },
-    "GOOGLE_CLIENT_ID": {
-      "type": "string"
-    },
-    "GOOGLE_CLIENT_SECRET": {
-      "type": "string"
-    }
-  }
+  "regions": ["iad1"]
 }
