@@ -8,10 +8,11 @@ export async function GET() {
   try {
     const session = await auth();
 
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    // Now TypeScript knows session.user.id is defined
     const events = await getEventsByUserId(session.user.id);
     
     return NextResponse.json(events);
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
   try {
     const session = await auth();
 
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -39,6 +40,7 @@ export async function POST(req: Request) {
       return new NextResponse("Invalid request body", { status: 400 });
     }
 
+    // Now TypeScript knows session.user.id is defined
     const event = await createEvent(session.user.id, validatedData.data);
     
     return NextResponse.json(event);
