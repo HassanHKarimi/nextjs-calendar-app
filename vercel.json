@@ -1,9 +1,10 @@
 {
-  "buildCommand": "NODE_OPTIONS='--max-old-space-size=4096' npm run vercel-build",
-  "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && npm run postinstall",
+  "buildCommand": "npm run vercel-build",
+  "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && prisma generate",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "env": {
+    "NEXT_TYPESCRIPT_COMPILE_ONLY": "1",
     "NEXT_TELEMETRY_DISABLED": "1"
   }
 }
