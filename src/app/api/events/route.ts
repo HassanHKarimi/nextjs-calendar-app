@@ -12,8 +12,9 @@ export async function GET() {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Now TypeScript knows session.user.id is defined
-    const events = await getEventsByUserId(session.user.id);
+    // Use a non-null assertion to tell TypeScript that userId is definitely not undefined
+    const userId = session.user.id!;
+    const events = await getEventsByUserId(userId);
     
     return NextResponse.json(events);
   } catch (error) {
@@ -31,6 +32,8 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    // Use a non-null assertion to tell TypeScript that userId is definitely not undefined
+    const userId = session.user.id!;
     const body = await req.json();
     
     // Validate the request body
@@ -40,8 +43,7 @@ export async function POST(req: Request) {
       return new NextResponse("Invalid request body", { status: 400 });
     }
 
-    // Now TypeScript knows session.user.id is defined
-    const event = await createEvent(session.user.id, validatedData.data);
+    const event = await createEvent(userId, validatedData.data);
     
     return NextResponse.json(event);
   } catch (error) {
