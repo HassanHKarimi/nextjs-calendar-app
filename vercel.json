@@ -1,8 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "installCommand": "npm install --force",
+  "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && npm run postinstall",
   "framework": "nextjs",
-  "outputDirectory": ".next",
-  "crons": [],
-  "regions": ["iad1"]
+  "outputDirectory": ".next"
 }
