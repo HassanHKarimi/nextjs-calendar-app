@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -21,7 +20,6 @@ import { RegisterSchema } from "@/schemas";
 import { useToast } from "@/hooks/use-toast";
 
 export function SignUpForm() {
-  const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,6 +38,8 @@ export function SignUpForm() {
     setIsLoading(true);
 
     try {
+      console.log("Starting registration process...");
+      
       // 1. Register the user
       const registerResponse = await fetch("/api/register", {
         method: "POST",
@@ -53,43 +53,35 @@ export function SignUpForm() {
         const error = await registerResponse.json();
         throw new Error(error.message || "Failed to register");
       }
+      
+      console.log("Registration successful, proceeding to sign in...");
 
       toast({
-        title: "Success",
-        description: "Registration successful! Signing you in...",
+        title: "Registration successful!",
+        description: "Signing you in now...",
       });
 
-      // 2. Sign in the user with credentials
-      const signInResult = await signIn("credentials", {
+      // 2. Sign in directly using the credentials provider with callbackUrl
+      // This will handle the redirect automatically after successful sign-in
+      await signIn("credentials", {
         email: values.email,
         password: values.password,
-        redirect: false,
+        callbackUrl: "/calendar",
+        redirect: true
       });
-
-      // 3. Handle sign-in errors
-      if (signInResult?.error) {
-        console.error("Sign-in error:", signInResult.error);
-        throw new Error("Failed to sign in after registration. Please go to the sign-in page.");
-      }
-
-      // 4. If sign-in is successful, redirect to calendar page
-      if (signInResult?.ok) {
-        toast({
-          title: "Signed in",
-          description: "Redirecting to your calendar...",
-        });
-        
-        // Use callbackUrl instead of manual redirect to ensure auth state is preserved
-        window.location.href = "/calendar";
-      }
+      
+      // The code execution won't reach here on successful sign-in
+      // as the browser will be redirected by NextAuth
+      
     } catch (error: any) {
-      console.error("Registration error:", error);
+      console.error("Registration or sign-in error:", error);
+      
       toast({
         title: "Error",
         description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
-    } finally {
+      
       setIsLoading(false);
     }
   }
