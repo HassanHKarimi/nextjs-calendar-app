@@ -40,7 +40,7 @@ export function SignUpForm() {
     try {
       console.log("Starting registration process...");
       
-      // 1. Register the user
+      // Create user account
       const registerResponse = await fetch("/api/register", {
         method: "POST",
         headers: {
@@ -58,23 +58,15 @@ export function SignUpForm() {
 
       toast({
         title: "Registration successful!",
-        description: "Signing you in now...",
+        description: "Redirecting to sign-in page...",
       });
 
-      // 2. Sign in directly using the credentials provider with callbackUrl
-      // This will handle the redirect automatically after successful sign-in
-      await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-        callbackUrl: "/calendar",
-        redirect: true
-      });
-      
-      // The code execution won't reach here on successful sign-in
-      // as the browser will be redirected by NextAuth
+      // Redirect to sign-in page manually with prefilled email
+      // This avoids the issue with direct authentication after registration
+      window.location.href = `/sign-in?email=${encodeURIComponent(values.email)}&registered=true`;
       
     } catch (error: any) {
-      console.error("Registration or sign-in error:", error);
+      console.error("Registration error:", error);
       
       toast({
         title: "Error",
