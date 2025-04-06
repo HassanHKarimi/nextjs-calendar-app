@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -22,23 +22,40 @@ import { useToast } from "@/hooks/use-toast";
 
 export function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Get email from URL if present (from registration redirect)
+  const emailFromUrl = searchParams.get("email");
+  const justRegistered = searchParams.get("registered") === "true";
 
   // Create form
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
-      email: "",
+      email: emailFromUrl || "",
       password: "",
     },
   });
+
+  // Show welcome toast if user just registered
+  useEffect(() => {
+    if (justRegistered) {
+      toast({
+        title: "Account created successfully!",
+        description: "Please sign in with your new account.",
+      });
+    }
+  }, [justRegistered, toast]);
 
   // Form submission handler
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
     setIsLoading(true);
 
     try {
+      console.log("Attempting to sign in...");
+      
       const response = await signIn("credentials", {
         email: values.email,
         password: values.password,
@@ -46,28 +63,31 @@ export function SignInForm() {
       });
 
       if (response?.error) {
+        console.error("Sign-in error:", response.error);
         toast({
           title: "Error",
           description: "Invalid email or password",
           variant: "destructive",
         });
+        setIsLoading(false);
         return;
       }
 
+      console.log("Sign-in successful, redirecting...");
       toast({
         title: "Success",
         description: "Signed in successfully",
       });
 
-      router.push("/calendar");
-      router.refresh();
+      // Use window.location for a full page reload to ensure proper session
+      window.location.href = "/calendar";
     } catch (error) {
+      console.error("Unexpected error during sign-in:", error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
   }
