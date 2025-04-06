@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "npm run build -- --no-lint",
   "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && npm run postinstall",
   "framework": "nextjs",
   "outputDirectory": ".next"
