@@ -3,9 +3,10 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 import authConfig from "@/auth.config";
 import { getUserById } from "@/data/user";
-import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
 import { getAccountByUserId } from "@/data/account";
-import { UserRole } from "@prisma/client";
+
+// Define the UserRole type if not automatically imported from Prisma
+type UserRole = "USER" | "ADMIN";
 
 export const {
   handlers: { GET, POST },
@@ -47,7 +48,7 @@ export const {
       }
 
       if (session.user) {
-        session.user.name = token.name;
+        session.user.name = token.name as string;
         session.user.email = token.email as string;
         session.user.isOAuth = token.isOAuth as boolean;
       }
