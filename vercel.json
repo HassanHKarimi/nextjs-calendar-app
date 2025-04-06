@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run vercel-build",
-  "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && prisma generate",
+  "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && npx prisma generate",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "env": {
