@@ -8,12 +8,16 @@ export async function GET() {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session?.user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Use a non-null assertion to tell TypeScript that userId is definitely not undefined
-    const userId = session.user.id!;
+    // Make TypeScript happy by providing a default value
+    const userId = session.user.id || "";
+    if (!userId) {
+      return new NextResponse("User ID not found", { status: 400 });
+    }
+
     const events = await getEventsByUserId(userId);
     
     return NextResponse.json(events);
@@ -28,12 +32,16 @@ export async function POST(req: Request) {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
+    if (!session?.user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Use a non-null assertion to tell TypeScript that userId is definitely not undefined
-    const userId = session.user.id!;
+    // Make TypeScript happy by providing a default value
+    const userId = session.user.id || "";
+    if (!userId) {
+      return new NextResponse("User ID not found", { status: 400 });
+    }
+
     const body = await req.json();
     
     // Validate the request body
