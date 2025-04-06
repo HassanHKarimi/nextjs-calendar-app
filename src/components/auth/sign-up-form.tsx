@@ -40,7 +40,8 @@ export function SignUpForm() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/register", {
+      // 1. Register the user
+      const registerResponse = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,8 +49,8 @@ export function SignUpForm() {
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
+      if (!registerResponse.ok) {
+        const error = await registerResponse.json();
         throw new Error(error.message || "Failed to register");
       }
 
@@ -58,23 +59,31 @@ export function SignUpForm() {
         description: "Registration successful! Signing you in...",
       });
 
-      // Sign in the user
+      // 2. Sign in the user with credentials
       const signInResult = await signIn("credentials", {
         email: values.email,
         password: values.password,
         redirect: false,
       });
 
+      // 3. Handle sign-in errors
       if (signInResult?.error) {
-        throw new Error(signInResult.error || "Failed to sign in after registration");
+        console.error("Sign-in error:", signInResult.error);
+        throw new Error("Failed to sign in after registration. Please go to the sign-in page.");
       }
 
-      // Wait a moment to ensure authentication state is updated
-      setTimeout(() => {
-        router.push("/calendar");
-        router.refresh();
-      }, 500);
+      // 4. If sign-in is successful, redirect to calendar page
+      if (signInResult?.ok) {
+        toast({
+          title: "Signed in",
+          description: "Redirecting to your calendar...",
+        });
+        
+        // Use callbackUrl instead of manual redirect to ensure auth state is preserved
+        window.location.href = "/calendar";
+      }
     } catch (error: any) {
+      console.error("Registration error:", error);
       toast({
         title: "Error",
         description: error.message || "Something went wrong. Please try again.",
