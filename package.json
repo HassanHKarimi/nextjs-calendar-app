@@ -8,7 +8,7 @@
     "vercel-build": "next build --no-lint",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "node install-deps.js && prisma generate"
+    "postinstall": "node install-deps.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^1.5.0",
