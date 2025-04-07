@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -21,7 +20,6 @@ import { RegisterSchema } from "@/schemas";
 import { useToast } from "@/hooks/use-toast";
 
 export function SignUpForm() {
-  const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,9 +36,11 @@ export function SignUpForm() {
   // Form submission handler
   async function onSubmit(values: z.infer<typeof RegisterSchema>) {
     setIsLoading(true);
+    console.log("Starting registration process...");
 
     try {
-      const response = await fetch("/api/register", {
+      // 1. Register the user
+      const registerResponse = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,32 +48,34 @@ export function SignUpForm() {
         body: JSON.stringify(values),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
+      console.log("Registration response status:", registerResponse.status);
+
+      if (!registerResponse.ok) {
+        const error = await registerResponse.json();
         throw new Error(error.message || "Failed to register");
       }
+      
+      // Get the response data
+      const userData = await registerResponse.json();
+      console.log("User registered successfully:", userData);
 
       toast({
-        title: "Success",
-        description: "Registration successful! Signing you in...",
+        title: "Registration successful!",
+        description: "Redirecting to sign-in page...",
       });
 
-      // Sign in the user
-      await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-        redirect: false,
-      });
-
-      router.push("/calendar");
-      router.refresh();
+      // 2. Redirect to sign-in page with prefilled email
+      window.location.href = `/sign-in?email=${encodeURIComponent(values.email)}&registered=true`;
+      
     } catch (error: any) {
+      console.error("Registration error:", error);
+      
       toast({
         title: "Error",
         description: error.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
-    } finally {
+      
       setIsLoading(false);
     }
   }
