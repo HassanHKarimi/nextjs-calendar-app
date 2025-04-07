@@ -30,8 +30,11 @@ const nextConfig = {
   // Add experimental features to support NextAuth
   experimental: {
     serverComponentsExternalPackages: ["@auth/core"],
+    // Enabling App Router
+    appDir: true,
   },
 
+  // Define page extensions
   pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
   
   // Disable the conflicting App Router APIs
