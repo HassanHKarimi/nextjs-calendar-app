@@ -26,6 +26,26 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+
+  // Add experimental features to support NextAuth
+  experimental: {
+    serverComponentsExternalPackages: ["@auth/core"],
+  },
+
+  // Add redirects for NextAuth routes
+  async redirects() {
+    return [];
+  },
+
+  // Add rewrites for NextAuth routes
+  async rewrites() {
+    return [
+      {
+        source: "/api/auth/:path*",
+        destination: "/api/auth/:path*",
+      }
+    ];
+  },
 };
 
 export default nextConfig;
