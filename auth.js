@@ -1,4 +1,22 @@
-// This is a compatibility file for NextAuth.js
-// It re-exports auth-related functions from the src/auth configuration
+// Root auth.js file to provide compatibility with older NextAuth patterns
+// and make authentication utilities available throughout the application
 
-export * from "./src/auth";
+import NextAuth from "next-auth";
+
+// Import the configuration from the Pages API route
+import options from "./src/pages/api/auth/[...nextauth]";
+
+// Export a simplified auth client for use in components and API routes
+export const { 
+  auth, 
+  handlers, 
+  signIn, 
+  signOut, 
+  getProviders,
+  getSession,
+  getCsrfToken,
+  getServerSession
+} = NextAuth(options);
+
+// Re-export the pages API configuration for compatibility
+export default options;
