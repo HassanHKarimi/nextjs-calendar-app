@@ -32,16 +32,11 @@ const nextConfig = {
     serverComponentsExternalPackages: ["@auth/core"],
   },
 
-  // Add rewrites to handle potential routing conflicts
-  async rewrites() {
-    return [
-      // Prioritize API routes in the Pages Router
-      {
-        source: "/api/:path*",
-        destination: "/api/:path*",
-      }
-    ];
-  },
+  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
+  
+  // Disable the conflicting App Router APIs
+  skipMiddlewareUrlNormalize: true,
+  skipTrailingSlashRedirect: true,
 };
 
 export default nextConfig;
