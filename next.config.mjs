@@ -30,22 +30,16 @@ const nextConfig = {
   // Add experimental features to support NextAuth
   experimental: {
     serverComponentsExternalPackages: ["@auth/core"],
+    // Enabling App Router
+    appDir: true,
   },
 
-  // Add redirects for NextAuth routes
-  async redirects() {
-    return [];
-  },
-
-  // Add rewrites for NextAuth routes
-  async rewrites() {
-    return [
-      {
-        source: "/api/auth/:path*",
-        destination: "/api/auth/:path*",
-      }
-    ];
-  },
+  // Define page extensions
+  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
+  
+  // Disable the conflicting App Router APIs
+  skipMiddlewareUrlNormalize: true,
+  skipTrailingSlashRedirect: true,
 };
 
 export default nextConfig;
