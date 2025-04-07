@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -36,10 +35,9 @@ export function SignUpForm() {
   // Form submission handler
   async function onSubmit(values: z.infer<typeof RegisterSchema>) {
     setIsLoading(true);
+    console.log("Starting registration...");
 
     try {
-      console.log("Starting registration process...");
-      
       // Create user account
       const registerResponse = await fetch("/api/register", {
         method: "POST",
@@ -49,20 +47,23 @@ export function SignUpForm() {
         body: JSON.stringify(values),
       });
 
+      console.log("Registration response status:", registerResponse.status);
+
       if (!registerResponse.ok) {
         const error = await registerResponse.json();
         throw new Error(error.message || "Failed to register");
       }
       
-      console.log("Registration successful, proceeding to sign in...");
+      // Get the response data
+      const userData = await registerResponse.json();
+      console.log("User registered successfully:", userData);
 
       toast({
-        title: "Registration successful!",
-        description: "Redirecting to sign-in page...",
+        title: "Account created!",
+        description: "Your account has been created. Please sign in now.",
       });
 
       // Redirect to sign-in page manually with prefilled email
-      // This avoids the issue with direct authentication after registration
       window.location.href = `/sign-in?email=${encodeURIComponent(values.email)}&registered=true`;
       
     } catch (error: any) {
@@ -128,26 +129,6 @@ export function SignUpForm() {
           </div>
         </form>
       </Form>
-
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t"></div>
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
-            Or continue with
-          </span>
-        </div>
-      </div>
-
-      <Button
-        variant="outline"
-        className="w-full"
-        onClick={() => signIn("google", { callbackUrl: "/calendar" })}
-        disabled={isLoading}
-      >
-        Continue with Google
-      </Button>
     </div>
   );
 }
