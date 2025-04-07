@@ -18,5 +18,5 @@ export default auth((req) => {
 
 // Match all paths except for API, static, and specific public paths
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"]
 };
