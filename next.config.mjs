@@ -32,14 +32,15 @@ const nextConfig = {
     serverComponentsExternalPackages: ["@auth/core"],
   },
 
-  // Ensure all NextAuth routes are handled properly
+  // Add rewrites to handle potential routing conflicts
   async rewrites() {
     return [
+      // Prioritize API routes in the Pages Router
       {
-        source: '/api/auth/:path*',
-        destination: '/api/auth/:path*',
+        source: "/api/:path*",
+        destination: "/api/:path*",
       }
-    ]
+    ];
   },
 };
 
