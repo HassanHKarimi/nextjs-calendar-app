@@ -2,12 +2,17 @@
   "version": 2,
   "buildCommand": "npm run build",
   "installCommand": "npm install --no-audit --no-fund",
-  "framework": "nextjs",
-  "outputDirectory": ".next",
+  "framework": false,
+  "outputDirectory": ".next/export",
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ],
   "env": {
     "NEXT_TYPESCRIPT_COMPILE_ONLY": "1",
     "NEXT_TELEMETRY_DISABLED": "1",
     "NEXT_SKIP_COMPILE_EVENT": "true",
-    "NEXT_FORCE_EDGE_IMAGES": "true"
+    "NEXT_FORCE_EDGE_IMAGES": "true",
+    "NODE_OPTIONS": "--max_old_space_size=4096"
   }
 }

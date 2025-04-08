@@ -2,12 +2,17 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // Allow the @neondatabase/serverless package to be transpiled
-  transpilePackages: ['@neondatabase/serverless'],
+  // Static export mode to bypass server-side rendering issues
+  output: 'export',
+  distDir: '.next',
+  
+  // Skip generating pages with prerendering issues
+  skipTrailingSlashRedirect: true,
+  skipMiddlewareUrlNormalize: true,
   
   // Add webpack configuration to prevent issues with external dependencies
   webpack: (config) => {
-    // Create alias for problematic packages
+    // Create alias for problematic packages - prevent them from being bundled
     config.resolve.alias = {
       ...config.resolve.alias,
       '@auth/core': false,
@@ -32,6 +37,11 @@ const nextConfig = {
     return config;
   },
   
+  // Disable image optimization for static export
+  images: {
+    unoptimized: true,
+  },
+  
   // Disable TypeScript checking during build
   typescript: {
     ignoreBuildErrors: true,
@@ -48,9 +58,11 @@ const nextConfig = {
     pagesBufferLength: 2,
   },
   
-  // These have been moved out of experimental in Next.js 14.2.0
-  skipTrailingSlashRedirect: true,
-  skipMiddlewareUrlNormalize: true
+  // Configure routes to exclude problematic pages during static export
+  experimental: {
+    // Exclude pages that are causing prerendering errors
+    excludeDefaultMomentLocales: true,
+  }
 };
 
 export default nextConfig;

@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "vercel-build": "next build",
-    "start": "next start",
+    "build": "node src/app/export-script.js && next build && node src/app/restore-script.js",
+    "vercel-build": "node src/app/export-script.js && next build && node src/app/restore-script.js",
+    "start": "npx serve .next/export",
     "lint": "next lint",
     "postinstall": "node install-deps.js"
   },
