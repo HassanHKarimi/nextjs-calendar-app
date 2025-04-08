@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  
   // Allow the @neondatabase/serverless package to be transpiled
   transpilePackages: ['@neondatabase/serverless'],
   
@@ -26,36 +28,11 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
-
-  // Add experimental features to support NextAuth
+  
+  // Skip prerendering of pages to avoid auth-related errors
   experimental: {
-    serverComponentsExternalPackages: ["@auth/core"],
-  },
-
-  // Define page extensions
-  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
-  
-  // Disable the conflicting App Router APIs
-  skipMiddlewareUrlNormalize: true,
-  skipTrailingSlashRedirect: true,
+    appDir: false
+  }
 };
 
-export default {
-  ...nextConfig,
-  // Explicitly configure to avoid duplicate/conflicting routes 
-  output: 'standalone', // Optimize for Vercel deployment
-  
-  // Add server configuration to avoid Edge Runtime compatibility issues
-  runtime: 'nodejs',
-  
-  // Configure redirects instead of rewrite to avoid Edge compatibility issues
-  async redirects() {
-    return [
-      {
-        source: '/api/auth/:path*',
-        destination: '/api/auth/:path*',
-        permanent: true,
-      },
-    ];
-  },
-};
+export default nextConfig;

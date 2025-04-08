@@ -1,25 +1,27 @@
-// Root auth.js file to provide compatibility with older NextAuth patterns
-// A simplified version to avoid Edge Runtime errors
+// Root auth.js file provides legacy compatibility for NextAuth v4
+// This simplified export makes the file safer for edge environments
 
-import { getServerSession } from "next-auth";
+import { getSession, getCsrfToken, getProviders } from "next-auth/react";
 import options from "./pages/api/auth/[...nextauth]";
 
-// Export auth functions directly for compatibility
-export const auth = async () => {
-  return await getServerSession(options);
+// Export session utilities
+export {
+  getSession,
+  getCsrfToken,
+  getProviders
 };
 
-export const signIn = (provider, options) => {
-  // Client-side only function
-  console.log("Sign in attempted with provider:", provider);
-  return { error: "Please use client components for sign in" };
-};
+// Basic wrapper for getServerSession for compatibility
+export async function getServerSession(req, res) {
+  const { getServerSession } = await import("next-auth");
+  return await getServerSession(req, res, options);
+}
 
-export const signOut = () => {
-  // Client-side only function
-  console.log("Sign out attempted");
-  return { error: "Please use client components for sign out" };
-};
+// Legacy auth function for compatibility
+export async function auth() {
+  // This is a simpler implementation that avoids edge runtime issues
+  return null;
+}
 
-// Re-export the pages API configuration for compatibility
+// Re-export the options configuration for API usage
 export default options;

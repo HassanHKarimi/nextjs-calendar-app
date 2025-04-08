@@ -1,11 +1,8 @@
-// This approach uses Pages Router for NextAuth.js API routes
-// This is the most reliable way to set up NextAuth with Vercel
-
+// Using legacy NextAuth.js v4 to avoid compatibility issues
 import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
-// Use bcrypt (native) instead of bcryptjs for better compatibility
+import { PrismaAdapter } from "@prisma/adapter-next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import * as bcrypt from "bcrypt";
 
 // Import your local utilities and schemas
@@ -23,7 +20,7 @@ type UserRole = "USER" | "ADMIN";
  * This is the primary authentication handler for the application
  */
 export default NextAuth({
-  // Specify adapter to connect to the database for session management
+  // Use database adapter
   adapter: PrismaAdapter(db),
   
   // Use JWT-based sessions for better compatibility
@@ -41,28 +38,39 @@ export default NextAuth({
   // Authentication providers
   providers: [
     // Google OAuth provider
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
     
     // Credentials provider for email/password login
-    Credentials({
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
       async authorize(credentials) {
-        const validatedFields = LoginSchema.safeParse(credentials);
+        if (!credentials) return null;
 
-        if (validatedFields.success) {
-          const { email, password } = validatedFields.data;
+        try {
+          const validatedFields = LoginSchema.safeParse(credentials);
 
-          const user = await getUserByEmail(email);
-          if (!user || !user.password) return null;
+          if (validatedFields.success) {
+            const { email, password } = validatedFields.data;
 
-          const passwordsMatch = await bcrypt.compare(
-            password,
-            user.password,
-          );
+            const user = await getUserByEmail(email);
+            if (!user || !user.password) return null;
 
-          if (passwordsMatch) return user;
+            const passwordsMatch = await bcrypt.compare(
+              password,
+              user.password,
+            );
+
+            if (passwordsMatch) return user;
+          }
+        } catch (error) {
+          console.error("Auth error:", error);
         }
 
         return null;
@@ -77,10 +85,15 @@ export default NextAuth({
       // Allow OAuth without email verification
       if (account?.provider !== "credentials") return true;
 
-      const existingUser = await getUserById(user.id);
+      try {
+        const existingUser = await getUserById(user.id);
 
-      // Prevent sign in without email verification
-      if (!existingUser?.emailVerified) return false;
+        // Prevent sign in without email verification
+        if (!existingUser?.emailVerified) return false;
+      } catch (error) {
+        console.error("Sign in error:", error);
+        return false;
+      }
 
       return true;
     },
@@ -108,16 +121,20 @@ export default NextAuth({
     async jwt({ token }) {
       if (!token.sub) return token;
 
-      const existingUser = await getUserById(token.sub);
+      try {
+        const existingUser = await getUserById(token.sub);
 
-      if (!existingUser) return token;
+        if (!existingUser) return token;
 
-      const existingAccount = await getAccountByUserId(existingUser.id);
+        const existingAccount = await getAccountByUserId(existingUser.id);
 
-      token.isOAuth = !!existingAccount;
-      token.name = existingUser.name;
-      token.email = existingUser.email;
-      token.role = existingUser.role;
+        token.isOAuth = !!existingAccount;
+        token.name = existingUser.name;
+        token.email = existingUser.email;
+        token.role = existingUser.role;
+      } catch (error) {
+        console.error("JWT error:", error);
+      }
 
       return token;
     }
@@ -127,10 +144,14 @@ export default NextAuth({
   events: {
     // Set email as verified when linking OAuth accounts
     async linkAccount({ user }) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { emailVerified: new Date() }
-      });
+      try {
+        await db.user.update({
+          where: { id: user.id },
+          data: { emailVerified: new Date() }
+        });
+      } catch (error) {
+        console.error("Link account error:", error);
+      }
     }
   },
 });
