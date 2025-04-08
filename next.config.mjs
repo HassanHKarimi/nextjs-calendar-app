@@ -7,10 +7,28 @@ const nextConfig = {
   
   // Add webpack configuration to prevent issues with external dependencies
   webpack: (config) => {
+    // Create alias for problematic packages
     config.resolve.alias = {
       ...config.resolve.alias,
       '@auth/core': false,
+      'next-auth': false,
+      '@auth/prisma-adapter': false,
+      '@prisma/adapter-next-auth': false,
+      'bcrypt': false,
+      'bcryptjs': false,
     };
+    
+    // Add externals to prevent webpack from trying to bundle these packages
+    config.externals = [
+      ...(config.externals || []),
+      '@auth/core',
+      'next-auth',
+      '@auth/prisma-adapter',
+      '@prisma/adapter-next-auth',
+      'bcrypt',
+      'bcryptjs',
+    ];
+    
     return config;
   },
   
@@ -30,11 +48,9 @@ const nextConfig = {
     pagesBufferLength: 2,
   },
   
-  // Disable build telemetry
-  experimental: {
-    skipTrailingSlashRedirect: true,
-    skipMiddlewareUrlNormalize: true
-  }
+  // These have been moved out of experimental in Next.js 14.2.0
+  skipTrailingSlashRedirect: true,
+  skipMiddlewareUrlNormalize: true
 };
 
 export default nextConfig;

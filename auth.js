@@ -11,11 +11,17 @@ export async function getServerSession() {
 }
 
 // Simple stubs for authentication functions
-export const signIn = () => {};
-export const signOut = () => {};
+export const signIn = () => Promise.resolve({ error: "Disabled during build" });
+export const signOut = () => Promise.resolve(true);
 export const getSession = () => null;
 export const getCsrfToken = () => "";
 export const getProviders = () => ({});
+export const useSession = () => ({ data: null, status: "unauthenticated" });
+
+// Handler stubs for API routes
+export const handlers = { GET: () => new Response(), POST: () => new Response() };
 
 // Empty default export for compatibility
-export default {};
+export default {
+  providers: [],
+};

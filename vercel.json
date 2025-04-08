@@ -1,17 +1,13 @@
 {
+  "version": 2,
   "buildCommand": "npm run build",
-  "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && node prisma/migrate-and-seed.js",
+  "installCommand": "npm install --no-audit --no-fund",
   "framework": "nextjs",
   "outputDirectory": ".next",
-  "functions": {
-    "pages/api/**/*": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  },
   "env": {
     "NEXT_TYPESCRIPT_COMPILE_ONLY": "1",
     "NEXT_TELEMETRY_DISABLED": "1",
-    "NEXT_SKIP_COMPILE_EVENT": "true"
+    "NEXT_SKIP_COMPILE_EVENT": "true",
+    "NEXT_FORCE_EDGE_IMAGES": "true"
   }
 }
