@@ -1,19 +1,22 @@
 import { auth } from "./auth";
-import { NextResponse } from "next/server";
 
+// This function runs for protected routes
 export default auth((req) => {
+  // Make sure users are logged in to access /calendar
+  const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
-  const isAuthPage = req.nextUrl.pathname.startsWith("/sign-in") || 
-                    req.nextUrl.pathname.startsWith("/sign-up") || 
-                    req.nextUrl.pathname.startsWith("/error");
 
-  // Redirect authenticated users away from auth pages
-  if (isLoggedIn && isAuthPage) {
-    return NextResponse.redirect(new URL("/calendar", req.nextUrl.origin));
+  const isCalendarPath = nextUrl.pathname.startsWith("/calendar");
+  const isAuthPath = nextUrl.pathname.startsWith("/sign-in") || 
+                    nextUrl.pathname.startsWith("/sign-up");
+
+  if (isCalendarPath && !isLoggedIn) {
+    return Response.redirect(new URL("/sign-in", nextUrl));
   }
 
-  // Allow public access to auth pages
-  return NextResponse.next();
+  if (isAuthPath && isLoggedIn) {
+    return Response.redirect(new URL("/calendar", nextUrl));
+  }
 });
 
 // Match all paths except for API, static, and specific public paths
