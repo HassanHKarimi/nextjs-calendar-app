@@ -4,7 +4,7 @@ import { getUserByEmail, getUserById } from "@/data/user";
 import { LoginSchema } from "@/schemas";
 import { db } from "@/lib/db";
 import { getAuthSecret } from "@/lib/auth-utils";
-import bcrypt from "bcryptjs";
+import * as bcrypt from "bcrypt";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";

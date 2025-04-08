@@ -44,4 +44,18 @@ export default {
   ...nextConfig,
   // Explicitly configure to avoid duplicate/conflicting routes 
   output: 'standalone', // Optimize for Vercel deployment
+  
+  // Add server configuration to avoid Edge Runtime compatibility issues
+  runtime: 'nodejs',
+  
+  // Configure redirects instead of rewrite to avoid Edge compatibility issues
+  async redirects() {
+    return [
+      {
+        source: '/api/auth/:path*',
+        destination: '/api/auth/:path*',
+        permanent: true,
+      },
+    ];
+  },
 };

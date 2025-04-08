@@ -5,7 +5,8 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import bcrypt from "bcryptjs";
+// Use bcrypt (native) instead of bcryptjs for better compatibility
+import * as bcrypt from "bcrypt";
 
 // Import your local utilities and schemas
 import { db } from "@/lib/db";

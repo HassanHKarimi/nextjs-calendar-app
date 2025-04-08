@@ -1,22 +1,25 @@
 // Root auth.js file to provide compatibility with older NextAuth patterns
-// and make authentication utilities available throughout the application
+// A simplified version to avoid Edge Runtime errors
 
-import NextAuth from "next-auth";
-
-// Import the configuration from the Pages API route
+import { getServerSession } from "next-auth";
 import options from "./pages/api/auth/[...nextauth]";
 
-// Export a simplified auth client for use in components and API routes
-export const { 
-  auth, 
-  handlers, 
-  signIn, 
-  signOut, 
-  getProviders,
-  getSession,
-  getCsrfToken,
-  getServerSession
-} = NextAuth(options);
+// Export auth functions directly for compatibility
+export const auth = async () => {
+  return await getServerSession(options);
+};
+
+export const signIn = (provider, options) => {
+  // Client-side only function
+  console.log("Sign in attempted with provider:", provider);
+  return { error: "Please use client components for sign in" };
+};
+
+export const signOut = () => {
+  // Client-side only function
+  console.log("Sign out attempted");
+  return { error: "Please use client components for sign out" };
+};
 
 // Re-export the pages API configuration for compatibility
 export default options;

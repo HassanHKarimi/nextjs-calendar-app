@@ -3,15 +3,14 @@
   "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && node prisma/migrate-and-seed.js",
   "framework": "nextjs",
   "outputDirectory": ".next",
+  "functions": {
+    "pages/api/**/*": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
   "env": {
     "NEXT_TYPESCRIPT_COMPILE_ONLY": "1",
     "NEXT_TELEMETRY_DISABLED": "1"
-  },
-  "rewrites": [
-    {
-      "source": "/api/auth/:path*",
-      "destination": "/api/auth/:path*"
-    }
-  ],
-  "ignoreCommand": "npx -y turbo-ignore"
+  }
 }

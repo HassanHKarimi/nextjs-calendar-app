@@ -11,16 +11,7 @@ const connectionString = process.env.DATABASE_URL || '';
 // Create a connection pool using the Neon serverless driver
 export const pool = new Pool({ connectionString });
 
-// Ensure connections are properly closed when the application terminates
-if (typeof window === 'undefined') {
-  // Only add these event listeners on the server side
-  process.on('beforeExit', () => {
-    void pool.end();
-  });
-}
-
-// Configuration for Prisma to use with Neon
+// Export a simpler neonConfig for compatibility with various environments
 export const neonConfig = {
   connectionString,
-  pool,
 };

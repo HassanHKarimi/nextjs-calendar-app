@@ -2,7 +2,7 @@
 // This provides better compatibility with Vercel deployment
 
 import { NextApiRequest, NextApiResponse } from "next";
-import bcrypt from "bcryptjs";
+import * as bcrypt from "bcrypt";
 
 import { db } from "@/lib/db";
 import { RegisterSchema } from "@/schemas";
