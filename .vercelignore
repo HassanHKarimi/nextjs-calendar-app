@@ -1,0 +1,9 @@
+# Ignore App Router API routes to avoid conflicts with Pages Router
+src/app/api
+app/api
+
+# Other ignored paths
+node_modules
+.next
+.git
+README.md

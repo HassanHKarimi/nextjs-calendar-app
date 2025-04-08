@@ -40,4 +40,8 @@ const nextConfig = {
   skipTrailingSlashRedirect: true,
 };
 
-export default nextConfig;
+export default {
+  ...nextConfig,
+  // Explicitly configure to avoid duplicate/conflicting routes 
+  output: 'standalone', // Optimize for Vercel deployment
+};
