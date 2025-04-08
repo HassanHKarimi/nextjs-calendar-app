@@ -1,8 +1,8 @@
 {
-  "buildCommand": "npm run vercel-build",
+  "buildCommand": "npm run build",
   "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && node prisma/migrate-and-seed.js",
   "framework": "nextjs",
-  "outputDirectory": "out",
+  "outputDirectory": ".next",
   "functions": {
     "pages/api/**/*": {
       "memory": 1024,

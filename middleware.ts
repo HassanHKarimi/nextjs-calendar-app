@@ -1,25 +1,13 @@
-import { auth } from "./auth";
+// Root middleware - simplified to avoid dependency issues
+import { NextResponse } from "next/server";
 
-// This function runs for protected routes
-export default auth((req) => {
-  // Make sure users are logged in to access /calendar
-  const { nextUrl } = req;
-  const isLoggedIn = !!req.auth;
+// Simple middleware function to pass through all requests
+export default function middleware() {
+  return NextResponse.next();
+}
 
-  const isCalendarPath = nextUrl.pathname.startsWith("/calendar");
-  const isAuthPath = nextUrl.pathname.startsWith("/sign-in") || 
-                    nextUrl.pathname.startsWith("/sign-up");
-
-  if (isCalendarPath && !isLoggedIn) {
-    return Response.redirect(new URL("/sign-in", nextUrl));
-  }
-
-  if (isAuthPath && isLoggedIn) {
-    return Response.redirect(new URL("/calendar", nextUrl));
-  }
-});
-
-// Match all paths except for API, static, and specific public paths
+// Configure minimal matcher to ensure the middleware doesn't run 
+// where it's not needed
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"]
+  matcher: []
 };

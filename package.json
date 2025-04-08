@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "vercel-build": "node generate-prisma.js && next build --no-lint && next export",
+    "vercel-build": "next build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "node install-deps.js"
