@@ -1,8 +1,8 @@
 This file was added to trigger a new deployment on Vercel.
-Latest commit: f43bd15 (Fix router conflicts by removing App Router files during build)
+Latest commit: d553ce0 (Switch to direct shell commands in vercel.json instead of pre-build script)
 This file helps ensure Vercel deploys the latest version with:
-1. Fixed routing conflicts between App Router and Pages Router
-2. Removal of problematic non-page files in pages directory
-3. Ultra minimal approach to avoid syntax errors
-4. No complex code or special characters
-5. No file restoration needed after build
+1. Direct shell commands in vercel.json to remove problematic files
+2. Complete bypass of pre-build.js and post-build.js scripts
+3. Removal of all conflicting files in one step
+4. No special characters or escape sequences
+5. Simple and direct approach to avoid syntax errors
