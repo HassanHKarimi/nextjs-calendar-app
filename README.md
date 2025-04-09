@@ -53,6 +53,8 @@ To use with real authentication and a database:
 
 ### Vercel Deployment
 
+This project contains both App Router (`src/app`) and Pages Router (`pages`) implementations. For deployment, the pre-build script automatically resolves conflicts by prioritizing the Pages Router implementation, which fully supports the demo mode.
+
 **Option 1: Using Vercel CLI**
 1. Install the Vercel CLI: `npm install -g vercel`
 2. Login to Vercel: `vercel login`
@@ -64,6 +66,14 @@ To use with real authentication and a database:
 3. Configure the following environment variables:
    - `NEXT_PUBLIC_DEMO_MODE=true`
    - `NEXTAUTH_SECRET=your-secret-here`
+
+### Router Implementation
+
+This project is built with a dual routing system:
+- **Pages Router**: Used in production deployment and demo mode
+- **App Router**: Included as a potential future version
+
+The pre-build and post-build scripts handle conflict resolution during deployment.
 
 ## Environment Variables
 
