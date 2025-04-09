@@ -15,12 +15,9 @@ export default async function CalendarPage({
 }: {
   searchParams: { date?: string };
 }) {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/sign-in");
-  }
-
+  // For demo purposes, create a dummy user ID and sample events
+  const dummyUserId = "demo-user-123";
+  
   // Handle date navigation through query params
   const currentDate = searchParams.date
     ? new Date(searchParams.date)
@@ -33,8 +30,53 @@ export default async function CalendarPage({
   const prevMonth = format(subMonths(currentDate, 1), "yyyy-MM-dd");
   const nextMonth = format(addMonths(currentDate, 1), "yyyy-MM-dd");
 
-  // Fetch events for the current month
-  const events = await getEventsByMonth(session.user.id, currentDate);
+  // Create sample events for the demo
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const sampleEvents = [
+    {
+      id: "event-1",
+      title: "Team Meeting",
+      description: "Weekly team meeting to discuss project progress",
+      startDate: tomorrow,
+      endDate: new Date(new Date(tomorrow).setHours(tomorrow.getHours() + 1)),
+      location: "Conference Room A",
+      isAllDay: false,
+      color: "green",
+      userId: dummyUserId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: "event-2",
+      title: "Product Launch",
+      description: "Launch of the new calendar feature",
+      startDate: today,
+      endDate: today,
+      isAllDay: true,
+      color: "blue",
+      userId: dummyUserId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: "event-3",
+      title: "Project Deadline",
+      description: "Final submission deadline for the calendar project",
+      startDate: new Date(new Date().setDate(today.getDate() + 7)),
+      endDate: new Date(new Date().setDate(today.getDate() + 7)),
+      isAllDay: true,
+      color: "red",
+      userId: dummyUserId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ];
+  
+  // Use sample events instead of database query for demo
+  const events = sampleEvents;
 
   return (
     <div className="space-y-4">

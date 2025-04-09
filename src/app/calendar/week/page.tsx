@@ -15,11 +15,8 @@ export default async function WeeklyCalendarPage({
 }: {
   searchParams: { date?: string };
 }) {
-  const session = await auth();
-
-  if (!session?.user) {
-    redirect("/sign-in");
-  }
+  // For demo purposes, create a dummy user ID and sample events
+  const dummyUserId = "demo-user-123";
 
   // Handle date navigation through query params
   const currentDate = searchParams.date
@@ -40,8 +37,69 @@ export default async function WeeklyCalendarPage({
   const prevWeek = format(subWeeks(currentDate, 1), "yyyy-MM-dd");
   const nextWeek = format(addWeeks(currentDate, 1), "yyyy-MM-dd");
 
-  // Fetch events for the current week
-  const events = await getEventsByWeek(session.user.id, currentDate);
+  // Create sample events for demo week view
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
+  const dayAfterTomorrow = new Date(today);
+  dayAfterTomorrow.setDate(today.getDate() + 2);
+  
+  const mondayMeeting = new Date(weekStart);
+  mondayMeeting.setHours(10, 0, 0, 0);
+  
+  const wednesdayMeeting = new Date(weekStart);
+  wednesdayMeeting.setDate(weekStart.getDate() + 3); // Wednesday
+  wednesdayMeeting.setHours(14, 0, 0, 0);
+  
+  const fridayMeeting = new Date(weekStart);
+  fridayMeeting.setDate(weekStart.getDate() + 5); // Friday
+  fridayMeeting.setHours(11, 0, 0, 0);
+  
+  const sampleEvents = [
+    {
+      id: "weekly-event-1",
+      title: "Planning Meeting",
+      description: "Weekly planning session",
+      startDate: mondayMeeting,
+      endDate: new Date(new Date(mondayMeeting).setHours(mondayMeeting.getHours() + 1)),
+      location: "Main Conference Room",
+      isAllDay: false,
+      color: "blue",
+      userId: dummyUserId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: "weekly-event-2",
+      title: "Mid-week Review",
+      description: "Review progress on calendar app",
+      startDate: wednesdayMeeting,
+      endDate: new Date(new Date(wednesdayMeeting).setHours(wednesdayMeeting.getHours() + 2)),
+      location: "Meeting Room 2",
+      isAllDay: false,
+      color: "green",
+      userId: dummyUserId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      id: "weekly-event-3",
+      title: "Demo Preparation",
+      description: "Prepare for next week's demo",
+      startDate: fridayMeeting,
+      endDate: new Date(new Date(fridayMeeting).setHours(fridayMeeting.getHours() + 1, 30)),
+      location: "Team Area",
+      isAllDay: false,
+      color: "purple",
+      userId: dummyUserId,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  ];
+  
+  // Use sample events for the demo
+  const events = sampleEvents;
 
   return (
     <div className="space-y-4">

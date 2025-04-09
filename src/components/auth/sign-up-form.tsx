@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 export function SignUpForm() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   // Create form
   const form = useForm<z.infer<typeof RegisterSchema>>({
@@ -39,13 +41,47 @@ export function SignUpForm() {
     console.log("Starting registration process...");
 
     try {
-      // 1. Register the user
+      // For demo purposes, we'll bypass actual API call in case the API is not available
+      if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
+        console.log("Demo mode: bypassing registration API");
+        
+        // Show success toast
+        toast({
+          title: "Registration successful! (Demo Mode)",
+          description: "Redirecting to sign-in page...",
+        });
+        
+        // Manual redirect with simulated delay for better UX
+        setTimeout(() => {
+          try {
+            const redirectUrl = `/sign-in?email=${encodeURIComponent(values.email)}&registered=true`;
+            
+            if (router) {
+              router.push(redirectUrl);
+            } else if (typeof window !== 'undefined') {
+              window.location.href = redirectUrl;
+            }
+          } catch (navError) {
+            console.error("Navigation error:", navError);
+            if (typeof window !== 'undefined') {
+              window.location.href = `/sign-in?email=${encodeURIComponent(values.email)}&registered=true`;
+            }
+          }
+        }, 1000);
+        
+        return;
+      }
+      
+      // If not in demo mode, proceed with real API call
       const registerResponse = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          ...values,
+          role: "USER" // Explicitly add the role field
+        }),
       });
 
       console.log("Registration response status:", registerResponse.status);
@@ -64,15 +100,36 @@ export function SignUpForm() {
         description: "Redirecting to sign-in page...",
       });
 
-      // 2. Redirect to sign-in page with prefilled email
-      window.location.href = `/sign-in?email=${encodeURIComponent(values.email)}&registered=true`;
-      
+      // Redirect to sign-in page with prefilled email
+      try {
+        const redirectUrl = `/sign-in?email=${encodeURIComponent(values.email)}&registered=true`;
+        
+        if (router) {
+          router.push(redirectUrl);
+        } else if (typeof window !== 'undefined') {
+          window.location.href = redirectUrl;
+        }
+      } catch (navError) {
+        console.error("Navigation error:", navError);
+        if (typeof window !== 'undefined') {
+          window.location.href = `/sign-in?email=${encodeURIComponent(values.email)}&registered=true`;
+        }
+      }
     } catch (error: any) {
       console.error("Registration error:", error);
       
+      // Check for specific error types
+      let errorMessage = "Something went wrong. Please try again.";
+      
+      if (error.message && error.message.includes("Email already in use")) {
+        errorMessage = "This email is already registered. Please try signing in instead.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
-        title: "Error",
-        description: error.message || "Something went wrong. Please try again.",
+        title: "Registration Error",
+        description: errorMessage,
         variant: "destructive",
       });
       
@@ -145,7 +202,18 @@ export function SignUpForm() {
       <Button
         variant="outline"
         className="w-full"
-        onClick={() => signIn("google", { callbackUrl: "/calendar" })}
+        onClick={() => {
+          try {
+            signIn("google", { callbackUrl: "/calendar" });
+          } catch (error) {
+            console.error("Google sign-in error:", error);
+            toast({
+              title: "Google Sign-Up Unavailable",
+              description: "This feature is not available in demo mode.",
+              variant: "destructive",
+            });
+          }
+        }}
         disabled={isLoading}
       >
         Continue with Google

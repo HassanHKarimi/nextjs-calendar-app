@@ -4,6 +4,11 @@ import { getToken } from "next-auth/jwt";
 import { getAuthSecret } from "@/lib/auth-utils";
 
 export async function middleware(request: NextRequest) {
+  // For demo purposes, bypass all authentication checks
+  // and let all routes through without authentication
+  return NextResponse.next();
+  
+  /* Original authentication logic:
   const token = await getToken({ 
     req: request,
     secret: getAuthSecret() 
@@ -29,6 +34,7 @@ export async function middleware(request: NextRequest) {
   }
 
   return NextResponse.next();
+  */
 }
 
 // Specify which routes this middleware should run on

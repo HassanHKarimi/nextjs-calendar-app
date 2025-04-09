@@ -13,13 +13,37 @@ export default function Home() {
   useEffect(() => {
     setMounted(true);
     
-    // Check if user is logged in by looking for session cookie
-    const hasSession = document.cookie.includes('next-auth.session-token') || 
-                     document.cookie.includes('__Secure-next-auth.session-token');
+    const checkAuth = () => {
+      try {
+        // Check if user is logged in by looking for session cookie
+        const hasSession = document.cookie.includes('next-auth.session-token') || 
+                         document.cookie.includes('__Secure-next-auth.session-token');
+        
+        // Check for our custom session storage auth
+        let hasCustomSession = false;
+        if (typeof window !== 'undefined') {
+          try {
+            const storedAuth = sessionStorage.getItem('calendarAuth');
+            if (storedAuth) {
+              const auth = JSON.parse(storedAuth);
+              hasCustomSession = auth.isAuthenticated && auth.user;
+            }
+          } catch (err) {
+            console.error('Error checking custom session:', err);
+          }
+        }
+        
+        // Redirect to calendar if authenticated by either method
+        if (hasSession || hasCustomSession) {
+          console.log('User already authenticated, redirecting to calendar');
+          router.push("/calendar");
+        }
+      } catch (err) {
+        console.error('Auth check error:', err);
+      }
+    };
     
-    if (hasSession) {
-      router.push("/calendar");
-    }
+    checkAuth();
   }, [router]);
 
   // Don't render until mounted to avoid hydration issues

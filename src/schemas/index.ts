@@ -19,6 +19,7 @@ export const RegisterSchema = z.object({
   password: z.string().min(6, {
     message: "Password must be at least 6 characters",
   }),
+  role: z.enum(["USER", "ADMIN"]).default("USER").optional(),
 });
 
 export const EventSchema = z.object({

@@ -46,8 +46,9 @@ export const {
         session.user.id = token.sub;
       }
 
-      if (token.role && session.user) {
-        session.user.role = token.role as UserRole;
+      // Set a default role if it's missing
+      if (session.user) {
+        session.user.role = (token.role as UserRole) || "USER";
       }
 
       if (session.user) {

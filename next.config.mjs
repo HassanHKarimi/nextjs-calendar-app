@@ -38,10 +38,8 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  // Add experimental features to support NextAuth
-  experimental: {
-    serverComponentsExternalPackages: ["@auth/core"],
-  },
+  // External packages config to support NextAuth
+  serverExternalPackages: ["@auth/core"],
 
   // Add redirects for NextAuth routes
   async redirects() {
