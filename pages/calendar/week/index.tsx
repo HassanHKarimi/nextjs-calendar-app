@@ -13,7 +13,7 @@ import {
   isSameDay,
   eachDayOfInterval
 } from "date-fns";
-import { EventModal } from "../components/event-modal";
+import { EventModal } from "../../utils/event-modal";
 
 // Sample event data for week view
 const createSampleWeekEvents = (weekStart: Date) => {

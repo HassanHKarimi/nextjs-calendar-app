@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { format, addDays, subDays, parseISO } from "date-fns";
-import { EventModal } from "../components/event-modal";
+import { EventModal } from "../../utils/event-modal";
 
 // Sample event data for day view
 const createSampleDayEvents = (date: Date) => {
