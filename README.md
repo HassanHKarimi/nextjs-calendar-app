@@ -60,12 +60,31 @@ This project contains both App Router (`src/app`) and Pages Router (`pages`) imp
 2. Login to Vercel: `vercel login`
 3. Deploy to Vercel: `npm run deploy`
 
-**Option 2: GitHub Integration**
-1. Connect your GitHub repository to Vercel
-2. Set up automatic deployments from the `main-vercel` branch
-3. Configure the following environment variables:
-   - `NEXT_PUBLIC_DEMO_MODE=true`
-   - `NEXTAUTH_SECRET=your-secret-here`
+**Option 2: GitHub Integration (Recommended)**
+1. Push this repository to GitHub if you haven't already:
+   ```
+   git remote add origin <your-github-repo-url>
+   git push -u origin main-vercel
+   ```
+2. Create a new project on Vercel:
+   - Go to [Vercel](https://vercel.com/new)
+   - Select your GitHub repository
+   - Click "Import"
+3. Configure the deployment settings:
+   - Framework Preset: Next.js
+   - Build Command: `npm run vercel-build`
+   - Output Directory: `dist`
+   - Install Command: `npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && node prisma/migrate-and-seed.js`
+4. Add the following environment variables:
+   - `NEXT_PUBLIC_DEMO_MODE`: `true`
+   - `NEXTAUTH_SECRET`: A secure random string (generate one with `openssl rand -base64 32`)
+   - `NEXTAUTH_URL`: Your Vercel deployment URL (you can update this after the first deployment)
+5. Click "Deploy"
+
+After the first deployment, you can set up:
+- Custom domain (if desired)
+- Automatic deployments from the GitHub repository
+- Preview deployments for pull requests
 
 ### Router Implementation
 
@@ -83,3 +102,41 @@ The following environment variables can be set:
 - `NEXTAUTH_URL`: The URL of your application
 - `NEXTAUTH_SECRET`: Secret used by NextAuth for encryption
 - `DATABASE_URL`: Only needed if not using demo mode
+
+## Troubleshooting Deployment
+
+### Common Deployment Issues
+
+1. **"Found pages without a React Component as default export"**
+   - This happens when non-page files are present in the `pages` directory
+   - The pre-build script should handle this automatically by moving these files during build
+
+2. **Router Conflict Errors**
+   - This project contains both App Router and Pages Router implementations
+   - The pre-build script prioritizes the Pages Router for deployment
+   - If you're seeing routing conflicts, check that the pre-build script ran successfully
+
+3. **Authentication Errors**
+   - Ensure `NEXTAUTH_SECRET` is properly set in your environment variables
+   - For demo mode, verify that `NEXT_PUBLIC_DEMO_MODE` is set to "true"
+   - Check browser console for more specific error messages
+
+4. **"Module not found" Errors**
+   - This can happen if dependencies weren't installed correctly
+   - Try deploying with the "Force New Build" option on Vercel
+   - If using the CLI, run `vercel --prod --force`
+
+### Verifying Build Scripts
+
+The deployment uses special build scripts to handle the dual routing system:
+
+- `prebuild`: Runs before the build to move conflicting files
+- `vercel-build`: Special build command for Vercel
+- `postbuild`: Runs after the build to restore moved files
+
+If you suspect build script issues, you can run these commands locally:
+```bash
+node pre-build.js  # Should move conflicting files to temporary locations
+next build         # Should build successfully without errors
+node post-build.js # Should restore moved files
+```
