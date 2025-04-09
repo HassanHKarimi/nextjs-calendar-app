@@ -8,6 +8,7 @@ import { getAccountByUserId } from "@/data/account";
 // Define the UserRole type if not automatically imported from Prisma
 type UserRole = "USER" | "ADMIN";
 
+// Note: This version is compatible with beta.3
 export const {
   handlers: { GET, POST },
   auth,
