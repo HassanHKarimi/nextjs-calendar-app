@@ -4,6 +4,15 @@ const next = require('next');
 const path = require('path');
 const fs = require('fs');
 
+// Check if running on Vercel
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
+
+// If running on Vercel, we don't need to run this custom server
+if (isVercel) {
+  console.log('Running on Vercel, skipping custom server');
+  process.exit(0);
+}
+
 // Load environment variables from .env.local file if it exists
 const envPath = path.resolve(process.cwd(), '.env.local');
 if (fs.existsSync(envPath)) {
@@ -14,7 +23,7 @@ if (fs.existsSync(envPath)) {
 // Set development mode
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = 'localhost';
-const port = process.env.PORT || 3000; // Use port 3000 for NextAuth configuration
+const port = process.env.PORT || 3000;
 
 // Initialize Next.js
 const app = next({ dev, hostname, port });
@@ -27,7 +36,7 @@ if (!process.env.NEXTAUTH_URL) {
 }
 
 // Force NEXTAUTH_URL to use port 3000
-process.env.NEXTAUTH_URL = `http://${hostname}:3000`;
+process.env.NEXTAUTH_URL = `http://${hostname}:${port}`;
 console.log(`Ensuring NEXTAUTH_URL is set to ${process.env.NEXTAUTH_URL}`);
 
 if (!process.env.NEXTAUTH_SECRET) {

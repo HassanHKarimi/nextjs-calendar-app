@@ -1,40 +1,75 @@
 # Next.js Calendar App
 
-A simple calendar application built with Next.js, TypeScript, and PostgreSQL via Neon.
+A simple calendar application built with Next.js, TypeScript, and Tailwind CSS. The application includes day, week, and month views for calendar events.
 
 ## Features
 
-- User authentication
-- Create, read, update, and delete calendar events
-- Pre-populated calendar events
-- Responsive design
+- **Multiple Calendar Views**: Day, Week, and Month views
+- **Demo Authentication**: Simulated login without requiring a database
+- **Responsive Design**: Works on desktop, tablet, and mobile
+- **Event Display**: View event details by clicking on events
+- **Modern UI**: Built with Tailwind CSS
+- **Database Ready**: Optional connection to PostgreSQL via Neon
 
 ## Tech Stack
 
-- Next.js 14 (App Router)
+- Next.js 15 (with support for both App Router and Pages Router)
 - TypeScript
 - Tailwind CSS
-- NextAuth.js for authentication
-- Prisma ORM
-- PostgreSQL (Neon)
-- Vercel for deployment
+- NextAuth.js for authentication structure
+- Prisma ORM (optional for database connection)
+- Demo mode for authentication without a database
 
 ## Getting Started
 
 1. Clone the repository
-2. Copy `.env.example` to `.env.local` and fill in the required environment variables
+2. Copy `.env.local.example` to `.env.local` and update if needed
 3. Install dependencies with `npm install`
 4. Run the development server with `npm run dev`
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Database Setup
+## Demo Mode
 
-The application uses Neon, a serverless PostgreSQL database. You'll need to:
+This branch operates in "demo mode" by default, which means:
+- No database connection is required
+- Authentication is simulated using sessionStorage
+- Calendar events are created on the client side
 
-1. Create a Neon account
-2. Create a new project and database
-3. Get your connection string and add it to your `.env.local` file
+To use with real authentication and a database:
+1. Set up a PostgreSQL database (e.g., with Neon)
+2. Update the connection string in `.env.local`
+3. Set `NEXT_PUBLIC_DEMO_MODE=false` in your environment
 
-## Deployment
+## Deployment to GitHub and Vercel
 
-The app is configured for easy deployment on Vercel. Just connect your repository and set up the environment variables.
+### GitHub Setup
+
+1. Create a new repository on GitHub
+2. Push your local repository to GitHub:
+   ```
+   git remote add origin <github-repository-url>
+   git push -u origin main-vercel
+   ```
+
+### Vercel Deployment
+
+**Option 1: Using Vercel CLI**
+1. Install the Vercel CLI: `npm install -g vercel`
+2. Login to Vercel: `vercel login`
+3. Deploy to Vercel: `npm run deploy`
+
+**Option 2: GitHub Integration**
+1. Connect your GitHub repository to Vercel
+2. Set up automatic deployments from the `main-vercel` branch
+3. Configure the following environment variables:
+   - `NEXT_PUBLIC_DEMO_MODE=true`
+   - `NEXTAUTH_SECRET=your-secret-here`
+
+## Environment Variables
+
+The following environment variables can be set:
+
+- `NEXT_PUBLIC_DEMO_MODE`: Set to "true" to enable demo authentication mode
+- `NEXTAUTH_URL`: The URL of your application
+- `NEXTAUTH_SECRET`: Secret used by NextAuth for encryption
+- `DATABASE_URL`: Only needed if not using demo mode

@@ -8,8 +8,19 @@ const nextConfig = {
     if (isServer) {
       config.externals = [...config.externals, 'pg-native'];
     }
+    // Fix for 404 errors in production
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+      };
+    }
     return config;
   },
+  
+  // Set the output directory for Vercel
+  distDir: 'dist',
 
   // Disable TypeScript checking during build for Vercel deployment
   typescript: {
@@ -25,6 +36,23 @@ const nextConfig = {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
+  },
+  
+  // External packages config to support NextAuth
+  serverExternalPackages: ["@auth/core"],
+  
+  // Add rewrites for NextAuth and Calendar routes
+  async rewrites() {
+    return [
+      {
+        source: "/api/auth/:path*",
+        destination: "/api/auth/:path*",
+      },
+      {
+        source: "/calendar/:path*",
+        destination: "/calendar/:path*",
+      }
+    ];
   },
 };
 
