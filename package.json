@@ -8,7 +8,7 @@
     "build": "next build",
     "prebuild": "node pre-build.js",
     "postbuild": "node post-build.js",
-    "vercel-build": "node pre-build.js && next build --no-lint",
+    "vercel-build": "node pre-build.js && next build --no-lint && node post-build.js",
     "start": "node server.js",
     "start-next": "next start",
     "lint": "next lint",
