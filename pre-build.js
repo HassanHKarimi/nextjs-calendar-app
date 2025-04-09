@@ -33,6 +33,39 @@ const conflictingPaths = [
   'app/sign-up/page.tsx',
 ];
 
+// Now let's handle non-page files in the pages directory
+// These are files that don't export a default React component
+console.log('Handling non-page files in the pages directory...');
+
+// Files to move from pages directory to proper locations
+const nonPageFiles = [
+  { 
+    source: path.join(__dirname, 'pages', 'auth', 'auth-context.js'),
+    destination: path.join(__dirname, '.build-tmp', 'auth-context.js')
+  },
+  { 
+    source: path.join(__dirname, 'pages', 'calendar', 'components', 'event-modal.tsx'),
+    destination: path.join(__dirname, '.build-tmp', 'event-modal.tsx')
+  }
+];
+
+// Create temp directory for non-page files
+const tmpDir = path.join(__dirname, '.build-tmp');
+if (!fs.existsSync(tmpDir)) {
+  fs.mkdirSync(tmpDir, { recursive: true });
+  console.log(`Created temporary directory: ${tmpDir}`);
+}
+
+// Move non-page files
+nonPageFiles.forEach(({ source, destination }) => {
+  if (fs.existsSync(source)) {
+    fs.renameSync(source, destination);
+    console.log(`Moved non-page file: ${source} -> ${destination}`);
+  } else {
+    console.log(`Non-page file not found, skipping: ${source}`);
+  }
+});
+
 // Move each App Router file to backup
 conflictingPaths.forEach(filePath => {
   const fullPath = path.join(__dirname, 'src', filePath);
@@ -62,47 +95,92 @@ const restoreScript = `
 const fs = require('fs');
 const path = require('path');
 
-console.log('Restoring App Router files from backup...');
+console.log('Restoring files after build...');
 
+// 1. Restore App Router files
 const backupDir = path.join(__dirname, '.app-router-backup');
-if (!fs.existsSync(backupDir)) {
-  console.log('Backup directory not found, nothing to restore.');
-  process.exit(0);
+if (fs.existsSync(backupDir)) {
+  console.log('Restoring App Router files from backup...');
+  
+  // Walk through the backup directory and restore all files
+  function restoreFiles(dir, baseDir = '') {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    
+    for (const entry of entries) {
+      const sourcePath = path.join(dir, entry.name);
+      const relativePath = path.join(baseDir, entry.name);
+      const targetPath = path.join(__dirname, 'src', relativePath);
+      
+      if (entry.isDirectory()) {
+        if (!fs.existsSync(targetPath)) {
+          fs.mkdirSync(targetPath, { recursive: true });
+        }
+        restoreFiles(sourcePath, relativePath);
+      } else {
+        // Create the target directory if it doesn't exist
+        const targetDir = path.dirname(targetPath);
+        if (!fs.existsSync(targetDir)) {
+          fs.mkdirSync(targetDir, { recursive: true });
+        }
+        
+        // Move the file back
+        fs.renameSync(sourcePath, targetPath);
+        console.log(\`Restored: \${sourcePath} -> \${targetPath}\`);
+      }
+    }
+  }
+
+  restoreFiles(backupDir);
+
+  // Remove the backup directory
+  fs.rmSync(backupDir, { recursive: true, force: true });
+  console.log('App Router files restored successfully.');
+} else {
+  console.log('App Router backup directory not found, skipping restoration.');
 }
 
-// Walk through the backup directory and restore all files
-function restoreFiles(dir, baseDir = '') {
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
+// 2. Restore non-page files
+const tmpDir = path.join(__dirname, '.build-tmp');
+if (fs.existsSync(tmpDir)) {
+  console.log('Restoring non-page files...');
   
-  for (const entry of entries) {
-    const sourcePath = path.join(dir, entry.name);
-    const relativePath = path.join(baseDir, entry.name);
-    const targetPath = path.join(__dirname, 'src', relativePath);
-    
-    if (entry.isDirectory()) {
-      if (!fs.existsSync(targetPath)) {
-        fs.mkdirSync(targetPath, { recursive: true });
-      }
-      restoreFiles(sourcePath, relativePath);
-    } else {
+  // Files to restore to their original locations
+  const nonPageFiles = [
+    { 
+      source: path.join(tmpDir, 'auth-context.js'),
+      destination: path.join(__dirname, 'pages', 'auth', 'auth-context.js') 
+    },
+    { 
+      source: path.join(tmpDir, 'event-modal.tsx'),
+      destination: path.join(__dirname, 'pages', 'calendar', 'components', 'event-modal.tsx')
+    }
+  ];
+  
+  // Restore each non-page file
+  nonPageFiles.forEach(({ source, destination }) => {
+    if (fs.existsSync(source)) {
       // Create the target directory if it doesn't exist
-      const targetDir = path.dirname(targetPath);
+      const targetDir = path.dirname(destination);
       if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true });
       }
       
       // Move the file back
-      fs.renameSync(sourcePath, targetPath);
-      console.log(\`Restored: \${sourcePath} -> \${targetPath}\`);
+      fs.renameSync(source, destination);
+      console.log(\`Restored non-page file: \${source} -> \${destination}\`);
+    } else {
+      console.log(\`Non-page file not found, skipping restoration: \${source}\`);
     }
-  }
+  });
+  
+  // Remove the temporary directory
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+  console.log('Non-page files restored successfully.');
+} else {
+  console.log('Temporary directory not found, skipping non-page file restoration.');
 }
 
-restoreFiles(backupDir);
-
-// Remove the backup directory
-fs.rmSync(backupDir, { recursive: true, force: true });
-console.log('App Router files restored successfully.');
+console.log('All files have been restored successfully.');
 `;
 
 fs.writeFileSync(path.join(__dirname, 'post-build.js'), restoreScript);

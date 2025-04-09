@@ -3,6 +3,6 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/calendar": "pages/calendar.js",
-  "/calendar/day": "pages/calendar/day.js",
-  "/calendar/new-event": "pages/calendar/new-event.js"
+  "/calendar/new-event": "pages/calendar/new-event.js",
+  "/calendar/day": "pages/calendar/day.js"
 }
