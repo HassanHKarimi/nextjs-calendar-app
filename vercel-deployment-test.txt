@@ -1,8 +1,8 @@
 This file was added to trigger a new deployment on Vercel.
-Latest commit: d553ce0 (Switch to direct shell commands in vercel.json instead of pre-build script)
+Latest commit: c578328 (Create stub event-modal component for import resolution)
 This file helps ensure Vercel deploys the latest version with:
-1. Direct shell commands in vercel.json to remove problematic files
-2. Complete bypass of pre-build.js and post-build.js scripts
-3. Removal of all conflicting files in one step
-4. No special characters or escape sequences
-5. Simple and direct approach to avoid syntax errors
+1. Direct shell commands in vercel.json for build preparation
+2. Creation of stub event-modal component to resolve imports
+3. Removal of all conflicting App Router files
+4. Removal of problematic auth directory
+5. Completely script-less approach for maximum compatibility
