@@ -1,8 +1,8 @@
 This file was added to trigger a new deployment on Vercel.
-Latest commit: 4d2fb86 (Fix template literals in RegExp for Node.js compatibility)
+Latest commit: cbfe70e (Replace with minimal pre-build script without special characters)
 This file helps ensure Vercel deploys the latest version with:
-1. Non-page file handling fixes
-2. Improved import path management for shared components
-3. Fixed RegExp syntax for Node.js compatibility
-4. Complete cleanup of temporary files after build
-5. No more "pages without valid component" errors
+1. Completely simplified pre-build and post-build scripts
+2. No special characters or escape sequences
+3. Direct file copying instead of complex operations
+4. Simpler import path management
+5. No complex regex patterns - just basic string operations
