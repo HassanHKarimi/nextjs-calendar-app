@@ -1,3 +1,6 @@
 This file was added to trigger a new deployment on Vercel.
-Latest commit: 537d9db (Update Vercel configuration for GitHub integration)
-This file helps ensure Vercel deploys the latest version with our non-page file handling fixes.
+Latest commit: 4d4b06f (Fix module imports by creating stub modules for different import paths)
+This file helps ensure Vercel deploys the latest version with:
+1. Non-page file handling fixes
+2. Module import stub creation
+3. Complete cleanup of temporary files after build
