@@ -106,6 +106,46 @@ problemDirectories.forEach(dir => {
   handleNonPageDirectory(dir.path, dir.backupPrefix);
 });
 
+// Special handling: Copy the event-modal.tsx to a temp location as module for imports to work
+console.log('Creating redirecting modules for imports...');
+
+// Helper function to create redirecting modules for imports
+function createRedirectingModule(importPath, contentPath) {
+  try {
+    // Create all necessary directories
+    const importDir = path.dirname(importPath);
+    if (!fs.existsSync(importDir)) {
+      fs.mkdirSync(importDir, { recursive: true });
+      console.log(`Created directory: ${importDir}`);
+    }
+    
+    // Read the original file content from the backup dir
+    const originalContent = fs.readFileSync(contentPath, 'utf8');
+    
+    // Write the content to the import path
+    fs.writeFileSync(importPath, originalContent);
+    console.log(`Created redirecting module: ${importPath}`);
+  } catch (error) {
+    console.error(`Error creating redirecting module for ${importPath}: ${error.message}`);
+  }
+}
+
+// Create a copy of event-modal.tsx for imports to work
+const eventModalSource = path.join(tmpDir, 'calendar-components/event-modal.tsx');
+const eventModalTargets = [
+  path.join(__dirname, 'pages/calendar/components/event-modal.tsx')
+];
+
+// First verify the source file exists
+if (fs.existsSync(eventModalSource)) {
+  // Create the component directory structure for imports
+  eventModalTargets.forEach(target => {
+    createRedirectingModule(target, eventModalSource);
+  });
+} else {
+  console.error(`ERROR: Source file for event-modal not found at ${eventModalSource}`);
+}
+
 // Move each App Router file to backup
 conflictingPaths.forEach(filePath => {
   const fullPath = path.join(__dirname, 'src', filePath);
@@ -218,6 +258,31 @@ if (fs.existsSync(tmpDir)) {
       console.error(\`Error restoring directory \${backupDirPath}: \${error.message}\`);
     }
   }
+  
+  // Clean up any temporary modules we created for imports
+  console.log('Cleaning up temporary modules...');
+  const tempModules = [
+    path.join(__dirname, 'pages/calendar/components/event-modal.tsx')
+  ];
+  
+  tempModules.forEach(modulePath => {
+    try {
+      if (fs.existsSync(modulePath)) {
+        fs.unlinkSync(modulePath);
+        console.log(\`Removed temporary module: \${modulePath}\`);
+        
+        // Check if the directory is now empty
+        const moduleDir = path.dirname(modulePath);
+        const remainingFiles = fs.readdirSync(moduleDir);
+        if (remainingFiles.length === 0) {
+          fs.rmdirSync(moduleDir);
+          console.log(\`Removed empty directory: \${moduleDir}\`);
+        }
+      }
+    } catch (error) {
+      console.error(\`Error cleaning up temporary module \${modulePath}: \${error.message}\`);
+    }
+  });
   
   // Directories to restore
   const directoriesToRestore = [
