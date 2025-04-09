@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run vercel-build",
+  "buildCommand": "rm -rf pages/auth pages/calendar/components src/app/api src/app/calendar src/app/page.tsx src/app/sign-in src/app/sign-up && next build --no-lint",
   "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && node prisma/migrate-and-seed.js",
   "framework": "nextjs",
   "outputDirectory": "dist",
