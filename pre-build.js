@@ -1,431 +1,268 @@
 /**
- * Pre-build script to handle App Router vs Pages Router conflicts
- * 
- * This script decides which router implementation to use by temporarily
- * moving the conflicting files to a backup directory.
- * 
- * For this deployment, we'll prioritize the Pages Router implementation
- * since it's fully working with the demo auth system.
+ * Minimal pre-build script to handle App Router vs Pages Router conflicts
  */
 
 const fs = require('fs');
 const path = require('path');
 
-console.log('Running pre-build script to resolve router conflicts...');
+console.log('Running minimalist pre-build script...');
 
-// Create a temporary directory for App Router files
-const backupDir = path.join(__dirname, '.app-router-backup');
-if (\!fs.existsSync(backupDir)) {
-  fs.mkdirSync(backupDir, { recursive: true });
-  console.log(`Created backup directory: ${backupDir}`);
+// Move problematic files from pages to a temporary location
+console.log('Moving non-page files...');
+
+// Get reference to auth-context.js
+const authContextPath = path.join(__dirname, 'pages/auth/auth-context.js');
+const authContextBackupPath = path.join(__dirname, '.build-tmp-auth-context.js');
+
+// Get reference to event-modal.tsx
+const eventModalPath = path.join(__dirname, 'pages/calendar/components/event-modal.tsx');
+const eventModalBackupPath = path.join(__dirname, '.build-tmp-event-modal.tsx');
+
+// Create a shared components directory
+const sharedDir = path.join(__dirname, 'shared-components');
+if (\!fs.existsSync(sharedDir)) {
+  fs.mkdirSync(sharedDir);
+  console.log('Created shared components directory');
 }
 
-// List of conflicting paths to temporarily move (App Router files)
-const conflictingPaths = [
-  'app/api/auth/[...nextauth]/route.ts',
-  'app/api/register/route.ts',
-  'app/calendar/day/page.tsx',
-  'app/calendar/new-event/page.tsx',
-  'app/calendar/page.tsx',
-  'app/calendar/week/page.tsx',
-  'app/page.tsx',
-  'app/sign-in/page.tsx',
-  'app/sign-up/page.tsx',
-];
-
-// Now let's handle non-page files in the pages directory
-// These are files that don't export a default React component
-console.log('Handling non-page files in the pages directory...');
-
-// Create temp directory for non-page files
-const tmpDir = path.join(__dirname, '.build-tmp');
-if (\!fs.existsSync(tmpDir)) {
-  fs.mkdirSync(tmpDir, { recursive: true });
-  console.log(`Created temporary directory: ${tmpDir}`);
+// Move auth-context.js if it exists
+if (fs.existsSync(authContextPath)) {
+  console.log('Moving auth-context.js to temporary location');
+  
+  // Read the file content
+  const content = fs.readFileSync(authContextPath, 'utf8');
+  
+  // Write it to the backup location
+  fs.writeFileSync(authContextBackupPath, content);
+  
+  // Remove the original directory
+  fs.unlinkSync(authContextPath);
+  fs.rmdirSync(path.dirname(authContextPath));
+  
+  console.log('Auth context moved successfully');
 }
 
-// Helper function to handle all types of files in problematic directories
-function handleNonPageDirectory(dirPath, backupDirPrefix) {
-  if (\!fs.existsSync(dirPath)) {
-    console.log(`Directory not found, skipping: ${dirPath}`);
-    return;
-  }
+// Move event-modal.tsx if it exists
+if (fs.existsSync(eventModalPath)) {
+  console.log('Moving event-modal.tsx to temporary location');
   
-  console.log(`Handling files in directory: ${dirPath}`);
+  // Read the file content
+  const content = fs.readFileSync(eventModalPath, 'utf8');
   
-  try {
-    const dirBackupPath = path.join(tmpDir, backupDirPrefix);
-    if (\!fs.existsSync(dirBackupPath)) {
-      fs.mkdirSync(dirBackupPath, { recursive: true });
-    }
-    
-    // Get all files in the directory
-    const files = fs.readdirSync(dirPath);
-    
-    // Process each file
-    files.forEach(file => {
-      const filePath = path.join(dirPath, file);
-      const fileStats = fs.statSync(filePath);
-      
-      // If it's a directory, recursively handle it
-      if (fileStats.isDirectory()) {
-        handleNonPageDirectory(
-          filePath, 
-          path.join(backupDirPrefix, file)
-        );
-        return;
-      }
-      
-      // It's a file, move it to backup
-      const destPath = path.join(dirBackupPath, file);
-      console.log(`Moving file: ${filePath} -> ${destPath}`);
-      fs.renameSync(filePath, destPath);
-    });
-    
-    // Remove the now-empty directory
-    fs.rmdirSync(dirPath);
-    console.log(`Removed directory: ${dirPath}`);
-  } catch (error) {
-    console.error(`Error handling directory ${dirPath}: ${error.message}`);
-  }
-}
-
-// Handle non-page directories completely
-const problemDirectories = [
-  {
-    path: path.join(__dirname, 'pages/auth'),
-    backupPrefix: 'auth'
-  },
-  {
-    path: path.join(__dirname, 'pages/calendar/components'),
-    backupPrefix: 'calendar-components'
-  }
-];
-
-problemDirectories.forEach(dir => {
-  handleNonPageDirectory(dir.path, dir.backupPrefix);
-});
-
-// Special handling: Move the event-modal.tsx to a safe location outside pages
-// and modify the import statements in the calendar files
-console.log('Creating shared components and updating imports...');
-
-// Helper function to create a shared component directory
-function createSharedComponent(contentPath) {
-  try {
-    // Create the shared directory outside of pages
-    const sharedDir = path.join(__dirname, 'shared-components');
-    if (\!fs.existsSync(sharedDir)) {
-      fs.mkdirSync(sharedDir, { recursive: true });
-      console.log(`Created shared components directory: ${sharedDir}`);
-    }
-    
-    // Read the original content
-    const originalContent = fs.readFileSync(contentPath, 'utf8');
-    
-    // Write the component to the shared location
-    const sharedComponentPath = path.join(sharedDir, 'event-modal.tsx');
-    fs.writeFileSync(sharedComponentPath, originalContent);
-    console.log(`Created shared component: ${sharedComponentPath}`);
-    
-    return sharedComponentPath;
-  } catch (error) {
-    console.error(`Error creating shared component: ${error.message}`);
-    return null;
-  }
-}
-
-// Function to update import paths in calendar files
-function updateImportPaths(filePath, oldImportPath, newImportPath) {
-  try {
-    if (fs.existsSync(filePath)) {
-      let content = fs.readFileSync(filePath, 'utf8');
-      
-      // Escape special regex characters in the path
-      const escapedOldImportPath = oldImportPath.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-      
-      // Create the import regex string - handle both single and double quotes
-      const importRegexStr = 'import\\s+\\{\\s*EventModal\\s*\\}\\s+from\\s+([\'"])' + 
-                            escapedOldImportPath + 
-                            '([\'"])';
-      
-      // Create the regex object
-      const importRegex = new RegExp(importRegexStr, 'g');
-      
-      // Build the replacement string
-      const replacementStr = 'import { EventModal } from $1' + newImportPath + '$2';
-      
-      // Replace the import path
-      content = content.replace(importRegex, replacementStr);
-      
-      // Write the modified content back
-      fs.writeFileSync(filePath, content);
-      console.log(`Updated import in: ${filePath}`);
-      return true;
-    } else {
-      console.log(`File not found, skipping: ${filePath}`);
-      return false;
-    }
-  } catch (error) {
-    console.error(`Error updating import in ${filePath}: ${error.message}`);
-    return false;
-  }
-}
-
-// Handle the event-modal component
-const eventModalSource = path.join(tmpDir, 'calendar-components/event-modal.tsx');
-
-// First verify the source file exists
-if (fs.existsSync(eventModalSource)) {
-  // Create the shared component
-  const sharedComponentPath = createSharedComponent(eventModalSource);
+  // Write it to the backup location and to shared components
+  fs.writeFileSync(eventModalBackupPath, content);
+  fs.writeFileSync(path.join(sharedDir, 'event-modal.tsx'), content);
   
-  if (sharedComponentPath) {
-    // Update import paths in all calendar files
-    const calendarFiles = [
-      {
-        path: path.join(__dirname, 'pages/calendar/index.tsx'),
-        oldImport: './components/event-modal',
-        newImport: '../shared-components/event-modal'
-      },
-      {
-        path: path.join(__dirname, 'pages/calendar/day/index.tsx'),
-        oldImport: '../components/event-modal',
-        newImport: '../../shared-components/event-modal'
-      },
-      {
-        path: path.join(__dirname, 'pages/calendar/week/index.tsx'),
-        oldImport: '../components/event-modal',
-        newImport: '../../shared-components/event-modal'
-      }
-    ];
-    
-    // Update each file's imports
-    calendarFiles.forEach(file => {
-      updateImportPaths(file.path, file.oldImport, file.newImport);
-    });
-    
-    console.log('Successfully updated all import paths to use shared component');
-  }
-} else {
-  console.error(`ERROR: Source file for event-modal not found at ${eventModalSource}`);
-}
-
-// Move each App Router file to backup
-conflictingPaths.forEach(filePath => {
-  const fullPath = path.join(__dirname, 'src', filePath);
+  // Remove the original directory
+  fs.unlinkSync(eventModalPath);
+  fs.rmdirSync(path.dirname(eventModalPath));
+  fs.rmdirSync(path.dirname(path.dirname(eventModalPath)));
   
-  if (fs.existsSync(fullPath)) {
-    // Create the target directory structure
-    const fileName = path.basename(filePath);
-    const dirPath = path.dirname(filePath);
-    const targetDir = path.join(backupDir, dirPath);
-    
-    fs.mkdirSync(targetDir, { recursive: true });
-    
-    // Move the file
-    const targetPath = path.join(backupDir, dirPath, fileName);
-    fs.renameSync(fullPath, targetPath);
-    
-    console.log(`Moved: ${fullPath} -> ${targetPath}`);
-  } else {
-    console.log(`File not found, skipping: ${fullPath}`);
-  }
-});
-
-// Create a restore script that can be run after build
-const restoreScript = `const fs = require('fs');
-const path = require('path');
-
-console.log('Restoring files after build...');
-
-// 1. Restore App Router files
-const backupDir = path.join(__dirname, '.app-router-backup');
-if (fs.existsSync(backupDir)) {
-  console.log('Restoring App Router files from backup...');
+  console.log('Event modal moved successfully');
   
-  // Walk through the backup directory and restore all files
-  function restoreFiles(dir, baseDir = '') {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-    
-    for (const entry of entries) {
-      const sourcePath = path.join(dir, entry.name);
-      const relativePath = path.join(baseDir, entry.name);
-      const targetPath = path.join(__dirname, 'src', relativePath);
-      
-      if (entry.isDirectory()) {
-        if (\!fs.existsSync(targetPath)) {
-          fs.mkdirSync(targetPath, { recursive: true });
-        }
-        restoreFiles(sourcePath, relativePath);
-      } else {
-        // Create the target directory if it doesn't exist
-        const targetDir = path.dirname(targetPath);
-        if (\!fs.existsSync(targetDir)) {
-          fs.mkdirSync(targetDir, { recursive: true });
-        }
-        
-        // Move the file back
-        fs.renameSync(sourcePath, targetPath);
-        console.log(\`Restored: \${sourcePath} -> \${targetPath}\`);
-      }
-    }
-  }
-
-  restoreFiles(backupDir);
-
-  // Remove the backup directory
-  fs.rmSync(backupDir, { recursive: true, force: true });
-  console.log('App Router files restored successfully.');
-} else {
-  console.log('App Router backup directory not found, skipping restoration.');
-}
-
-// 2. Restore non-page files
-const tmpDir = path.join(__dirname, '.build-tmp');
-if (fs.existsSync(tmpDir)) {
-  console.log('Restoring non-page files...');
-  
-  // Helper function to restore directory structure
-  function restoreDirectoryFromBackup(backupDirPath, originalPathPrefix) {
-    if (\!fs.existsSync(backupDirPath)) {
-      console.log(\`Backup directory not found, skipping: \${backupDirPath}\`);
-      return;
-    }
-    
-    console.log(\`Restoring directory: \${backupDirPath} -> \${originalPathPrefix}\`);
-    
-    try {
-      // Create the original directory if it doesn't exist
-      if (\!fs.existsSync(originalPathPrefix)) {
-        fs.mkdirSync(originalPathPrefix, { recursive: true });
-        console.log(\`Created original directory: \${originalPathPrefix}\`);
-      }
-      
-      // Get all files and directories in the backup
-      const entries = fs.readdirSync(backupDirPath, { withFileTypes: true });
-      
-      // Process each entry
-      entries.forEach(entry => {
-        const sourcePath = path.join(backupDirPath, entry.name);
-        const destPath = path.join(originalPathPrefix, entry.name);
-        
-        if (entry.isDirectory()) {
-          // Recursively restore subdirectory
-          restoreDirectoryFromBackup(sourcePath, destPath);
-        } else {
-          // Restore file
-          console.log(\`Restoring file: \${sourcePath} -> \${destPath}\`);
-          fs.renameSync(sourcePath, destPath);
-        }
-      });
-    } catch (error) {
-      console.error(\`Error restoring directory \${backupDirPath}: \${error.message}\`);
-    }
-  }
-  
-  // Restore original import paths
-  console.log('Restoring original import paths...');
-  
-  function restoreImportPaths(filePath, currentImportPath, originalImportPath) {
-    try {
-      if (fs.existsSync(filePath)) {
-        let content = fs.readFileSync(filePath, 'utf8');
-        
-        // Escape special regex characters in the path
-        const escapedCurrentImportPath = currentImportPath.replace(/[-\\/\\^$*+?.()|[\\]{}]/g, '\\\\$&');
-        
-        // Create the import regex string - handle both single and double quotes
-        const importRegexStr = 'import\\\\s+\\\\{\\\\s*EventModal\\\\s*\\\\}\\\\s+from\\\\s+([\\'\\""])' + 
-                             escapedCurrentImportPath + 
-                             '([\\'\\""])';
-        
-        // Create the regex object
-        const importRegex = new RegExp(importRegexStr, 'g');
-        
-        // Build the replacement string
-        const replacementStr = 'import { EventModal } from $1' + originalImportPath + '$2';
-        
-        // Replace the import path
-        content = content.replace(importRegex, replacementStr);
-        
-        // Write the modified content back
-        fs.writeFileSync(filePath, content);
-        console.log(\`Restored import in: \${filePath}\`);
-        return true;
-      } else {
-        console.log(\`File not found, skipping import restoration: \${filePath}\`);
-        return false;
-      }
-    } catch (error) {
-      console.error(\`Error restoring import in \${filePath}: \${error.message}\`);
-      return false;
-    }
-  }
-  
-  // Files to restore imports in
+  // Update import paths in calendar files
   const calendarFiles = [
     {
       path: path.join(__dirname, 'pages/calendar/index.tsx'),
-      currentImport: '../shared-components/event-modal',
-      originalImport: './components/event-modal'
+      oldImport: './components/event-modal',
+      newImport: '../shared-components/event-modal'
     },
     {
       path: path.join(__dirname, 'pages/calendar/day/index.tsx'),
-      currentImport: '../../shared-components/event-modal',
-      originalImport: '../components/event-modal'
+      oldImport: '../components/event-modal',
+      newImport: '../../shared-components/event-modal'
     },
     {
       path: path.join(__dirname, 'pages/calendar/week/index.tsx'),
-      currentImport: '../../shared-components/event-modal',
-      originalImport: '../components/event-modal'
+      oldImport: '../components/event-modal',
+      newImport: '../../shared-components/event-modal'
     }
   ];
   
-  // Restore imports in each file
+  // Update each file's imports
   calendarFiles.forEach(file => {
-    restoreImportPaths(file.path, file.currentImport, file.originalImport);
-  });
-  
-  // Remove the shared directory
-  const sharedDir = path.join(__dirname, 'shared-components');
-  if (fs.existsSync(sharedDir)) {
-    try {
-      fs.rmSync(sharedDir, { recursive: true, force: true });
-      console.log(\`Removed shared components directory: \${sharedDir}\`);
-    } catch (error) {
-      console.error(\`Error removing shared directory \${sharedDir}: \${error.message}\`);
+    if (fs.existsSync(file.path)) {
+      console.log('Updating import in: ' + file.path);
+      
+      let content = fs.readFileSync(file.path, 'utf8');
+      content = content.replace(
+        new RegExp('import { EventModal } from [\'"]' + file.oldImport + '[\'"]', 'g'),
+        'import { EventModal } from "' + file.newImport + '"'
+      );
+      
+      fs.writeFileSync(file.path, content);
     }
-  }
-  
-  // Directories to restore
-  const directoriesToRestore = [
-    {
-      backupPath: path.join(tmpDir, 'auth'),
-      originalPath: path.join(__dirname, 'pages/auth')
-    },
-    {
-      backupPath: path.join(tmpDir, 'calendar-components'),
-      originalPath: path.join(__dirname, 'pages/calendar/components')
-    }
-  ];
-  
-  // Restore each directory
-  directoriesToRestore.forEach(({ backupPath, originalPath }) => {
-    restoreDirectoryFromBackup(backupPath, originalPath);
   });
-  
-  // Remove the temporary directory
-  fs.rmSync(tmpDir, { recursive: true, force: true });
-  console.log('Non-page files restored successfully.');
-} else {
-  console.log('Temporary directory not found, skipping non-page file restoration.');
 }
 
-console.log('All files have been restored successfully.');
+// Move App Router files
+const appRouterDir = path.join(__dirname, 'src/app');
+if (fs.existsSync(appRouterDir)) {
+  console.log('Moving App Router files...');
+  
+  // Create a backup directory
+  const backupDir = path.join(__dirname, '.app-router-backup');
+  if (\!fs.existsSync(backupDir)) {
+    fs.mkdirSync(backupDir);
+  }
+  
+  // Simple list of app routes to move
+  const appRoutes = [
+    'api/auth/[...nextauth]/route.ts',
+    'api/register/route.ts',
+    'calendar/day/page.tsx',
+    'calendar/new-event/page.tsx',
+    'calendar/page.tsx',
+    'calendar/week/page.tsx',
+    'page.tsx',
+    'sign-in/page.tsx',
+    'sign-up/page.tsx'
+  ];
+  
+  appRoutes.forEach(route => {
+    const sourcePath = path.join(__dirname, 'src/app', route);
+    if (fs.existsSync(sourcePath)) {
+      const targetDir = path.join(backupDir, path.dirname(route));
+      
+      if (\!fs.existsSync(targetDir)) {
+        fs.mkdirSync(targetDir, { recursive: true });
+      }
+      
+      const targetPath = path.join(backupDir, route);
+      
+      // Read source file and write to target
+      const content = fs.readFileSync(sourcePath, 'utf8');
+      fs.writeFileSync(targetPath, content);
+      fs.unlinkSync(sourcePath);
+      
+      console.log('Moved: ' + route);
+    }
+  });
+}
+
+// Create a post-build script
+const postBuildScript = `
+const fs = require('fs');
+const path = require('path');
+
+console.log('Running post-build script...');
+
+// Restore App Router files
+const appBackupDir = path.join(__dirname, '.app-router-backup');
+if (fs.existsSync(appBackupDir)) {
+  console.log('Restoring App Router files...');
+  
+  const restoreFile = (filePath) => {
+    const relativePath = path.relative(appBackupDir, filePath);
+    const targetPath = path.join(__dirname, 'src/app', relativePath);
+    
+    // Create target directory if it doesn't exist
+    const targetDir = path.dirname(targetPath);
+    if (\!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+    
+    // Restore the file
+    fs.writeFileSync(targetPath, fs.readFileSync(filePath, 'utf8'));
+    console.log('Restored: ' + relativePath);
+  };
+  
+  const readDir = (dir) => {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    
+    entries.forEach(entry => {
+      const fullPath = path.join(dir, entry.name);
+      
+      if (entry.isDirectory()) {
+        readDir(fullPath);
+      } else {
+        restoreFile(fullPath);
+      }
+    });
+  };
+  
+  readDir(appBackupDir);
+  
+  // Remove backup directory
+  fs.rmSync(appBackupDir, { recursive: true });
+}
+
+// Restore auth-context.js
+const authContextBackupPath = path.join(__dirname, '.build-tmp-auth-context.js');
+if (fs.existsSync(authContextBackupPath)) {
+  console.log('Restoring auth-context.js...');
+  
+  const targetPath = path.join(__dirname, 'pages/auth/auth-context.js');
+  const targetDir = path.dirname(targetPath);
+  
+  if (\!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
+  
+  fs.writeFileSync(targetPath, fs.readFileSync(authContextBackupPath, 'utf8'));
+  fs.unlinkSync(authContextBackupPath);
+}
+
+// Restore event-modal.tsx
+const eventModalBackupPath = path.join(__dirname, '.build-tmp-event-modal.tsx');
+if (fs.existsSync(eventModalBackupPath)) {
+  console.log('Restoring event-modal.tsx...');
+  
+  const targetPath = path.join(__dirname, 'pages/calendar/components/event-modal.tsx');
+  const targetDir = path.dirname(targetPath);
+  
+  if (\!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
+  
+  fs.writeFileSync(targetPath, fs.readFileSync(eventModalBackupPath, 'utf8'));
+  fs.unlinkSync(eventModalBackupPath);
+  
+  // Update import paths in calendar files
+  const calendarFiles = [
+    {
+      path: path.join(__dirname, 'pages/calendar/index.tsx'),
+      oldImport: '../shared-components/event-modal',
+      newImport: './components/event-modal'
+    },
+    {
+      path: path.join(__dirname, 'pages/calendar/day/index.tsx'),
+      oldImport: '../../shared-components/event-modal',
+      newImport: '../components/event-modal'
+    },
+    {
+      path: path.join(__dirname, 'pages/calendar/week/index.tsx'),
+      oldImport: '../../shared-components/event-modal',
+      newImport: '../components/event-modal'
+    }
+  ];
+  
+  // Update each file's imports
+  calendarFiles.forEach(file => {
+    if (fs.existsSync(file.path)) {
+      console.log('Updating import in: ' + file.path);
+      
+      let content = fs.readFileSync(file.path, 'utf8');
+      content = content.replace(
+        new RegExp('import { EventModal } from [\'"]' + file.oldImport + '[\'"]', 'g'),
+        'import { EventModal } from "' + file.newImport + '"'
+      );
+      
+      fs.writeFileSync(file.path, content);
+    }
+  });
+  
+  // Remove shared components directory
+  const sharedDir = path.join(__dirname, 'shared-components');
+  if (fs.existsSync(sharedDir)) {
+    fs.rmSync(sharedDir, { recursive: true });
+  }
+}
+
+console.log('Post-build script completed successfully.');
 `;
 
-fs.writeFileSync(path.join(__dirname, 'post-build.js'), restoreScript);
-console.log('Created post-build restore script.');
+fs.writeFileSync(path.join(__dirname, 'post-build.js'), postBuildScript);
+console.log('Created post-build script');
 
 console.log('Pre-build script completed successfully.');
