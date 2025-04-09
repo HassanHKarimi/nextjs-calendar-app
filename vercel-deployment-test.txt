@@ -1,0 +1,3 @@
+This file was added to trigger a new deployment on Vercel.
+Latest commit: 537d9db (Update Vercel configuration for GitHub integration)
+This file helps ensure Vercel deploys the latest version with our non-page file handling fixes.
