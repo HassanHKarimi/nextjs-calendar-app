@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
-import { EventModal } from "../utils/event-modal";
+import { EventModal } from "./utils/event-modal";
 
 // Sample event data
 const SAMPLE_EVENTS = [

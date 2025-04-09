@@ -1,8 +1,9 @@
 This file was added to trigger a new deployment on Vercel.
-Latest commit: 966e826 (Move build commands to separate shell script to avoid length limit)
+Latest commit: 91d3616 (Fix event-modal import paths for Vercel deployment)
 This file helps ensure Vercel deploys the latest version with:
 1. Separate build shell script to avoid Vercel's command length limits
-2. Creation of stub event-modal component to resolve imports
-3. Removal of all conflicting App Router files
-4. Removal of problematic auth directory
-5. Simple shell commands that should work in any environment
+2. Creation of stub event-modal component in multiple locations to resolve imports
+3. Improved placement of event-modal.js in pages/calendar/utils to match relative imports
+4. Enhanced shell script debugging for troubleshooting deployment issues
+5. Removal of all conflicting App Router files
+6. Removal of problematic auth directory
