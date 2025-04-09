@@ -14,7 +14,7 @@ if (fs.existsSync(envPath)) {
 // Set development mode
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = 'localhost';
-const port = process.env.PORT || 3001; // Use 3001 since 3000 appears to be in use
+const port = process.env.PORT || 3002; // Use 3002 since 3000 and 3001 appear to be in use
 
 // Initialize Next.js
 const app = next({ dev, hostname, port });
