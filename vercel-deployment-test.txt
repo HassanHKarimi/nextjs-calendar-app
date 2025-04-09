@@ -1,8 +1,8 @@
 This file was added to trigger a new deployment on Vercel.
-Latest commit: cbfe70e (Replace with minimal pre-build script without special characters)
+Latest commit: f396f7a (Use ultra minimal build scripts that just delete problem files)
 This file helps ensure Vercel deploys the latest version with:
-1. Completely simplified pre-build and post-build scripts
-2. No special characters or escape sequences
-3. Direct file copying instead of complex operations
-4. Simpler import path management
-5. No complex regex patterns - just basic string operations
+1. Ultra minimal pre-build script that just deletes problematic directories
+2. No special characters, complex logic, or regex patterns
+3. No file restoration - simplifies the whole process
+4. No import path manipulation - removes complexity
+5. Updated vercel-build script to explicitly run post-build
