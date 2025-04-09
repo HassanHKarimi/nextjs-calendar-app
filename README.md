@@ -109,7 +109,10 @@ The following environment variables can be set:
 
 1. **"Found pages without a React Component as default export"**
    - This happens when non-page files are present in the `pages` directory
-   - The pre-build script should handle this automatically by moving these files during build
+   - The pre-build script handles this automatically by temporarily removing the directories with non-page files
+   - In this project, the problematic files are in:
+     - `pages/auth/auth-context.js`
+     - `pages/calendar/components/event-modal.tsx`
 
 2. **Router Conflict Errors**
    - This project contains both App Router and Pages Router implementations
