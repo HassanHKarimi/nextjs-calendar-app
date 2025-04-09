@@ -48,7 +48,23 @@ app.prepare().then(() => {
       // Special handling for root path
       if (pathname === '/') {
         console.log('Handling request for root path');
-        await app.render(req, res, '/', query);
+        try {
+          // Try different variations to find the home page
+          if (fs.existsSync(path.join(process.cwd(), 'src/app/page.tsx'))) {
+            console.log('Found home page at src/app/page.tsx');
+            await app.render(req, res, '/', query);
+          } else if (fs.existsSync(path.join(process.cwd(), 'pages/index.tsx'))) {
+            console.log('Found home page at pages/index.tsx');
+            await app.render(req, res, '/', query);
+          } else {
+            console.log('No home page found, rendering sign-in page');
+            await app.render(req, res, '/sign-in', query);
+          }
+        } catch (err) {
+          console.error('Error rendering home page:', err);
+          // Fallback to sign-in page
+          await app.render(req, res, '/sign-in', query);
+        }
         return;
       }
       
