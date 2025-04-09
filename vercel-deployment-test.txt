@@ -1,8 +1,8 @@
 This file was added to trigger a new deployment on Vercel.
-Latest commit: c578328 (Create stub event-modal component for import resolution)
+Latest commit: 966e826 (Move build commands to separate shell script to avoid length limit)
 This file helps ensure Vercel deploys the latest version with:
-1. Direct shell commands in vercel.json for build preparation
+1. Separate build shell script to avoid Vercel's command length limits
 2. Creation of stub event-modal component to resolve imports
 3. Removal of all conflicting App Router files
 4. Removal of problematic auth directory
-5. Completely script-less approach for maximum compatibility
+5. Simple shell commands that should work in any environment
