@@ -132,8 +132,15 @@ function createRedirectingModule(importPath, contentPath) {
 
 // Create a copy of event-modal.tsx for imports to work
 const eventModalSource = path.join(tmpDir, 'calendar-components/event-modal.tsx');
+
+// There are multiple import paths used in different files:
+// 1. In pages/calendar/index.tsx: "./components/event-modal"
+// 2. In pages/calendar/day/index.tsx: "../components/event-modal"
+// 3. In pages/calendar/week/index.tsx: "../components/event-modal"
+
 const eventModalTargets = [
-  path.join(__dirname, 'pages/calendar/components/event-modal.tsx')
+  // Main path for the modal component
+  path.join(__dirname, 'pages/calendar/components/event-modal.tsx'),
 ];
 
 // First verify the source file exists
@@ -141,6 +148,40 @@ if (fs.existsSync(eventModalSource)) {
   // Create the component directory structure for imports
   eventModalTargets.forEach(target => {
     createRedirectingModule(target, eventModalSource);
+  });
+  
+  // Create stub modules for imports with different relative paths
+  // These modules simply re-export the main component
+  const stubModules = [
+    // For imports in pages/calendar/week/index.tsx and pages/calendar/day/index.tsx
+    { 
+      path: path.join(__dirname, 'pages/calendar/week/components/event-modal.tsx'),
+      content: `// Stub module for week view
+import { EventModal } from "../../components/event-modal";
+export { EventModal };`
+    },
+    { 
+      path: path.join(__dirname, 'pages/calendar/day/components/event-modal.tsx'),
+      content: `// Stub module for day view
+import { EventModal } from "../../components/event-modal";
+export { EventModal };`
+    }
+  ];
+  
+  // Create each stub module
+  stubModules.forEach(stub => {
+    try {
+      const stubDir = path.dirname(stub.path);
+      if (!fs.existsSync(stubDir)) {
+        fs.mkdirSync(stubDir, { recursive: true });
+        console.log(`Created stub module directory: ${stubDir}`);
+      }
+      
+      fs.writeFileSync(stub.path, stub.content);
+      console.log(`Created stub module: ${stub.path}`);
+    } catch (error) {
+      console.error(`Error creating stub module ${stub.path}: ${error.message}`);
+    }
   });
 } else {
   console.error(`ERROR: Source file for event-modal not found at ${eventModalSource}`);
@@ -262,7 +303,9 @@ if (fs.existsSync(tmpDir)) {
   // Clean up any temporary modules we created for imports
   console.log('Cleaning up temporary modules...');
   const tempModules = [
-    path.join(__dirname, 'pages/calendar/components/event-modal.tsx')
+    path.join(__dirname, 'pages/calendar/components/event-modal.tsx'),
+    path.join(__dirname, 'pages/calendar/week/components/event-modal.tsx'),
+    path.join(__dirname, 'pages/calendar/day/components/event-modal.tsx')
   ];
   
   tempModules.forEach(modulePath => {
@@ -273,10 +316,22 @@ if (fs.existsSync(tmpDir)) {
         
         // Check if the directory is now empty
         const moduleDir = path.dirname(modulePath);
-        const remainingFiles = fs.readdirSync(moduleDir);
-        if (remainingFiles.length === 0) {
-          fs.rmdirSync(moduleDir);
-          console.log(\`Removed empty directory: \${moduleDir}\`);
+        if (fs.existsSync(moduleDir)) {
+          const remainingFiles = fs.readdirSync(moduleDir);
+          if (remainingFiles.length === 0) {
+            fs.rmdirSync(moduleDir);
+            console.log(\`Removed empty directory: \${moduleDir}\`);
+            
+            // Also try to clean up parent directories if they're empty
+            const parentDir = path.dirname(moduleDir);
+            if (fs.existsSync(parentDir)) {
+              const parentFiles = fs.readdirSync(parentDir);
+              if (parentFiles.length === 0) {
+                fs.rmdirSync(parentDir);
+                console.log(\`Removed empty parent directory: \${parentDir}\`);
+              }
+            }
+          }
         }
       }
     } catch (error) {
