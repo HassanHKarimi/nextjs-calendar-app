@@ -1,8 +1,8 @@
 This file was added to trigger a new deployment on Vercel.
-Latest commit: f396f7a (Use ultra minimal build scripts that just delete problem files)
+Latest commit: f43bd15 (Fix router conflicts by removing App Router files during build)
 This file helps ensure Vercel deploys the latest version with:
-1. Ultra minimal pre-build script that just deletes problematic directories
-2. No special characters, complex logic, or regex patterns
-3. No file restoration - simplifies the whole process
-4. No import path manipulation - removes complexity
-5. Updated vercel-build script to explicitly run post-build
+1. Fixed routing conflicts between App Router and Pages Router
+2. Removal of problematic non-page files in pages directory
+3. Ultra minimal approach to avoid syntax errors
+4. No complex code or special characters
+5. No file restoration needed after build
