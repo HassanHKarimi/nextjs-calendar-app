@@ -14,6 +14,8 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
+  adapter: PrismaAdapter(db),
+  session: { strategy: "jwt" },
   pages: {
     signIn: "/sign-in",
     error: "/error",
@@ -72,7 +74,16 @@ export const {
       return token;
     }
   },
-  adapter: PrismaAdapter(db),
-  session: { strategy: "jwt" },
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production"
+      }
+    }
+  },
   ...authConfig,
 });

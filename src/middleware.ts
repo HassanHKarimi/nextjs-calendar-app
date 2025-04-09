@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/auth";
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request });
+  const session = await auth({ request });
   const pathname = request.nextUrl.pathname;
 
   // Auth routes - redirect to calendar if authenticated
   const isAuthRoute = pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up");
   if (isAuthRoute) {
-    if (token) {
+    if (session) {
       return NextResponse.redirect(new URL("/calendar", request.url));
     }
     return NextResponse.next();
@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   // Protected routes - redirect to sign-in if not authenticated
   const isProtectedRoute = pathname.startsWith("/calendar");
   if (isProtectedRoute) {
-    if (!token) {
+    if (!session) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
     return NextResponse.next();
