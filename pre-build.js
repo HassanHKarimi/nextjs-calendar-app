@@ -106,83 +106,96 @@ problemDirectories.forEach(dir => {
   handleNonPageDirectory(dir.path, dir.backupPrefix);
 });
 
-// Special handling: Copy the event-modal.tsx to a temp location as module for imports to work
-console.log('Creating redirecting modules for imports...');
+// Special handling: Move the event-modal.tsx to a safe location outside pages
+// and modify the import statements in the calendar files
+console.log('Creating shared components and updating imports...');
 
-// Helper function to create redirecting modules for imports
-function createRedirectingModule(importPath, contentPath) {
+// Helper function to create a shared component directory
+function createSharedComponent(contentPath) {
   try {
-    // Create all necessary directories
-    const importDir = path.dirname(importPath);
-    if (!fs.existsSync(importDir)) {
-      fs.mkdirSync(importDir, { recursive: true });
-      console.log(`Created directory: ${importDir}`);
+    // Create the shared directory outside of pages
+    const sharedDir = path.join(__dirname, 'shared-components');
+    if (!fs.existsSync(sharedDir)) {
+      fs.mkdirSync(sharedDir, { recursive: true });
+      console.log(`Created shared components directory: ${sharedDir}`);
     }
     
-    // Read the original file content from the backup dir
+    // Read the original content
     const originalContent = fs.readFileSync(contentPath, 'utf8');
     
-    // Write the content to the import path
-    fs.writeFileSync(importPath, originalContent);
-    console.log(`Created redirecting module: ${importPath}`);
+    // Write the component to the shared location
+    const sharedComponentPath = path.join(sharedDir, 'event-modal.tsx');
+    fs.writeFileSync(sharedComponentPath, originalContent);
+    console.log(`Created shared component: ${sharedComponentPath}`);
+    
+    return sharedComponentPath;
   } catch (error) {
-    console.error(`Error creating redirecting module for ${importPath}: ${error.message}`);
+    console.error(`Error creating shared component: ${error.message}`);
+    return null;
   }
 }
 
-// Create a copy of event-modal.tsx for imports to work
+// Function to update import paths in calendar files
+function updateImportPaths(filePath, oldImportPath, newImportPath) {
+  try {
+    if (fs.existsSync(filePath)) {
+      let content = fs.readFileSync(filePath, 'utf8');
+      
+      // Create the import regex - handle both single and double quotes
+      const importRegex = new RegExp(`import\\s+\\{\\s*EventModal\\s*\\}\\s+from\\s+(['"])${oldImportPath}(['"])`, 'g');
+      
+      // Replace the import path
+      content = content.replace(importRegex, `import { EventModal } from $1${newImportPath}$2`);
+      
+      // Write the modified content back
+      fs.writeFileSync(filePath, content);
+      console.log(`Updated import in: ${filePath}`);
+      return true;
+    } else {
+      console.log(`File not found, skipping: ${filePath}`);
+      return false;
+    }
+  } catch (error) {
+    console.error(`Error updating import in ${filePath}: ${error.message}`);
+    return false;
+  }
+}
+
+// Handle the event-modal component
 const eventModalSource = path.join(tmpDir, 'calendar-components/event-modal.tsx');
-
-// There are multiple import paths used in different files:
-// 1. In pages/calendar/index.tsx: "./components/event-modal"
-// 2. In pages/calendar/day/index.tsx: "../components/event-modal"
-// 3. In pages/calendar/week/index.tsx: "../components/event-modal"
-
-const eventModalTargets = [
-  // Main path for the modal component
-  path.join(__dirname, 'pages/calendar/components/event-modal.tsx'),
-];
 
 // First verify the source file exists
 if (fs.existsSync(eventModalSource)) {
-  // Create the component directory structure for imports
-  eventModalTargets.forEach(target => {
-    createRedirectingModule(target, eventModalSource);
-  });
+  // Create the shared component
+  const sharedComponentPath = createSharedComponent(eventModalSource);
   
-  // Create stub modules for imports with different relative paths
-  // These modules simply re-export the main component
-  const stubModules = [
-    // For imports in pages/calendar/week/index.tsx and pages/calendar/day/index.tsx
-    { 
-      path: path.join(__dirname, 'pages/calendar/week/components/event-modal.tsx'),
-      content: `// Stub module for week view
-import { EventModal } from "../../components/event-modal";
-export { EventModal };`
-    },
-    { 
-      path: path.join(__dirname, 'pages/calendar/day/components/event-modal.tsx'),
-      content: `// Stub module for day view
-import { EventModal } from "../../components/event-modal";
-export { EventModal };`
-    }
-  ];
-  
-  // Create each stub module
-  stubModules.forEach(stub => {
-    try {
-      const stubDir = path.dirname(stub.path);
-      if (!fs.existsSync(stubDir)) {
-        fs.mkdirSync(stubDir, { recursive: true });
-        console.log(`Created stub module directory: ${stubDir}`);
+  if (sharedComponentPath) {
+    // Update import paths in all calendar files
+    const calendarFiles = [
+      {
+        path: path.join(__dirname, 'pages/calendar/index.tsx'),
+        oldImport: './components/event-modal',
+        newImport: '../shared-components/event-modal'
+      },
+      {
+        path: path.join(__dirname, 'pages/calendar/day/index.tsx'),
+        oldImport: '../components/event-modal',
+        newImport: '../../shared-components/event-modal'
+      },
+      {
+        path: path.join(__dirname, 'pages/calendar/week/index.tsx'),
+        oldImport: '../components/event-modal',
+        newImport: '../../shared-components/event-modal'
       }
-      
-      fs.writeFileSync(stub.path, stub.content);
-      console.log(`Created stub module: ${stub.path}`);
-    } catch (error) {
-      console.error(`Error creating stub module ${stub.path}: ${error.message}`);
-    }
-  });
+    ];
+    
+    // Update each file's imports
+    calendarFiles.forEach(file => {
+      updateImportPaths(file.path, file.oldImport, file.newImport);
+    });
+    
+    console.log('Successfully updated all import paths to use shared component');
+  }
 } else {
   console.error(`ERROR: Source file for event-modal not found at ${eventModalSource}`);
 }
@@ -300,44 +313,68 @@ if (fs.existsSync(tmpDir)) {
     }
   }
   
-  // Clean up any temporary modules we created for imports
-  console.log('Cleaning up temporary modules...');
-  const tempModules = [
-    path.join(__dirname, 'pages/calendar/components/event-modal.tsx'),
-    path.join(__dirname, 'pages/calendar/week/components/event-modal.tsx'),
-    path.join(__dirname, 'pages/calendar/day/components/event-modal.tsx')
-  ];
+  // Restore original import paths
+  console.log('Restoring original import paths...');
   
-  tempModules.forEach(modulePath => {
+  function restoreImportPaths(filePath, currentImportPath, originalImportPath) {
     try {
-      if (fs.existsSync(modulePath)) {
-        fs.unlinkSync(modulePath);
-        console.log(\`Removed temporary module: \${modulePath}\`);
+      if (fs.existsSync(filePath)) {
+        let content = fs.readFileSync(filePath, 'utf8');
         
-        // Check if the directory is now empty
-        const moduleDir = path.dirname(modulePath);
-        if (fs.existsSync(moduleDir)) {
-          const remainingFiles = fs.readdirSync(moduleDir);
-          if (remainingFiles.length === 0) {
-            fs.rmdirSync(moduleDir);
-            console.log(\`Removed empty directory: \${moduleDir}\`);
-            
-            // Also try to clean up parent directories if they're empty
-            const parentDir = path.dirname(moduleDir);
-            if (fs.existsSync(parentDir)) {
-              const parentFiles = fs.readdirSync(parentDir);
-              if (parentFiles.length === 0) {
-                fs.rmdirSync(parentDir);
-                console.log(\`Removed empty parent directory: \${parentDir}\`);
-              }
-            }
-          }
-        }
+        // Create the import regex - handle both single and double quotes
+        const importRegex = new RegExp(`import\\s+\\{\\s*EventModal\\s*\\}\\s+from\\s+(['"])${currentImportPath}(['"])`, 'g');
+        
+        // Replace the import path
+        content = content.replace(importRegex, `import { EventModal } from $1${originalImportPath}$2`);
+        
+        // Write the modified content back
+        fs.writeFileSync(filePath, content);
+        console.log(\`Restored import in: \${filePath}\`);
+        return true;
+      } else {
+        console.log(\`File not found, skipping import restoration: \${filePath}\`);
+        return false;
       }
     } catch (error) {
-      console.error(\`Error cleaning up temporary module \${modulePath}: \${error.message}\`);
+      console.error(\`Error restoring import in \${filePath}: \${error.message}\`);
+      return false;
     }
+  }
+  
+  // Files to restore imports in
+  const calendarFiles = [
+    {
+      path: path.join(__dirname, 'pages/calendar/index.tsx'),
+      currentImport: '../shared-components/event-modal',
+      originalImport: './components/event-modal'
+    },
+    {
+      path: path.join(__dirname, 'pages/calendar/day/index.tsx'),
+      currentImport: '../../shared-components/event-modal',
+      originalImport: '../components/event-modal'
+    },
+    {
+      path: path.join(__dirname, 'pages/calendar/week/index.tsx'),
+      currentImport: '../../shared-components/event-modal',
+      originalImport: '../components/event-modal'
+    }
+  ];
+  
+  // Restore imports in each file
+  calendarFiles.forEach(file => {
+    restoreImportPaths(file.path, file.currentImport, file.originalImport);
   });
+  
+  // Remove the shared directory
+  const sharedDir = path.join(__dirname, 'shared-components');
+  if (fs.existsSync(sharedDir)) {
+    try {
+      fs.rmSync(sharedDir, { recursive: true, force: true });
+      console.log(\`Removed shared components directory: \${sharedDir}\`);
+    } catch (error) {
+      console.error(\`Error removing shared directory \${sharedDir}: \${error.message}\`);
+    }
+  }
   
   // Directories to restore
   const directoriesToRestore = [
