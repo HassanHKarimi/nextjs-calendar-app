@@ -37,18 +37,6 @@ const conflictingPaths = [
 // These are files that don't export a default React component
 console.log('Handling non-page files in the pages directory...');
 
-// Files to move from pages directory to proper locations
-const nonPageFiles = [
-  { 
-    source: path.join(__dirname, 'pages', 'auth', 'auth-context.js'),
-    destination: path.join(__dirname, '.build-tmp', 'auth-context.js')
-  },
-  { 
-    source: path.join(__dirname, 'pages', 'calendar', 'components', 'event-modal.tsx'),
-    destination: path.join(__dirname, '.build-tmp', 'event-modal.tsx')
-  }
-];
-
 // Create temp directory for non-page files
 const tmpDir = path.join(__dirname, '.build-tmp');
 if (!fs.existsSync(tmpDir)) {
@@ -56,14 +44,66 @@ if (!fs.existsSync(tmpDir)) {
   console.log(`Created temporary directory: ${tmpDir}`);
 }
 
-// Move non-page files
-nonPageFiles.forEach(({ source, destination }) => {
-  if (fs.existsSync(source)) {
-    fs.renameSync(source, destination);
-    console.log(`Moved non-page file: ${source} -> ${destination}`);
-  } else {
-    console.log(`Non-page file not found, skipping: ${source}`);
+// Helper function to handle all types of files in problematic directories
+function handleNonPageDirectory(dirPath, backupDirPrefix) {
+  if (!fs.existsSync(dirPath)) {
+    console.log(`Directory not found, skipping: ${dirPath}`);
+    return;
   }
+  
+  console.log(`Handling files in directory: ${dirPath}`);
+  
+  try {
+    const dirBackupPath = path.join(tmpDir, backupDirPrefix);
+    if (!fs.existsSync(dirBackupPath)) {
+      fs.mkdirSync(dirBackupPath, { recursive: true });
+    }
+    
+    // Get all files in the directory
+    const files = fs.readdirSync(dirPath);
+    
+    // Process each file
+    files.forEach(file => {
+      const filePath = path.join(dirPath, file);
+      const fileStats = fs.statSync(filePath);
+      
+      // If it's a directory, recursively handle it
+      if (fileStats.isDirectory()) {
+        handleNonPageDirectory(
+          filePath, 
+          path.join(backupDirPrefix, file)
+        );
+        return;
+      }
+      
+      // It's a file, move it to backup
+      const destPath = path.join(dirBackupPath, file);
+      console.log(`Moving file: ${filePath} -> ${destPath}`);
+      fs.renameSync(filePath, destPath);
+    });
+    
+    // Remove the now-empty directory
+    fs.rmdirSync(dirPath);
+    console.log(`Removed directory: ${dirPath}`);
+  } catch (error) {
+    console.error(`Error handling directory ${dirPath}: ${error.message}`);
+  }
+}
+
+// Handle non-page directories completely
+const problemDirectories = [
+  {
+    path: path.join(__dirname, 'pages/auth'),
+    backupPrefix: 'auth'
+  },
+  {
+    path: path.join(__dirname, 'pages/calendar/components'),
+    backupPrefix: 'calendar-components'
+  }
+];
+
+problemDirectories.forEach(dir => {
+  handleNonPageDirectory(dir.path, dir.backupPrefix);
 });
 
 // Move each App Router file to backup
@@ -144,33 +184,59 @@ const tmpDir = path.join(__dirname, '.build-tmp');
 if (fs.existsSync(tmpDir)) {
   console.log('Restoring non-page files...');
   
-  // Files to restore to their original locations
-  const nonPageFiles = [
-    { 
-      source: path.join(tmpDir, 'auth-context.js'),
-      destination: path.join(__dirname, 'pages', 'auth', 'auth-context.js') 
+  // Helper function to restore directory structure
+  function restoreDirectoryFromBackup(backupDirPath, originalPathPrefix) {
+    if (!fs.existsSync(backupDirPath)) {
+      console.log(\`Backup directory not found, skipping: \${backupDirPath}\`);
+      return;
+    }
+    
+    console.log(\`Restoring directory: \${backupDirPath} -> \${originalPathPrefix}\`);
+    
+    try {
+      // Create the original directory if it doesn't exist
+      if (!fs.existsSync(originalPathPrefix)) {
+        fs.mkdirSync(originalPathPrefix, { recursive: true });
+        console.log(\`Created original directory: \${originalPathPrefix}\`);
+      }
+      
+      // Get all files and directories in the backup
+      const entries = fs.readdirSync(backupDirPath, { withFileTypes: true });
+      
+      // Process each entry
+      entries.forEach(entry => {
+        const sourcePath = path.join(backupDirPath, entry.name);
+        const destPath = path.join(originalPathPrefix, entry.name);
+        
+        if (entry.isDirectory()) {
+          // Recursively restore subdirectory
+          restoreDirectoryFromBackup(sourcePath, destPath);
+        } else {
+          // Restore file
+          console.log(\`Restoring file: \${sourcePath} -> \${destPath}\`);
+          fs.renameSync(sourcePath, destPath);
+        }
+      });
+    } catch (error) {
+      console.error(\`Error restoring directory \${backupDirPath}: \${error.message}\`);
+    }
+  }
+  
+  // Directories to restore
+  const directoriesToRestore = [
+    {
+      backupPath: path.join(tmpDir, 'auth'),
+      originalPath: path.join(__dirname, 'pages/auth')
     },
-    { 
-      source: path.join(tmpDir, 'event-modal.tsx'),
-      destination: path.join(__dirname, 'pages', 'calendar', 'components', 'event-modal.tsx')
+    {
+      backupPath: path.join(tmpDir, 'calendar-components'),
+      originalPath: path.join(__dirname, 'pages/calendar/components')
     }
   ];
   
-  // Restore each non-page file
-  nonPageFiles.forEach(({ source, destination }) => {
-    if (fs.existsSync(source)) {
-      // Create the target directory if it doesn't exist
-      const targetDir = path.dirname(destination);
-      if (!fs.existsSync(targetDir)) {
-        fs.mkdirSync(targetDir, { recursive: true });
-      }
-      
-      // Move the file back
-      fs.renameSync(source, destination);
-      console.log(\`Restored non-page file: \${source} -> \${destination}\`);
-    } else {
-      console.log(\`Non-page file not found, skipping restoration: \${source}\`);
-    }
+  // Restore each directory
+  directoriesToRestore.forEach(({ backupPath, originalPath }) => {
+    restoreDirectoryFromBackup(backupPath, originalPath);
   });
   
   // Remove the temporary directory
