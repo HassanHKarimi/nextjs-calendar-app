@@ -129,10 +129,7 @@ conflictingPaths.forEach(filePath => {
 });
 
 // Create a restore script that can be run after build
-const restoreScript = `
-#!/usr/bin/env node
-
-const fs = require('fs');
+const restoreScript = `const fs = require('fs');
 const path = require('path');
 
 console.log('Restoring files after build...');
