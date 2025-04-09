@@ -15,7 +15,7 @@ console.log('Running pre-build script to resolve router conflicts...');
 
 // Create a temporary directory for App Router files
 const backupDir = path.join(__dirname, '.app-router-backup');
-if (!fs.existsSync(backupDir)) {
+if (\!fs.existsSync(backupDir)) {
   fs.mkdirSync(backupDir, { recursive: true });
   console.log(`Created backup directory: ${backupDir}`);
 }
@@ -39,14 +39,14 @@ console.log('Handling non-page files in the pages directory...');
 
 // Create temp directory for non-page files
 const tmpDir = path.join(__dirname, '.build-tmp');
-if (!fs.existsSync(tmpDir)) {
+if (\!fs.existsSync(tmpDir)) {
   fs.mkdirSync(tmpDir, { recursive: true });
   console.log(`Created temporary directory: ${tmpDir}`);
 }
 
 // Helper function to handle all types of files in problematic directories
 function handleNonPageDirectory(dirPath, backupDirPrefix) {
-  if (!fs.existsSync(dirPath)) {
+  if (\!fs.existsSync(dirPath)) {
     console.log(`Directory not found, skipping: ${dirPath}`);
     return;
   }
@@ -55,7 +55,7 @@ function handleNonPageDirectory(dirPath, backupDirPrefix) {
   
   try {
     const dirBackupPath = path.join(tmpDir, backupDirPrefix);
-    if (!fs.existsSync(dirBackupPath)) {
+    if (\!fs.existsSync(dirBackupPath)) {
       fs.mkdirSync(dirBackupPath, { recursive: true });
     }
     
@@ -115,7 +115,7 @@ function createSharedComponent(contentPath) {
   try {
     // Create the shared directory outside of pages
     const sharedDir = path.join(__dirname, 'shared-components');
-    if (!fs.existsSync(sharedDir)) {
+    if (\!fs.existsSync(sharedDir)) {
       fs.mkdirSync(sharedDir, { recursive: true });
       console.log(`Created shared components directory: ${sharedDir}`);
     }
@@ -141,11 +141,22 @@ function updateImportPaths(filePath, oldImportPath, newImportPath) {
     if (fs.existsSync(filePath)) {
       let content = fs.readFileSync(filePath, 'utf8');
       
-      // Create the import regex - handle both single and double quotes
-      const importRegex = new RegExp(`import\\s+\\{\\s*EventModal\\s*\\}\\s+from\\s+(['"])${oldImportPath}(['"])`, 'g');
+      // Escape special regex characters in the path
+      const escapedOldImportPath = oldImportPath.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      
+      // Create the import regex string - handle both single and double quotes
+      const importRegexStr = 'import\\s+\\{\\s*EventModal\\s*\\}\\s+from\\s+([\'"])' + 
+                            escapedOldImportPath + 
+                            '([\'"])';
+      
+      // Create the regex object
+      const importRegex = new RegExp(importRegexStr, 'g');
+      
+      // Build the replacement string
+      const replacementStr = 'import { EventModal } from $1' + newImportPath + '$2';
       
       // Replace the import path
-      content = content.replace(importRegex, `import { EventModal } from $1${newImportPath}$2`);
+      content = content.replace(importRegex, replacementStr);
       
       // Write the modified content back
       fs.writeFileSync(filePath, content);
@@ -243,14 +254,14 @@ if (fs.existsSync(backupDir)) {
       const targetPath = path.join(__dirname, 'src', relativePath);
       
       if (entry.isDirectory()) {
-        if (!fs.existsSync(targetPath)) {
+        if (\!fs.existsSync(targetPath)) {
           fs.mkdirSync(targetPath, { recursive: true });
         }
         restoreFiles(sourcePath, relativePath);
       } else {
         // Create the target directory if it doesn't exist
         const targetDir = path.dirname(targetPath);
-        if (!fs.existsSync(targetDir)) {
+        if (\!fs.existsSync(targetDir)) {
           fs.mkdirSync(targetDir, { recursive: true });
         }
         
@@ -277,7 +288,7 @@ if (fs.existsSync(tmpDir)) {
   
   // Helper function to restore directory structure
   function restoreDirectoryFromBackup(backupDirPath, originalPathPrefix) {
-    if (!fs.existsSync(backupDirPath)) {
+    if (\!fs.existsSync(backupDirPath)) {
       console.log(\`Backup directory not found, skipping: \${backupDirPath}\`);
       return;
     }
@@ -286,7 +297,7 @@ if (fs.existsSync(tmpDir)) {
     
     try {
       // Create the original directory if it doesn't exist
-      if (!fs.existsSync(originalPathPrefix)) {
+      if (\!fs.existsSync(originalPathPrefix)) {
         fs.mkdirSync(originalPathPrefix, { recursive: true });
         console.log(\`Created original directory: \${originalPathPrefix}\`);
       }
@@ -321,11 +332,22 @@ if (fs.existsSync(tmpDir)) {
       if (fs.existsSync(filePath)) {
         let content = fs.readFileSync(filePath, 'utf8');
         
-        // Create the import regex - handle both single and double quotes
-        const importRegex = new RegExp(`import\\s+\\{\\s*EventModal\\s*\\}\\s+from\\s+(['"])${currentImportPath}(['"])`, 'g');
+        // Escape special regex characters in the path
+        const escapedCurrentImportPath = currentImportPath.replace(/[-\\/\\^$*+?.()|[\\]{}]/g, '\\\\$&');
+        
+        // Create the import regex string - handle both single and double quotes
+        const importRegexStr = 'import\\\\s+\\\\{\\\\s*EventModal\\\\s*\\\\}\\\\s+from\\\\s+([\\'\\""])' + 
+                             escapedCurrentImportPath + 
+                             '([\\'\\""])';
+        
+        // Create the regex object
+        const importRegex = new RegExp(importRegexStr, 'g');
+        
+        // Build the replacement string
+        const replacementStr = 'import { EventModal } from $1' + originalImportPath + '$2';
         
         // Replace the import path
-        content = content.replace(importRegex, `import { EventModal } from $1${originalImportPath}$2`);
+        content = content.replace(importRegex, replacementStr);
         
         // Write the modified content back
         fs.writeFileSync(filePath, content);
