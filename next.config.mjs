@@ -8,8 +8,19 @@ const nextConfig = {
     if (isServer) {
       config.externals = [...config.externals, 'pg-native'];
     }
+    // Fix for 404 errors in development
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        path: false,
+      };
+    }
     return config;
   },
+  
+  // Set the output directory to avoid BUILD_ID issues
+  distDir: 'dist',
   
   // Disable TypeScript checking during build
   typescript: {
