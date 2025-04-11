@@ -1,14 +1,18 @@
 # Next.js Calendar App
 
-A simple calendar application built with Next.js, TypeScript, and Tailwind CSS. The application includes day, week, and month views for calendar events.
+A modern, feature-rich calendar application built with Next.js, TypeScript, and Tailwind CSS. The application includes day, week, and month views for calendar events with a sleek, modern interface.
 
 ## Features
 
+- **Modern UI Design**: Completely refreshed interface with improved visual hierarchy and modern design principles
 - **Multiple Calendar Views**: Day, Week, and Month views
+- **Event Categories & Tags**: Categorize events with custom tags for better organization
+- **Calendar Filter System**: Comprehensive filtering by event type, tag, participant, and more
+- **Pre-populated Calendar**: Includes seed data with holidays, observances, and sample events for new users
+- **Visual Event Indicators**: Color-coded events with intuitive icons for quick recognition
 - **Demo Authentication**: Simulated login without requiring a database
 - **Responsive Design**: Works on desktop, tablet, and mobile
 - **Event Display**: View event details by clicking on events
-- **Modern UI**: Built with Tailwind CSS
 - **Database Ready**: Optional connection to PostgreSQL via Neon
 
 ## Tech Stack
@@ -19,6 +23,30 @@ A simple calendar application built with Next.js, TypeScript, and Tailwind CSS. 
 - NextAuth.js for authentication structure
 - Prisma ORM (optional for database connection)
 - Demo mode for authentication without a database
+
+## Recent Updates (Calendar UI v1.1)
+
+This update includes significant UI/UX improvements focusing on the high-priority items from the enhancement backlog:
+
+1. **Complete Calendar UI Redesign**
+   - Modern design principles with improved visual hierarchy
+   - Enhanced readability and information density
+   - Consistent styling across all views
+
+2. **Advanced Calendar Filter System**
+   - Filter events by type, tag, participant, and custom criteria
+   - Accessible filter panel with intuitive controls
+   - Visual indicators for active filters
+
+3. **Pre-populated Calendar Data**
+   - Added seed data with common holidays and observances
+   - Includes sample personal and work events for demonstration
+   - Automatically generated for new users
+
+4. **Improved Event Interaction**
+   - Enhanced event display with more contextual information
+   - Better visual distinction between event types
+   - Improved event modal with organized information layout
 
 ## Getting Started
 
@@ -33,7 +61,7 @@ A simple calendar application built with Next.js, TypeScript, and Tailwind CSS. 
 This branch operates in "demo mode" by default, which means:
 - No database connection is required
 - Authentication is simulated using sessionStorage
-- Calendar events are created on the client side
+- Calendar events are created on the client side with seed data
 
 To use with real authentication and a database:
 1. Set up a PostgreSQL database (e.g., with Neon)
@@ -81,65 +109,22 @@ This project contains both App Router (`src/app`) and Pages Router (`pages`) imp
    - `NEXTAUTH_URL`: Your Vercel deployment URL (you can update this after the first deployment)
 5. Click "Deploy"
 
-After the first deployment, you can set up:
-- Custom domain (if desired)
-- Automatic deployments from the GitHub repository
-- Preview deployments for pull requests
+## Future Enhancements
 
-### Router Implementation
+The following items are planned for future updates:
 
-This project is built with a dual routing system:
-- **Pages Router**: Used in production deployment and demo mode
-- **App Router**: Included as a potential future version
+1. **Real Authentication System**: Replace demo authentication with a fully implemented NextAuth.js solution
+2. **User Profiles**: Allow users to create and manage their profiles with avatars and preferences
+3. **Database Integration**: Fully implement PostgreSQL with Prisma ORM for persistent data
+4. **Recurring Events**: Add support for daily, weekly, monthly, and custom recurring events
+5. **Event Reminders**: Implement notifications and reminders for upcoming events
+6. **Drag-and-Drop Events**: Enable drag-and-drop functionality for event creation and rescheduling
+7. **Time Zone Support**: Add support for different time zones with automatic conversion
 
-The pre-build and post-build scripts handle conflict resolution during deployment.
+## Contributing
 
-## Environment Variables
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-The following environment variables can be set:
+## License
 
-- `NEXT_PUBLIC_DEMO_MODE`: Set to "true" to enable demo authentication mode
-- `NEXTAUTH_URL`: The URL of your application
-- `NEXTAUTH_SECRET`: Secret used by NextAuth for encryption
-- `DATABASE_URL`: Only needed if not using demo mode
-
-## Troubleshooting Deployment
-
-### Common Deployment Issues
-
-1. **"Found pages without a React Component as default export"**
-   - This happens when non-page files are present in the `pages` directory
-   - The pre-build script handles this automatically by temporarily removing the directories with non-page files
-   - In this project, the problematic files are in:
-     - `pages/auth/auth-context.js`
-     - `pages/calendar/components/event-modal.tsx`
-
-2. **Router Conflict Errors**
-   - This project contains both App Router and Pages Router implementations
-   - The pre-build script prioritizes the Pages Router for deployment
-   - If you're seeing routing conflicts, check that the pre-build script ran successfully
-
-3. **Authentication Errors**
-   - Ensure `NEXTAUTH_SECRET` is properly set in your environment variables
-   - For demo mode, verify that `NEXT_PUBLIC_DEMO_MODE` is set to "true"
-   - Check browser console for more specific error messages
-
-4. **"Module not found" Errors**
-   - This can happen if dependencies weren't installed correctly
-   - Try deploying with the "Force New Build" option on Vercel
-   - If using the CLI, run `vercel --prod --force`
-
-### Verifying Build Scripts
-
-The deployment uses special build scripts to handle the dual routing system:
-
-- `prebuild`: Runs before the build to move conflicting files
-- `vercel-build`: Special build command for Vercel
-- `postbuild`: Runs after the build to restore moved files
-
-If you suspect build script issues, you can run these commands locally:
-```bash
-node pre-build.js  # Should move conflicting files to temporary locations
-next build         # Should build successfully without errors
-node post-build.js # Should restore moved files
-```
+This project is licensed under the MIT License - see the LICENSE file for details.
