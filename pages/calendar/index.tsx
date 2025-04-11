@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
-import { EventModal } from "./utils/event-modal";
-import { FilterPanel, FilterState } from "./utils/filter-panel";
-import { CalendarEvent } from "./utils/seed-events";
+import { EventModal } from "../../components/EventModal";
+import { FilterPanel, FilterState } from "../../components/FilterPanel";
+import { CalendarEvent } from "../../utils/seedEvents";
 
 // Empty placeholder for when there are no events
 const EMPTY_EVENTS: CalendarEvent[] = [];
@@ -312,7 +312,7 @@ export default function CalendarPage() {
                             key={event.id}
                             onClick={() => setSelectedEvent(event)}
                             className={`block w-full truncate rounded-md px-2 py-1 text-xs font-medium text-left ${event.color}`}
-                            title={`${event.title}${event.isAllDay ? ' (All day)' : ` (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}\\n${event.description || ''}`}
+                            title={`${event.title}${event.isAllDay ? ' (All day)' : ` (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}\n${event.description || ''}`}
                           >
                             {event.isAllDay && (
                               <span className="inline-block w-2 h-2 rounded-full bg-current mr-1"></span>
