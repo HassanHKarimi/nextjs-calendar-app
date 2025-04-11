@@ -5,124 +5,10 @@ import Link from "next/link";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
 import { EventModal } from "./utils/event-modal";
 import { FilterPanel, FilterState } from "./components/filter-panel";
+import { CalendarEvent } from "./utils/seed-events";
 
-// Sample event data
-const SAMPLE_EVENTS = [
-  {
-    id: "event-1",
-    title: "Team Meeting",
-    description: "Weekly team meeting to discuss project progress",
-    startDate: new Date(new Date().setHours(10, 0, 0, 0)),
-    endDate: new Date(new Date().setHours(11, 0, 0, 0)),
-    location: "Conference Room A",
-    isAllDay: false,
-    color: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-    userId: "demo-user",
-    type: "meeting",
-    tags: ["work", "important"],
-    participants: ["alex.johnson", "sarah.williams"]
-  },
-  {
-    id: "event-2", 
-    title: "Product Launch",
-    description: "Launch of the new calendar feature",
-    startDate: new Date(),
-    endDate: new Date(),
-    isAllDay: true,
-    color: "bg-green-100 text-green-800 hover:bg-green-200",
-    userId: "demo-user",
-    type: "appointment",
-    tags: ["work", "important"],
-    participants: ["alex.johnson", "john.smith", "sarah.williams"]
-  },
-  {
-    id: "event-3",
-    title: "Project Deadline",
-    description: "Final submission deadline for the calendar project",
-    startDate: new Date(new Date().setDate(new Date().getDate() + 7)),
-    endDate: new Date(new Date().setDate(new Date().getDate() + 7)),
-    isAllDay: true,
-    color: "bg-red-100 text-red-800 hover:bg-red-200",
-    userId: "demo-user",
-    type: "reminder",
-    tags: ["work", "important"],
-    participants: ["alex.johnson"]
-  }
-];
-
-// Add a few more events to make the calendar look more populated
-for (let i = 1; i <= 10; i++) {
-  const eventDate = new Date();
-  eventDate.setDate(eventDate.getDate() + Math.floor(Math.random() * 28) - 7);
-  
-  const startHour = 9 + Math.floor(Math.random() * 8);
-  const duration = 1 + Math.floor(Math.random() * 3);
-  
-  const startTime = new Date(eventDate);
-  startTime.setHours(startHour, 0, 0, 0);
-  
-  const endTime = new Date(eventDate);
-  endTime.setHours(startHour + duration, 0, 0, 0);
-  
-  const titles = [
-    "Team Standup", 
-    "Client Meeting", 
-    "Design Review", 
-    "Code Review", 
-    "Planning Session",
-    "Sprint Demo",
-    "1:1 with Manager",
-    "Project Review",
-    "API Discussion",
-    "UI/UX Workshop"
-  ];
-  
-  const colors = [
-    "bg-blue-100 text-blue-800 hover:bg-blue-200",
-    "bg-green-100 text-green-800 hover:bg-green-200",
-    "bg-purple-100 text-purple-800 hover:bg-purple-200",
-    "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-    "bg-red-100 text-red-800 hover:bg-red-200",
-    "bg-indigo-100 text-indigo-800 hover:bg-indigo-200"
-  ];
-
-  const types = ["meeting", "appointment", "reminder", "task"];
-  const tagsList = ["work", "personal", "important", "travel"];
-  const participantsList = ["alex.johnson", "sarah.williams", "john.smith"];
-  
-  // Generate random tags and participants
-  const tags = [];
-  const randomTagCount = Math.floor(Math.random() * 3) + 1;
-  for (let j = 0; j < randomTagCount; j++) {
-    const randomTag = tagsList[Math.floor(Math.random() * tagsList.length)];
-    if (!tags.includes(randomTag)) {
-      tags.push(randomTag);
-    }
-  }
-
-  const participants = [];
-  const randomParticipantCount = Math.floor(Math.random() * 3) + 1;
-  for (let j = 0; j < randomParticipantCount; j++) {
-    const randomParticipant = participantsList[Math.floor(Math.random() * participantsList.length)];
-    if (!participants.includes(randomParticipant)) {
-      participants.push(randomParticipant);
-    }
-  }
-  
-  SAMPLE_EVENTS.push({
-    id: `event-${i + 3}`,
-    title: titles[i % titles.length],
-    description: `Description for ${titles[i % titles.length]}`,
-    startDate: startTime,
-    endDate: endTime,
-    isAllDay: Math.random() > 0.8,  // 20% chance of all-day event
-    color: colors[i % colors.length],
-    userId: "demo-user",
-    type: types[Math.floor(Math.random() * types.length)],
-    tags,
-    participants
-  });
-}
+// Empty placeholder for when there are no events
+const EMPTY_EVENTS: CalendarEvent[] = [];
 
 export default function CalendarPage() {
   const router = useRouter();
@@ -132,8 +18,8 @@ export default function CalendarPage() {
   const [dataLoading, setDataLoading] = useState(true);
   const dateParam = router.query.date as string | undefined;
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState(SAMPLE_EVENTS);
-  const [filteredEvents, setFilteredEvents] = useState(SAMPLE_EVENTS);
+  const [events, setEvents] = useState<CalendarEvent[]>(EMPTY_EVENTS);
+  const [filteredEvents, setFilteredEvents] = useState<CalendarEvent[]>(EMPTY_EVENTS);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState | null>(null);
@@ -148,6 +34,26 @@ export default function CalendarPage() {
           const auth = JSON.parse(storedAuth);
           if (auth.isAuthenticated && auth.user) {
             setAuthUser(auth.user);
+            
+            // Load seed events from session storage
+            const userId = auth.user.id;
+            const storedEvents = sessionStorage.getItem(`calendarEvents-${userId}`);
+            
+            if (storedEvents) {
+              try {
+                const parsedEvents = JSON.parse(storedEvents);
+                setEvents(parsedEvents);
+                setFilteredEvents(parsedEvents);
+              } catch (error) {
+                console.error('Error parsing stored events:', error);
+                setEvents(EMPTY_EVENTS);
+                setFilteredEvents(EMPTY_EVENTS);
+              }
+            } else {
+              setEvents(EMPTY_EVENTS);
+              setFilteredEvents(EMPTY_EVENTS);
+            }
+            
             setLoading(false);
           } else {
             router.push('/');
@@ -433,6 +339,36 @@ export default function CalendarPage() {
                 </div>
               );
             })}
+          </div>
+          
+          {/* Event categories */}
+          <div className="mt-6 flex flex-wrap gap-2">
+            <div className="text-sm font-medium text-gray-700 mr-2">Event Categories:</div>
+            {/* Holidays */}
+            <span className="inline-flex items-center rounded-full bg-purple-100 px-3 py-0.5 text-sm font-medium text-purple-800">
+              <span className="w-2 h-2 rounded-full bg-purple-600 mr-1"></span>
+              Holidays
+            </span>
+            {/* Observances */}
+            <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-0.5 text-sm font-medium text-blue-800">
+              <span className="w-2 h-2 rounded-full bg-blue-600 mr-1"></span>
+              Observances
+            </span>
+            {/* Meetings */}
+            <span className="inline-flex items-center rounded-full bg-green-100 px-3 py-0.5 text-sm font-medium text-green-800">
+              <span className="w-2 h-2 rounded-full bg-green-600 mr-1"></span>
+              Meetings
+            </span>
+            {/* Personal */}
+            <span className="inline-flex items-center rounded-full bg-yellow-100 px-3 py-0.5 text-sm font-medium text-yellow-800">
+              <span className="w-2 h-2 rounded-full bg-yellow-600 mr-1"></span>
+              Personal
+            </span>
+            {/* Deadlines */}
+            <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-0.5 text-sm font-medium text-red-800">
+              <span className="w-2 h-2 rounded-full bg-red-600 mr-1"></span>
+              Deadlines
+            </span>
           </div>
         </div>
         
