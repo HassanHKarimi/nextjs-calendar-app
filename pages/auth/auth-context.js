@@ -1,6 +1,7 @@
 // pages/auth/auth-context.js
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import generateAllEvents from '../calendar/utils/seed-events';
 
 // Create the auth context
 const AuthContext = createContext();
@@ -47,13 +48,35 @@ export function AuthProvider({ children }) {
     }
   }, [router.pathname]);
 
-  // Login function
+  // Login function with seed data generation
   const login = (userData) => {
-    setUser(userData);
+    // Generate a unique user ID if not provided
+    const userId = userData.id || `user-${Date.now()}`;
+    
+    // Create user data with ID
+    const enrichedUserData = {
+      ...userData,
+      id: userId
+    };
+    
+    setUser(enrichedUserData);
+    
     if (typeof window !== 'undefined') {
+      // Check if we already have stored events for this user
+      const storedEvents = sessionStorage.getItem(`calendarEvents-${userId}`);
+      
+      if (!storedEvents) {
+        // Generate seed events for the user
+        const seedEvents = generateAllEvents(userId);
+        
+        // Store the events in session storage
+        sessionStorage.setItem(`calendarEvents-${userId}`, JSON.stringify(seedEvents));
+      }
+      
+      // Store auth data
       sessionStorage.setItem('calendarAuth', JSON.stringify({
         isAuthenticated: true,
-        user: userData
+        user: enrichedUserData
       }));
     }
   };
@@ -78,10 +101,10 @@ export function AuthProvider({ children }) {
   // Show loading state or render children
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">Loading...</h2>
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Loading...</h2>
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     );
