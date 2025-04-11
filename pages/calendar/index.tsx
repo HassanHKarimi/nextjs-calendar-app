@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
-import { EventModal } from "./components/event-modal";
+import { EventModal } from "./utils/event-modal";
+import { FilterPanel, FilterState } from "./components/filter-panel";
 
 // Sample event data
 const SAMPLE_EVENTS = [
@@ -17,6 +18,9 @@ const SAMPLE_EVENTS = [
     isAllDay: false,
     color: "bg-blue-100 text-blue-800 hover:bg-blue-200",
     userId: "demo-user",
+    type: "meeting",
+    tags: ["work", "important"],
+    participants: ["alex.johnson", "sarah.williams"]
   },
   {
     id: "event-2", 
@@ -27,6 +31,9 @@ const SAMPLE_EVENTS = [
     isAllDay: true,
     color: "bg-green-100 text-green-800 hover:bg-green-200",
     userId: "demo-user",
+    type: "appointment",
+    tags: ["work", "important"],
+    participants: ["alex.johnson", "john.smith", "sarah.williams"]
   },
   {
     id: "event-3",
@@ -37,6 +44,9 @@ const SAMPLE_EVENTS = [
     isAllDay: true,
     color: "bg-red-100 text-red-800 hover:bg-red-200",
     userId: "demo-user",
+    type: "reminder",
+    tags: ["work", "important"],
+    participants: ["alex.johnson"]
   }
 ];
 
@@ -75,6 +85,29 @@ for (let i = 1; i <= 10; i++) {
     "bg-red-100 text-red-800 hover:bg-red-200",
     "bg-indigo-100 text-indigo-800 hover:bg-indigo-200"
   ];
+
+  const types = ["meeting", "appointment", "reminder", "task"];
+  const tagsList = ["work", "personal", "important", "travel"];
+  const participantsList = ["alex.johnson", "sarah.williams", "john.smith"];
+  
+  // Generate random tags and participants
+  const tags = [];
+  const randomTagCount = Math.floor(Math.random() * 3) + 1;
+  for (let j = 0; j < randomTagCount; j++) {
+    const randomTag = tagsList[Math.floor(Math.random() * tagsList.length)];
+    if (!tags.includes(randomTag)) {
+      tags.push(randomTag);
+    }
+  }
+
+  const participants = [];
+  const randomParticipantCount = Math.floor(Math.random() * 3) + 1;
+  for (let j = 0; j < randomParticipantCount; j++) {
+    const randomParticipant = participantsList[Math.floor(Math.random() * participantsList.length)];
+    if (!participants.includes(randomParticipant)) {
+      participants.push(randomParticipant);
+    }
+  }
   
   SAMPLE_EVENTS.push({
     id: `event-${i + 3}`,
@@ -84,7 +117,10 @@ for (let i = 1; i <= 10; i++) {
     endDate: endTime,
     isAllDay: Math.random() > 0.8,  // 20% chance of all-day event
     color: colors[i % colors.length],
-    userId: "demo-user"
+    userId: "demo-user",
+    type: types[Math.floor(Math.random() * types.length)],
+    tags,
+    participants
   });
 }
 
@@ -97,8 +133,10 @@ export default function CalendarPage() {
   const dateParam = router.query.date as string | undefined;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState(SAMPLE_EVENTS);
+  const [filteredEvents, setFilteredEvents] = useState(SAMPLE_EVENTS);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [view, setView] = useState('month'); // 'month', 'week', 'day'
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+  const [filters, setFilters] = useState<FilterState | null>(null);
   
   // Use effect to check auth status client-side
   useEffect(() => {
@@ -144,6 +182,45 @@ export default function CalendarPage() {
     const timer = setTimeout(() => setDataLoading(false), 500);
     return () => clearTimeout(timer);
   }, [dateParam]);
+
+  // Effect to apply filters when they change
+  useEffect(() => {
+    if (!filters) {
+      setFilteredEvents(events);
+      return;
+    }
+
+    const filtered = events.filter(event => {
+      // Check event type
+      if (event.type && !filters.eventTypes[event.type]) {
+        return false;
+      }
+
+      // Check tags
+      if (event.tags && event.tags.length > 0) {
+        const hasActiveTag = event.tags.some(tag => filters.tags[tag]);
+        if (!hasActiveTag) {
+          return false;
+        }
+      }
+
+      // Check participants
+      if (event.participants && event.participants.length > 0) {
+        const hasActiveParticipant = event.participants.some(participant => 
+          filters.participants[participant]
+        );
+        if (!hasActiveParticipant) {
+          return false;
+        }
+      }
+
+      // Date range checking would go here
+
+      return true;
+    });
+
+    setFilteredEvents(filtered);
+  }, [filters, events]);
   
   // Logout function
   const logout = () => {
@@ -151,6 +228,11 @@ export default function CalendarPage() {
       sessionStorage.removeItem('calendarAuth');
       router.push('/');
     }
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
   };
   
   // Return loading state if not authenticated yet
@@ -229,25 +311,38 @@ export default function CalendarPage() {
       <main className="container mx-auto px-4 py-6">
         <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
-            <Link
-              href={`/calendar?date=${prevMonth}`}
-              className="rounded-full p-2 text-gray-600 hover:bg-gray-100 transition-colors"
-              aria-label="Previous month"
+            <div className="flex items-center">
+              <Link
+                href={`/calendar?date=${prevMonth}`}
+                className="rounded-full p-2 text-gray-600 hover:bg-gray-100 transition-colors mr-2"
+                aria-label="Previous month"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </Link>
+              <h2 className="text-2xl font-bold text-gray-900">{formattedDate}</h2>
+              <Link
+                href={`/calendar?date=${nextMonth}`}
+                className="rounded-full p-2 text-gray-600 hover:bg-gray-100 transition-colors ml-2"
+                aria-label="Next month"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+            
+            <button 
+              onClick={() => setIsFilterPanelOpen(true)}
+              className="flex items-center gap-2 rounded-md bg-gray-100 px-4 py-2 text-gray-700 hover:bg-gray-200 transition-colors"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
-            </Link>
-            <h2 className="text-2xl font-bold text-gray-900">{formattedDate}</h2>
-            <Link
-              href={`/calendar?date=${nextMonth}`}
-              className="rounded-full p-2 text-gray-600 hover:bg-gray-100 transition-colors"
-              aria-label="Next month"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </Link>
+              <span>Filter</span>
+              {filters && <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white text-xs">!</span>}
+            </button>
           </div>
           
           {/* Calendar grid */}
@@ -265,7 +360,7 @@ export default function CalendarPage() {
             {/* Calendar days */}
             {days.map((day) => {
               // Get events for this day
-              const dayEvents = events.filter((event) => {
+              const dayEvents = filteredEvents.filter((event) => {
                 const eventStart = new Date(event.startDate);
                 const eventEnd = new Date(event.endDate);
                 
@@ -400,6 +495,15 @@ export default function CalendarPage() {
       {/* Event Modal */}
       {selectedEvent && (
         <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      )}
+      
+      {/* Filter Panel */}
+      {isFilterPanelOpen && (
+        <FilterPanel 
+          onFilterChange={handleFilterChange} 
+          isOpen={isFilterPanelOpen} 
+          onClose={() => setIsFilterPanelOpen(false)} 
+        />
       )}
     </div>
   );
