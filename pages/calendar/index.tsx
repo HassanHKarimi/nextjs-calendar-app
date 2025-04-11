@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
 import { EventModal } from "./utils/event-modal";
-import { FilterPanel, FilterState } from "./components/filter-panel";
+import { FilterPanel, FilterState } from "./utils/filter-panel";
 import { CalendarEvent } from "./utils/seed-events";
 
 // Empty placeholder for when there are no events
