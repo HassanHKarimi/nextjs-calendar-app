@@ -190,10 +190,10 @@ export default function WeekView() {
   // Return loading state if not authenticated yet
   if (loading || !authUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">Loading...</h2>
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Loading Calendar...</h2>
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       </div>
     );
@@ -202,9 +202,10 @@ export default function WeekView() {
   // Show data loading state
   if (dataLoading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold">Loading...</h1>
-        <p className="mt-4">Please wait while we retrieve your calendar</p>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
+        <h1 className="text-4xl font-bold text-gray-800">Loading Calendar</h1>
+        <p className="mt-4 text-gray-600">Please wait while we retrieve your events</p>
+        <div className="mt-8 w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -241,172 +242,277 @@ export default function WeekView() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Weekly Calendar</h1>
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex gap-2">
-            <div className="text-sm text-gray-600">
-              Logged in as <span className="font-medium">{authUser?.name || 'User'}</span>
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white shadow-sm">
+        <div className="container mx-auto px-4 py-6 flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-900">Weekly Calendar</h1>
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-3 text-gray-600">
+              <div className="flex items-center">
+                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center mr-2">
+                  {authUser?.name?.charAt(0) || 'U'}
+                </div>
+                <span className="font-medium">{authUser?.name || 'User'}</span>
+              </div>
+              <button 
+                onClick={logout}
+                className="text-sm text-red-600 hover:text-red-800 hover:underline"
+              >
+                Logout
+              </button>
             </div>
-            <button 
-              onClick={logout}
-              className="text-sm text-red-600 hover:text-red-800"
-            >
-              Logout
-            </button>
-          </div>
-          <div className="flex gap-2">
-            <Link
-              href="/calendar"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
-            >
-              Month View
-            </Link>
-            <Link
-              href="/calendar/day"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
-            >
-              Day View
-            </Link>
-            <Link
-              href="/calendar/new-event"
-              className="rounded bg-green-600 px-4 py-2 text-white"
-            >
-              New Event
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href="/calendar" className="rounded-md bg-blue-100 px-4 py-2 text-blue-800 font-medium hover:bg-blue-200 transition-colors">
+                Month
+              </Link>
+              <Link href="/calendar/day" className="rounded-md bg-blue-100 px-4 py-2 text-blue-800 font-medium hover:bg-blue-200 transition-colors">
+                Day
+              </Link>
+              <Link href="/calendar/new-event" className="rounded-md bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 transition-colors">
+                + New Event
+              </Link>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
-        <div className="flex items-center justify-between border-b pb-4 mb-4">
-          <Link
-            href={`/calendar/week?date=${prevWeek}`}
-            className="rounded bg-gray-100 px-3 py-1 hover:bg-gray-200"
-          >
-            &larr; Previous Week
-          </Link>
-          <h2 className="text-xl font-semibold">{formattedDateRange}</h2>
-          <Link
-            href={`/calendar/week?date=${nextWeek}`}
-            className="rounded bg-gray-100 px-3 py-1 hover:bg-gray-200"
-          >
-            Next Week &rarr;
-          </Link>
-        </div>
-        
-        {/* Week view grid */}
-        <div className="mt-4 flex">
-          {/* Time column */}
-          <div className="w-16 pr-2 flex-shrink-0">
-            <div className="h-12 border-b border-transparent"></div>
-            {HOURS.map(hour => (
-              <div key={hour} className="h-[60px] text-xs text-gray-500 text-right">
-                {hour === 12 ? '12 PM' : hour < 12 ? `${hour} AM` : `${hour-12} PM`}
-              </div>
-            ))}
+      <main className="container mx-auto px-4 py-6">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+            <Link
+              href={`/calendar/week?date=${prevWeek}`}
+              className="rounded-full p-2 text-gray-600 hover:bg-gray-100 transition-colors"
+              aria-label="Previous week"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </Link>
+            <h2 className="text-2xl font-bold text-gray-900">{formattedDateRange}</h2>
+            <Link
+              href={`/calendar/week?date=${nextWeek}`}
+              className="rounded-full p-2 text-gray-600 hover:bg-gray-100 transition-colors"
+              aria-label="Next week"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
           
-          {/* Day columns */}
-          <div className="flex-grow grid grid-cols-7 divide-x">
-            {/* Day headers */}
-            {weekDays.map((day, index) => (
-              <div key={day.toString()} className="text-center">
-                <div className="h-12 flex flex-col justify-center border-b">
-                  <div className="text-xs text-gray-500">{format(day, "EEE")}</div>
-                  <Link href={`/calendar/day?date=${format(day, "yyyy-MM-dd")}`}>
-                    <div className={`text-sm font-medium ${isSameDay(day, new Date()) ? "bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center mx-auto" : ""}`}>
-                      {format(day, "d")}
-                    </div>
-                  </Link>
+          {/* Week view grid */}
+          <div className="flex">
+            {/* Time column */}
+            <div className="w-20 flex-shrink-0 pr-4">
+              <div className="h-16"></div> {/* Empty space for day headers */}
+              {HOURS.map(hour => (
+                <div key={hour} className="h-[60px] relative">
+                  <span className="absolute -top-3 text-xs text-gray-500">
+                    {hour === 12 ? '12 PM' : hour < 12 ? `${hour} AM` : `${hour-12} PM`}
+                  </span>
                 </div>
-                
-                {/* All day events */}
-                <div className="min-h-[20px] bg-gray-50 p-1">
-                  {getDayEvents(day)
-                    .filter(event => event.isAllDay)
-                    .slice(0, 1)
-                    .map(event => (
-                      <div 
-                        key={event.id} 
-                        onClick={() => setSelectedEvent(event)}
-                        className={`text-xs p-1 rounded truncate ${event.color} cursor-pointer hover:opacity-90`}
-                        title={event.title}
-                      >
-                        {event.title}
+              ))}
+            </div>
+            
+            {/* Day columns */}
+            <div className="flex-grow grid grid-cols-7 divide-x divide-gray-200">
+              {/* Day headers */}
+              {weekDays.map((day, index) => (
+                <div key={day.toString()} className="relative">
+                  <div className="h-16 flex flex-col justify-center items-center border-b border-gray-200">
+                    <div className="text-xs font-medium text-gray-500 mb-1">{format(day, "EEE")}</div>
+                    <Link href={`/calendar/day?date=${format(day, "yyyy-MM-dd")}`}>
+                      <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                        isSameDay(day, new Date()) ? "bg-blue-600 text-white" : "hover:bg-gray-100 text-gray-900"
+                      }`}>
+                        {format(day, "d")}
                       </div>
-                    ))}
-                  {getDayEvents(day).filter(event => event.isAllDay).length > 1 && (
-                    <div className="text-xs text-gray-500 px-1">
-                      + {getDayEvents(day).filter(event => event.isAllDay).length - 1} more
-                    </div>
-                  )}
-                </div>
-                
-                {/* Time slots */}
-                <div className="relative">
-                  {HOURS.map(hour => (
-                    <div key={hour} className="h-[60px] border-b border-gray-100"></div>
-                  ))}
+                    </Link>
+                  </div>
                   
-                  {/* Events */}
-                  {getDayEvents(day)
-                    .filter(event => !event.isAllDay)
-                    .map(event => {
-                      const { top, height } = getEventPosition(event);
-                      return (
-                        <div
-                          key={event.id}
+                  {/* All day events */}
+                  <div className="bg-gray-50 px-1 py-2 border-b border-gray-200">
+                    {getDayEvents(day)
+                      .filter(event => event.isAllDay)
+                      .slice(0, 1)
+                      .map(event => (
+                        <button 
+                          key={event.id} 
                           onClick={() => setSelectedEvent(event)}
-                          className={`absolute mx-1 rounded-sm px-1 shadow-sm text-xs ${event.color} overflow-hidden cursor-pointer hover:opacity-90`}
-                          style={{ 
-                            top: `${top}px`, 
-                            height: `${height}px`,
-                            left: '2px',
-                            right: '2px'
-                          }}
-                          title={`${event.title}\n${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')}\n${event.description || ''}`}
+                          className={`text-xs p-1 rounded-md w-full text-left truncate ${event.color} cursor-pointer hover:opacity-90 mb-1`}
+                          title={event.title}
                         >
-                          <div className="font-medium truncate">
-                            {event.title}
+                          <div className="flex items-center">
+                            <div className="w-1 h-4 rounded-full bg-current mr-1"></div>
+                            <span className="truncate">{event.title}</span>
                           </div>
-                          {height >= 30 && (
-                            <div className="text-[10px] truncate">
-                              {format(new Date(event.startDate), 'h:mm a')}
+                        </button>
+                      ))}
+                    {getDayEvents(day).filter(event => event.isAllDay).length > 1 && (
+                      <button 
+                        onClick={() => router.push(`/calendar/day?date=${format(day, "yyyy-MM-dd")}`)}
+                        className="text-xs text-gray-500 hover:text-gray-700 w-full text-left px-1"
+                      >
+                        + {getDayEvents(day).filter(event => event.isAllDay).length - 1} more
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Time grid */}
+                  <div className="relative">
+                    {HOURS.map(hour => (
+                      <div key={hour} className="h-[60px] border-b border-gray-100"></div>
+                    ))}
+                    
+                    {/* Current time indicator */}
+                    {isSameDay(day, new Date()) && (
+                      <div className="absolute left-0 right-0 flex items-center" style={{ 
+                        top: `${(new Date().getHours() - 8 + new Date().getMinutes() / 60) * 60}px` 
+                      }}>
+                        <div className="w-1 h-1 rounded-full bg-red-500 ml-1"></div>
+                        <div className="flex-grow h-[1px] bg-red-500 ml-1"></div>
+                      </div>
+                    )}
+                    
+                    {/* Time-based events */}
+                    {getDayEvents(day)
+                      .filter(event => !event.isAllDay)
+                      .map(event => {
+                        const { top, height } = getEventPosition(event);
+                        return (
+                          <div
+                            key={event.id}
+                            onClick={() => setSelectedEvent(event)}
+                            className={`absolute mx-1 rounded-md px-1 shadow-sm text-xs ${event.color} overflow-hidden cursor-pointer hover:opacity-90 border-l-2 border-current`}
+                            style={{ 
+                              top: `${top}px`, 
+                              height: `${Math.max(height, 20)}px`,
+                              left: '2px',
+                              right: '2px'
+                            }}
+                            title={`${event.title}\n${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')}\n${event.description || ''}`}
+                          >
+                            <div className="font-medium truncate">
+                              {event.title}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                            {height >= 30 && (
+                              <div className="text-[10px] truncate opacity-75">
+                                {format(new Date(event.startDate), 'h:mm a')}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      
-      <div className="mt-6 text-center text-gray-500 text-sm">
-        <p>This is a demo calendar with sample events. Click on a day to view detailed schedule.</p>
-        <p className="mt-2">Logged in as: <span className="font-semibold">{authUser?.email || 'user@example.com'}</span></p>
-        
-        <div className="mt-4 flex justify-center">
-          <div className="bg-purple-50 border-l-4 border-purple-400 p-4 max-w-md">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-purple-800">Team Calendar Features</h3>
-                <div className="mt-2 text-sm text-purple-700">
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Team member availability view - <span className="font-semibold">Requires Team Plan</span></li>
-                    <li>Meeting scheduling assistant - <span className="font-semibold">Requires Team Plan</span></li>
-                    <li>Shared calendar permissions - <span className="font-semibold">Requires Team Plan</span></li>
-                  </ul>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
-      </div>
+        
+        {/* Filter section */}
+        <div className="mt-8 flex flex-col md:flex-row gap-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-grow">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Calendar Filters</h3>
+            <div className="space-y-3">
+              <label className="flex items-center space-x-3">
+                <input type="checkbox" checked className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                <span className="text-gray-700">Work Events</span>
+              </label>
+              <label className="flex items-center space-x-3">
+                <input type="checkbox" checked className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                <span className="text-gray-700">Personal Events</span>
+              </label>
+              <label className="flex items-center space-x-3">
+                <input type="checkbox" checked className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                <span className="text-gray-700">Holidays</span>
+              </label>
+              <label className="flex items-center space-x-3">
+                <input type="checkbox" checked className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                <span className="text-gray-700">Birthdays</span>
+              </label>
+            </div>
+            <div className="mt-6">
+              <button className="text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                Manage Categories...
+              </button>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-grow">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Team Members</h3>
+            <div className="space-y-3">
+              <label className="flex items-center space-x-3">
+                <input type="checkbox" checked className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-2 text-xs">
+                    A
+                  </div>
+                  <span className="text-gray-700">Alex Johnson</span>
+                </div>
+              </label>
+              <label className="flex items-center space-x-3">
+                <input type="checkbox" checked className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-2 text-xs">
+                    S
+                  </div>
+                  <span className="text-gray-700">Sarah Williams</span>
+                </div>
+              </label>
+              <label className="flex items-center space-x-3">
+                <input type="checkbox" checked className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                <div className="flex items-center">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-2 text-xs">
+                    J
+                  </div>
+                  <span className="text-gray-700">John Smith</span>
+                </div>
+              </label>
+            </div>
+            <div className="mt-6">
+              <button className="text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                Manage Team...
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Upgrade banner */}
+        <div className="mt-8 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-100">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div>
+              <h3 className="text-xl font-bold text-indigo-900">Team Calendar Features</h3>
+              <p className="mt-2 text-indigo-800">Collaborate with your team more effectively with shared calendars.</p>
+              <ul className="mt-4 space-y-2">
+                <li className="flex items-center text-indigo-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Shared team availability view
+                </li>
+                <li className="flex items-center text-indigo-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Meeting scheduling assistant
+                </li>
+                <li className="flex items-center text-indigo-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  Calendar permissions management
+                </li>
+              </ul>
+            </div>
+            <div className="mt-6 md:mt-0">
+              <button className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                Upgrade to Team Plan
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
       
       {/* Event Modal */}
       {selectedEvent && (
