@@ -2,6 +2,7 @@
 
 import { format, isValid } from "date-fns";
 import { useState, useEffect } from "react";
+import { getColorClass } from "@/lib/utils";
 
 interface Event {
   id: string;
@@ -132,8 +133,8 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
     );
   }
 
-  // Determine color class name from event color
-  const getColorClass = () => {
+  // Get color class for the event indicator
+  const getIndicatorColorClass = () => {
     if (!event.color) return 'bg-gray-500';
     
     if (event.color.includes('blue')) return 'bg-blue-500';
@@ -142,6 +143,7 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
     if (event.color.includes('purple')) return 'bg-purple-500';
     if (event.color.includes('yellow')) return 'bg-yellow-500';
     if (event.color.includes('indigo')) return 'bg-indigo-500';
+    if (event.color.includes('pink')) return 'bg-pink-500';
     
     return 'bg-gray-500';
   };
@@ -164,7 +166,7 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
         </button>
 
         {/* Event color indicator */}
-        <div className={`mb-4 h-2 w-16 rounded ${getColorClass()}`} />
+        <div className={`mb-4 h-2 w-16 rounded ${getIndicatorColorClass()}`} />
 
         {/* Event title */}
         <h2 className="text-2xl font-bold">

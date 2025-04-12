@@ -19,9 +19,18 @@ import { cn, getColorClass } from "@/lib/utils";
 import { Event } from "@prisma/client";
 import dynamic from "next/dynamic";
 
-// Import the EventModal component
+// Import the EventModal component with no SSR to prevent hydration issues
 const EventModal = dynamic(() => import("@/components/calendar/event-modal"), {
   ssr: false,
+  loading: () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <div className="flex justify-center items-center py-8">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    </div>
+  ),
 });
 
 type MonthlyCalendarProps = {
@@ -45,9 +54,11 @@ export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyC
   // Day names for the header
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   
-  // Handler for event clicks
+  // Handler for event clicks with debugging
   const handleEventClick = (e: React.MouseEvent, event: Event) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent event bubbling
+    console.log("Event clicked:", event); // For debugging
     setSelectedEvent(event);
   };
 
@@ -130,19 +141,18 @@ export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyC
                 {dayEvents.length > 0 && (
                   <div className="space-y-1.5">
                     {dayEvents.slice(0, 3).map((event) => (
-                      <a
+                      <button
                         key={event.id}
-                        href={`/calendar/event/${event.id}`}
                         onClick={(e) => handleEventClick(e, event)}
                         className={cn(
-                          "block truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-all cursor-pointer",
+                          "block w-full text-left truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-all cursor-pointer",
                           "bg-gray-50 dark:bg-gray-800/50",
                           "hover:scale-[1.02] hover:-translate-y-[1px]",
                           getColorClass(event.color)
                         )}
                       >
                         {event.title}
-                      </a>
+                      </button>
                     ))}
                     {dayEvents.length > 3 && (
                       <div className="px-1 text-xs text-muted-foreground">
