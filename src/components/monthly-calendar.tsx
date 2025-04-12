@@ -54,17 +54,13 @@ export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyC
   // Day names for the header
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   
-  // Handler for event clicks with enhanced debugging
+  // Handler for event clicks with direct alert
   const handleEventClick = (e: React.MouseEvent, event: Event) => {
     e.preventDefault();
     e.stopPropagation(); // Prevent event bubbling
     
-    // Enhanced debugging
-    console.log("----------EVENT CLICKED----------");
-    console.log("Event data:", event);
-    console.log("Event target:", e.target);
-    console.log("Current target:", e.currentTarget);
-    console.log("---------------------------------");
+    // Add immediate visual feedback with an alert
+    alert(`Opening event: ${event.title}`);
     
     // Make sure we're dealing with the right event format
     const fixedEvent = {
@@ -76,6 +72,14 @@ export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyC
     
     // Update state to show modal
     setSelectedEvent(fixedEvent);
+    
+    // Force re-render by setting state twice
+    setTimeout(() => {
+      setSelectedEvent(null);
+      setTimeout(() => {
+        setSelectedEvent(fixedEvent);
+      }, 50);
+    }, 50);
   };
 
   return (
