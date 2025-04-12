@@ -141,6 +141,7 @@ export const EventModal = ({ event, onClose }: EventModalProps) => {
     if (event.color.includes('purple')) return 'bg-purple-500';
     if (event.color.includes('yellow')) return 'bg-yellow-500';
     if (event.color.includes('indigo')) return 'bg-indigo-500';
+    if (event.color.includes('pink')) return 'bg-pink-500';
     
     return 'bg-gray-500';
   };

@@ -296,7 +296,11 @@ export default function CalendarPage() {
                       {dayEvents.slice(0, 3).map((event) => (
                         <button
                           key={event.id}
-                          onClick={() => setSelectedEvent(event)}
+                          onClick={() => {
+                            console.log("Event clicked:", event);
+                            alert(`Opening event: ${event.title}`);
+                            setSelectedEvent(event);
+                          }}
                           className={`block w-full truncate rounded-sm px-1 py-0.5 text-xs font-medium text-left ${event.color}`}
                           title={`${event.title}${event.isAllDay ? ' (All day)' : ` (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}\n${event.description || ''}`}
                         >
