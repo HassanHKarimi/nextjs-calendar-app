@@ -67,7 +67,7 @@ export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyC
         ))}
       </div>
 
-      <div className="grid grid-cols-7 divide-x divide-y">
+      <div className="grid grid-cols-7 border-t border-l">
         {days.map((day) => {
           // Get events for this day
           const dayEvents = events.filter((event) => {
@@ -85,7 +85,7 @@ export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyC
             <div
               key={day.toISOString()}
               className={cn(
-                "min-h-[120px] p-2",
+                "min-h-[120px] p-2 border-r border-b border-gray-200 dark:border-gray-800",
                 !isSameMonth(day, date) && "bg-muted/50 text-muted-foreground",
                 isToday(day) && "bg-accent/50"
               )}
@@ -102,15 +102,15 @@ export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyC
                 </Link>
               </div>
 
-              <div className="mt-1 max-h-[80px] space-y-1 overflow-y-auto">
+              <div className="mt-1 max-h-[80px] space-y-1.5 overflow-y-auto">
                 {dayEvents.length > 0 && (
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     {dayEvents.slice(0, 3).map((event) => (
                       <Link
                         key={event.id}
                         href={`/calendar/event/${event.id}`}
                         className={cn(
-                          "block truncate rounded-sm px-1 py-0.5 text-xs font-medium",
+                          "block truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-shadow",
                           getColorClass(event.color)
                         )}
                       >

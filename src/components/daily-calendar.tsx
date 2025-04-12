@@ -70,7 +70,7 @@ export function DailyCalendar({ date, events, prevDay, nextDay }: DailyCalendarP
                 key={event.id}
                 href={`/calendar/event/${event.id}`}
                 className={cn(
-                  "block rounded px-2 py-1 text-sm",
+                  "block rounded-md px-3 py-1.5 text-sm border shadow-sm hover:shadow-md transition-shadow",
                   getColorClass(event.color)
                 )}
               >
@@ -82,7 +82,7 @@ export function DailyCalendar({ date, events, prevDay, nextDay }: DailyCalendarP
       )}
 
       {/* Hourly events */}
-      <div className="divide-y">
+      <div className="divide-y divide-gray-200 dark:divide-gray-800">
         {hours.map((hour) => {
           const hourEvents = getEventsForHour(hour);
           const hasEvents = hourEvents.length > 0;
@@ -107,7 +107,7 @@ export function DailyCalendar({ date, events, prevDay, nextDay }: DailyCalendarP
                         key={event.id}
                         href={`/calendar/event/${event.id}`}
                         className={cn(
-                          "block rounded px-2 py-1 text-sm",
+                          "block rounded-md px-3 py-1.5 text-sm border shadow-sm hover:shadow-md transition-shadow",
                           getColorClass(event.color)
                         )}
                       >

@@ -102,12 +102,12 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
       </div>
 
       {/* Day headers */}
-      <div className="grid grid-cols-7 border-b">
+      <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-800">
         {days.map((day) => (
           <div
             key={day.toISOString()}
             className={cn(
-              "py-2 text-center",
+              "py-3 text-center border-r border-gray-200 dark:border-gray-800 last:border-r-0",
               isToday(day) && "bg-accent/50"
             )}
           >
@@ -122,7 +122,7 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
               </div>
               <div 
                 className={cn(
-                  "mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full text-sm",
+                  "mt-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-sm",
                   isToday(day) && "bg-primary text-primary-foreground font-semibold"
                 )}
               >
@@ -134,7 +134,7 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
       </div>
 
       {/* All-day events */}
-      <div className="grid grid-cols-7 border-b">
+      <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-800">
         {days.map((day) => {
           const allDayEvents = getAllDayEventsForDay(day);
           
@@ -142,7 +142,7 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
             <div
               key={`allday-${day.toISOString()}`}
               className={cn(
-                "p-2 min-h-[60px]", 
+                "p-2 min-h-[60px] border-r border-gray-200 dark:border-gray-800 last:border-r-0", 
                 isToday(day) && "bg-accent/50"
               )}
             >
@@ -153,7 +153,7 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
                       key={event.id}
                       href={`/calendar/event/${event.id}`}
                       className={cn(
-                        "block truncate rounded-sm px-1 py-0.5 text-xs font-medium",
+                        "block truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-shadow",
                         getColorClass(event.color)
                       )}
                     >
@@ -180,11 +180,11 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
       </div>
 
       {/* Hourly grid */}
-      <div>
+      <div className="border-t border-gray-200 dark:border-gray-800">
         {hours.map((hour) => (
-          <div key={hour.toISOString()} className="grid grid-cols-7 border-b last:border-b-0">
+          <div key={hour.toISOString()} className="grid grid-cols-7 border-b last:border-b-0 border-gray-200 dark:border-gray-800">
             {/* Time label */}
-            <div className="col-span-7 border-b pl-2 py-1 text-xs text-muted-foreground">
+            <div className="col-span-7 border-b pl-2 py-1 text-xs text-muted-foreground border-gray-200 dark:border-gray-800">
               {format(hour, "h a")}
             </div>
 
@@ -196,7 +196,7 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
                 <div
                   key={`${day.toISOString()}-${hour.toISOString()}`}
                   className={cn(
-                    "min-h-[60px] p-1 border-r last:border-r-0",
+                    "min-h-[60px] p-1 border-r border-gray-200 dark:border-gray-800 last:border-r-0",
                     isToday(day) && "bg-accent/20"
                   )}
                 >
@@ -207,7 +207,7 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
                           key={event.id}
                           href={`/calendar/event/${event.id}`}
                           className={cn(
-                            "block truncate rounded-sm px-1 py-0.5 text-xs font-medium",
+                            "block truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-shadow",
                             getColorClass(event.color)
                           )}
                         >

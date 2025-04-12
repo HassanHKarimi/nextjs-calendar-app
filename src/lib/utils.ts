@@ -41,20 +41,20 @@ export function formatDateRange(startDate: Date, endDate: Date, isAllDay: boolea
 export function getColorClass(color: string | null | undefined): string {
   switch (color) {
     case "blue":
-      return "bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-700";
+      return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/80 dark:text-blue-300 dark:border-blue-700";
     case "green":
-      return "bg-green-100 text-green-700 border-green-300 dark:bg-green-900 dark:text-green-300 dark:border-green-700";
+      return "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/80 dark:text-green-300 dark:border-green-700";
     case "red":
-      return "bg-red-100 text-red-700 border-red-300 dark:bg-red-900 dark:text-red-300 dark:border-red-700";
+      return "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/80 dark:text-red-300 dark:border-red-700";
     case "purple":
-      return "bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900 dark:text-purple-300 dark:border-purple-700";
+      return "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/80 dark:text-purple-300 dark:border-purple-700";
     case "yellow":
-      return "bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-300 dark:border-yellow-700";
+      return "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-900/80 dark:text-yellow-300 dark:border-yellow-700";
     case "indigo":
-      return "bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-900 dark:text-indigo-300 dark:border-indigo-700";
+      return "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-900/80 dark:text-indigo-300 dark:border-indigo-700";
     case "pink":
-      return "bg-pink-100 text-pink-700 border-pink-300 dark:bg-pink-900 dark:text-pink-300 dark:border-pink-700";
+      return "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-900/80 dark:text-pink-300 dark:border-pink-700";
     default:
-      return "bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-700";
+      return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/80 dark:text-blue-300 dark:border-blue-700";
   }
 }
