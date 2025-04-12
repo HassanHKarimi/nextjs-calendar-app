@@ -19,8 +19,8 @@ import { cn, getColorClass } from "@/lib/utils";
 import { Event } from "@prisma/client";
 import dynamic from "next/dynamic";
 
-// Dynamically import the EventModal to avoid SSR issues
-const EventModal = dynamic(() => import("../pages/calendar/components/event-modal").then(mod => mod.EventModal), {
+// Import the EventModal component
+const EventModal = dynamic(() => import("@/components/calendar/event-modal"), {
   ssr: false,
 });
 

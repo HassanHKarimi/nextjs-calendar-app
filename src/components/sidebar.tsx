@@ -28,30 +28,34 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex h-full flex-col border-r bg-background p-4 space-y-4 w-60">
-      <Button asChild size="sm" className="justify-start">
+    <div className="flex h-full flex-col border-r bg-background p-4 space-y-4 w-56">
+      <Button 
+        asChild 
+        size="sm" 
+        className="justify-start bg-gray-800 hover:bg-gray-700 text-white py-1 px-3 text-sm font-medium rounded-md"
+      >
         <Link href="/calendar/new-event">
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus className="mr-2 h-3.5 w-3.5" />
           New Event
         </Link>
       </Button>
 
-      <div className="mt-8 space-y-1">
+      <div className="mt-6 space-y-0.5">
         {routes.map((route) => (
           <Button
             key={route.href}
-            variant={pathname === route.href ? "secondary" : "ghost"}
+            variant="ghost"
             size="sm"
             asChild
             className={cn(
-              "w-full justify-start",
+              "w-full justify-start py-1 px-3 text-xs font-medium rounded",
               pathname === route.href
-                ? "bg-secondary text-secondary-foreground"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-gray-800 text-white hover:bg-gray-700"
+                : "text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-800"
             )}
           >
             <Link href={route.href}>
-              <route.icon className="mr-2 h-4 w-4" />
+              <route.icon className="mr-2 h-3.5 w-3.5" />
               {route.label}
             </Link>
           </Button>
