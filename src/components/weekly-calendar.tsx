@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { 
   format, 
   startOfWeek,
@@ -16,6 +17,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, getColorClass } from "@/lib/utils";
 import { Event } from "@prisma/client";
+import dynamic from "next/dynamic";
+
+// Dynamically import the EventModal to avoid SSR issues
+const EventModal = dynamic(() => import("../pages/calendar/components/event-modal").then(mod => mod.EventModal), {
+  ssr: false,
+});
 
 type WeeklyCalendarProps = {
   date: Date;
@@ -25,10 +32,19 @@ type WeeklyCalendarProps = {
 };
 
 export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalendarProps) {
+  // State to track the selected event for the modal
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  
   // Create days for the week
   const weekStart = startOfWeek(date, { weekStartsOn: 0 });
   const weekEnd = endOfWeek(date, { weekStartsOn: 0 });
   const days = eachDayOfInterval({ start: weekStart, end: weekEnd });
+  
+  // Handler for event clicks
+  const handleEventClick = (e: React.MouseEvent, event: Event) => {
+    e.preventDefault();
+    setSelectedEvent(event);
+  };
 
   // Create time slots (hourly, from 8am to 8pm for simplicity)
   const hours = Array.from({ length: 13 }, (_, i) => {
@@ -84,6 +100,14 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
 
   return (
     <div className="rounded-lg border bg-card">
+      {/* Event Modal */}
+      {selectedEvent && (
+        <EventModal 
+          event={selectedEvent} 
+          onClose={() => setSelectedEvent(null)} 
+        />
+      )}
+      
       {/* Calendar navigation */}
       <div className="flex items-center justify-between border-b p-4">
         <Link href={`/calendar/week?date=${prevWeek}`} className="text-sm text-muted-foreground hover:text-foreground">
@@ -149,16 +173,19 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
               {allDayEvents.length > 0 ? (
                 <div className="space-y-1">
                   {allDayEvents.slice(0, 2).map((event) => (
-                    <Link
+                    <a
                       key={event.id}
                       href={`/calendar/event/${event.id}`}
+                      onClick={(e) => handleEventClick(e, event)}
                       className={cn(
-                        "block truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-shadow",
+                        "block truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-all",
+                        "bg-gray-50 dark:bg-gray-800/50",
+                        "hover:scale-[1.02] hover:-translate-y-[1px] cursor-pointer",
                         getColorClass(event.color)
                       )}
                     >
                       {event.title}
-                    </Link>
+                    </a>
                   ))}
                   {allDayEvents.length > 2 && (
                     <div className="px-1 text-xs text-muted-foreground">
@@ -203,16 +230,19 @@ export function WeeklyCalendar({ date, events, prevWeek, nextWeek }: WeeklyCalen
                   {hourlyEvents.length > 0 ? (
                     <div className="space-y-1">
                       {hourlyEvents.map((event) => (
-                        <Link
+                        <a
                           key={event.id}
                           href={`/calendar/event/${event.id}`}
+                          onClick={(e) => handleEventClick(e, event)}
                           className={cn(
-                            "block truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-shadow",
+                            "block truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-all",
+                            "bg-gray-50 dark:bg-gray-800/50",
+                            "hover:scale-[1.02] hover:-translate-y-[1px] cursor-pointer",
                             getColorClass(event.color)
                           )}
                         >
                           {event.title}
-                        </Link>
+                        </a>
                       ))}
                     </div>
                   ) : (

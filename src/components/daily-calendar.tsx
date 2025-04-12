@@ -1,11 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { format, isSameDay, addHours, setHours, setMinutes } from "date-fns";
 import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, getColorClass, formatTime } from "@/lib/utils";
 import { Event } from "@prisma/client";
+import dynamic from "next/dynamic";
+
+// Dynamically import the EventModal to avoid SSR issues
+const EventModal = dynamic(() => import("../pages/calendar/components/event-modal").then(mod => mod.EventModal), {
+  ssr: false,
+});
 
 type DailyCalendarProps = {
   date: Date;
@@ -15,6 +22,9 @@ type DailyCalendarProps = {
 };
 
 export function DailyCalendar({ date, events, prevDay, nextDay }: DailyCalendarProps) {
+  // State to track the selected event for the modal
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
   // Create time slots for the day (hourly)
   const hours = Array.from({ length: 24 }, (_, i) => {
     return setHours(setMinutes(new Date(date), 0), i);
@@ -41,8 +51,22 @@ export function DailyCalendar({ date, events, prevDay, nextDay }: DailyCalendarP
   // Find all-day events
   const allDayEvents = events.filter((event) => event.isAllDay);
   
+  // Handler for event clicks
+  const handleEventClick = (e: React.MouseEvent, event: Event) => {
+    e.preventDefault();
+    setSelectedEvent(event);
+  };
+  
   return (
     <div className="rounded-lg border bg-card">
+      {/* Event Modal */}
+      {selectedEvent && (
+        <EventModal 
+          event={selectedEvent} 
+          onClose={() => setSelectedEvent(null)} 
+        />
+      )}
+      
       {/* Calendar navigation */}
       <div className="flex items-center justify-between border-b p-4">
         <Link href={`/calendar/day?date=${prevDay}`} className="text-sm text-muted-foreground hover:text-foreground">
@@ -66,16 +90,19 @@ export function DailyCalendar({ date, events, prevDay, nextDay }: DailyCalendarP
           <div className="mb-1 font-medium text-sm">All day</div>
           <div className="space-y-1">
             {allDayEvents.map((event) => (
-              <Link
+              <a
                 key={event.id}
                 href={`/calendar/event/${event.id}`}
+                onClick={(e) => handleEventClick(e, event)}
                 className={cn(
-                  "block rounded-md px-3 py-1.5 text-sm border shadow-sm hover:shadow-md transition-shadow",
+                  "block rounded-md px-3 py-1.5 text-sm border shadow-sm hover:shadow-md transition-all",
+                  "bg-gray-50 dark:bg-gray-800/50",
+                  "hover:scale-[1.02] hover:-translate-y-[1px] cursor-pointer",
                   getColorClass(event.color)
                 )}
               >
                 {event.title}
-              </Link>
+              </a>
             ))}
           </div>
         </div>
@@ -103,11 +130,14 @@ export function DailyCalendar({ date, events, prevDay, nextDay }: DailyCalendarP
                 {hasEvents ? (
                   <div className="space-y-1">
                     {hourEvents.map((event) => (
-                      <Link
+                      <a
                         key={event.id}
                         href={`/calendar/event/${event.id}`}
+                        onClick={(e) => handleEventClick(e, event)}
                         className={cn(
-                          "block rounded-md px-3 py-1.5 text-sm border shadow-sm hover:shadow-md transition-shadow",
+                          "block rounded-md px-3 py-1.5 text-sm border shadow-sm hover:shadow-md transition-all",
+                          "bg-gray-50 dark:bg-gray-800/50",
+                          "hover:scale-[1.02] hover:-translate-y-[1px] cursor-pointer",
                           getColorClass(event.color)
                         )}
                       >

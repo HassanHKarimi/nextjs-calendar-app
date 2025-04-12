@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { 
   format, 
   startOfMonth, 
@@ -16,6 +17,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, getColorClass } from "@/lib/utils";
 import { Event } from "@prisma/client";
+import dynamic from "next/dynamic";
+
+// Dynamically import the EventModal to avoid SSR issues
+const EventModal = dynamic(() => import("../pages/calendar/components/event-modal").then(mod => mod.EventModal), {
+  ssr: false,
+});
 
 type MonthlyCalendarProps = {
   date: Date;
@@ -25,6 +32,9 @@ type MonthlyCalendarProps = {
 };
 
 export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyCalendarProps) {
+  // State to track the selected event for the modal
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+
   // Create calendar days for the grid
   const monthStart = startOfMonth(date);
   const monthEnd = endOfMonth(date);
@@ -34,9 +44,23 @@ export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyC
 
   // Day names for the header
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  
+  // Handler for event clicks
+  const handleEventClick = (e: React.MouseEvent, event: Event) => {
+    e.preventDefault();
+    setSelectedEvent(event);
+  };
 
   return (
     <div className="rounded-lg border bg-card">
+      {/* Event Modal */}
+      {selectedEvent && (
+        <EventModal 
+          event={selectedEvent} 
+          onClose={() => setSelectedEvent(null)} 
+        />
+      )}
+      
       {/* Calendar navigation */}
       <div className="flex items-center justify-between border-b p-4">
         <Link href={`/calendar?date=${prevMonth}`} className="text-sm text-muted-foreground hover:text-foreground">
@@ -106,16 +130,19 @@ export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyC
                 {dayEvents.length > 0 && (
                   <div className="space-y-1.5">
                     {dayEvents.slice(0, 3).map((event) => (
-                      <Link
+                      <a
                         key={event.id}
                         href={`/calendar/event/${event.id}`}
+                        onClick={(e) => handleEventClick(e, event)}
                         className={cn(
-                          "block truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-shadow",
+                          "block truncate rounded-md px-2 py-1 text-xs font-medium border shadow-sm hover:shadow-md transition-all cursor-pointer",
+                          "bg-gray-50 dark:bg-gray-800/50",
+                          "hover:scale-[1.02] hover:-translate-y-[1px]",
                           getColorClass(event.color)
                         )}
                       >
                         {event.title}
-                      </Link>
+                      </a>
                     ))}
                     {dayEvents.length > 3 && (
                       <div className="px-1 text-xs text-muted-foreground">
