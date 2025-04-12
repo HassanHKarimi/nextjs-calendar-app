@@ -35,12 +35,13 @@ export default async function CalendarPage({
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
   
+  // Format dates consistently as JavaScript Date objects
   const sampleEvents = [
     {
       id: "event-1",
       title: "Team Meeting",
       description: "Weekly team meeting to discuss project progress",
-      startDate: tomorrow,
+      startDate: new Date(tomorrow),
       endDate: new Date(new Date(tomorrow).setHours(tomorrow.getHours() + 1)),
       location: "Conference Room A",
       isAllDay: false,
@@ -53,8 +54,8 @@ export default async function CalendarPage({
       id: "event-2",
       title: "Product Launch",
       description: "Launch of the new calendar feature",
-      startDate: today,
-      endDate: today,
+      startDate: new Date(today),
+      endDate: new Date(today),
       isAllDay: true,
       color: "blue",
       userId: dummyUserId,

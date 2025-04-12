@@ -54,12 +54,28 @@ export function MonthlyCalendar({ date, events, prevMonth, nextMonth }: MonthlyC
   // Day names for the header
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   
-  // Handler for event clicks with debugging
+  // Handler for event clicks with enhanced debugging
   const handleEventClick = (e: React.MouseEvent, event: Event) => {
     e.preventDefault();
     e.stopPropagation(); // Prevent event bubbling
-    console.log("Event clicked:", event); // For debugging
-    setSelectedEvent(event);
+    
+    // Enhanced debugging
+    console.log("----------EVENT CLICKED----------");
+    console.log("Event data:", event);
+    console.log("Event target:", e.target);
+    console.log("Current target:", e.currentTarget);
+    console.log("---------------------------------");
+    
+    // Make sure we're dealing with the right event format
+    const fixedEvent = {
+      ...event,
+      // Ensure dates are proper Date objects if they're strings
+      startDate: event.startDate instanceof Date ? event.startDate : new Date(event.startDate),
+      endDate: event.endDate instanceof Date ? event.endDate : new Date(event.endDate)
+    };
+    
+    // Update state to show modal
+    setSelectedEvent(fixedEvent);
   };
 
   return (
