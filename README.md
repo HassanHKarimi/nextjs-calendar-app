@@ -1,6 +1,10 @@
 # Next.js Calendar App
 
-A simple calendar application built with Next.js, TypeScript, and Tailwind CSS. The application includes day, week, and month views for calendar events.
+> **⚠️ IMPORTANT: STATIC EXPORT MODE**  
+> This application uses Next.js static export mode instead of server-side rendering.
+> Do not modify the `output: 'export'` setting in next.config.js without careful testing!
+
+A simple calendar application built with Next.js, TypeScript, and inline styles (previously used Tailwind CSS). The application includes day, week, and month views for calendar events.
 
 ## Features
 
@@ -13,9 +17,9 @@ A simple calendar application built with Next.js, TypeScript, and Tailwind CSS. 
 
 ## Tech Stack
 
-- Next.js 15 (with support for both App Router and Pages Router)
+- Next.js 15 (Pages Router with static export mode)
 - TypeScript
-- Tailwind CSS
+- Inline CSS styles (Tailwind CSS was removed to simplify deployment)
 - NextAuth.js for authentication structure
 - Prisma ORM (optional for database connection)
 - Demo mode for authentication without a database
@@ -86,13 +90,14 @@ After the first deployment, you can set up:
 - Automatic deployments from the GitHub repository
 - Preview deployments for pull requests
 
-### Router Implementation
+### Deployment Architecture
 
-This project is built with a dual routing system:
-- **Pages Router**: Used in production deployment and demo mode
-- **App Router**: Included as a potential future version
+This project uses a static site generation approach:
+- **Static Export Mode**: Pages are pre-rendered to static HTML during build
+- **No Server-Side Rendering**: All functionality runs client-side
+- **Pages Router Only**: The App Router implementation has been removed
 
-The pre-build and post-build scripts handle conflict resolution during deployment.
+The build scripts generate all necessary static files and HTML during deployment.
 
 ## Environment Variables
 
@@ -107,32 +112,41 @@ The following environment variables can be set:
 
 ### Common Deployment Issues
 
-1. **"Found pages without a React Component as default export"**
+1. **404 Errors on Root Page**
+   - This application MUST use static export mode (`output: 'export'` in next.config.js)
+   - Without static export, routing fails on Vercel deployment
+   - If you see 404 errors, check that static export mode is enabled
+   - The fallback index.html will indicate if routing is failing
+
+2. **Styling Issues**
+   - This project originally used Tailwind CSS but now uses inline styles
+   - This change was made to simplify deployment and avoid CSS conflicts
+   - When adding new components, use inline styles instead of Tailwind classes
+   - The styles.css file contains minimal global styles
+
+3. **"Found pages without a React Component as default export"**
    - This happens when non-page files are present in the `pages` directory
    - In this project, we've moved auth-context.js to the `/context` directory to fix this
-   - We've also added a proper React component in `pages/auth/index.tsx` that redirects to sign-in
+   - Each file in the pages directory must export a React component
 
-2. **Router Conflict Errors**
-   - This project contains both App Router and Pages Router implementations
-   - The vercel-build.sh script focuses on the Pages Router for deployment
-
-3. **Authentication Errors**
+4. **Authentication Errors**
    - Ensure `NEXTAUTH_SECRET` is properly set in your environment variables
    - For demo mode, verify that `NEXT_PUBLIC_DEMO_MODE` is set to "true"
    - Check browser console for more specific error messages
 
-4. **"Module not found" Errors**
+5. **"Module not found" Errors**
    - This can happen if dependencies weren't installed correctly
    - Try deploying with the "Force New Build" option on Vercel
    - If using the CLI, run `vercel --prod --force`
 
-5. **"Routes Manifest Could Not Be Found" Error**
+6. **"Routes Manifest Could Not Be Found" Error**
    - This can happen when the Next.js build output directory doesn't match Vercel's expected location
    - We've fixed this by setting `distDir: 'dist'` in next.config.js and explicitly creating the routes-manifest.json file
+   - The static export mode avoids many of these routing issues
 
 ### Deployment Infrastructure
 
-The project now uses a streamlined deployment approach:
+The project now uses a streamlined static export deployment approach:
 
 - `vercel.json` - Configures Vercel-specific settings like:
   - Build command: `bash ./vercel-build.sh`
@@ -140,10 +154,47 @@ The project now uses a streamlined deployment approach:
   - Environment variables
 
 - `vercel-build.sh` - The main build script that:
-  - Creates the Next.js configuration
+  - Creates the Next.js configuration with `output: 'export'` mode
   - Generates necessary files for NextAuth
   - Creates directory structure
   - Sets up auth-related components
-  - Ensures the routes-manifest.json is available
+  - Builds static HTML files for all routes
+  - Creates a fallback index.html if needed
 
-This approach ensures consistent, reliable deployments by creating all necessary files during the build process, rather than relying on pre-existing files that might be missing or have issues.
+- `next.config.js` - Critical configuration file:
+  - Sets `output: 'export'` for static HTML generation
+  - Sets `images: { unoptimized: true }` for static image handling
+  - Contains webpack configuration for client-side rendering
+
+### Developer Guidelines
+
+When working on this project, follow these important guidelines:
+
+1. **Keep Static Export Mode Enabled**
+   - The `output: 'export'` setting in next.config.js is REQUIRED
+   - Without it, the application will fail to deploy correctly
+   - This setting causes Next.js to generate static HTML files instead of using server-side rendering
+
+2. **Use Inline Styles**
+   - Tailwind CSS has been removed to simplify deployment
+   - Use React inline style objects instead of CSS classes
+   - Example: `<div style={{ marginTop: '1rem', color: '#333' }}>`
+   - Add global styles to src/app/styles.css when needed
+
+3. **Keep Auth Logic Client-Side**
+   - Authentication uses client-side storage in demo mode
+   - All API calls will fail in static export mode
+   - Keep logic in useEffect hooks and event handlers
+
+4. **Testing Deployment Locally**
+   - Run `npm run test-vercel-build` to test the build script
+   - Check the generated dist directory for proper HTML files
+   - Use a local static server to test the output: `npx serve dist`
+
+5. **Adding New Pages**
+   - All new pages must be added to the Pages Router (`pages/` directory)
+   - Each page must export a default React component
+   - Make sure to add proper inline styles
+   - Test the static export build before committing
+
+These guidelines ensure the application remains deployable and functional.
