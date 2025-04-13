@@ -1,20 +1,37 @@
-// Fallback _app.tsx for Pages Router
+// Minimal _app.tsx without any CSS frameworks
 import type { AppProps } from 'next/app'
-import '../src/app/globals.css'
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
-import { Inter } from "next/font/google";
+import { useEffect } from 'react'
+import '../src/app/styles.css'
 
-const inter = Inter({ subsets: ["latin"] });
+// Log on module load
+console.log("[DIAGNOSTIC] _app.tsx module loaded");
 
 export default function MyApp({ Component, pageProps }: AppProps) {
-  // Simplified app wrapper without AuthProvider
-  return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <main className={inter.className}>
-        <Component {...pageProps} />
-        <Toaster />
-      </main>
-    </ThemeProvider>
-  );
+  // Log on component render
+  console.log("[DIAGNOSTIC] MyApp rendering with route:", typeof window !== 'undefined' ? window.location.pathname : 'SSR');
+  
+  useEffect(() => {
+    // Log on client-side
+    console.log("[DIAGNOSTIC] MyApp mounted, current URL:", window.location.href);
+    console.log("[DIAGNOSTIC] Current pathname:", window.location.pathname);
+    
+    // Add global error handler to catch any issues
+    const originalOnError = window.onerror;
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.log("[DIAGNOSTIC] Global error:", message);
+      console.log("[DIAGNOSTIC] Error details:", {source, lineno, colno, error});
+      
+      // Call original handler if it exists
+      if (originalOnError) {
+        return originalOnError(message, source, lineno, colno, error);
+      }
+      return false;
+    };
+    
+    return () => {
+      window.onerror = originalOnError;
+    };
+  }, []);
+  
+  return <Component {...pageProps} />;
 }

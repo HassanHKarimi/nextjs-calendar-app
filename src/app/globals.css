@@ -74,3 +74,42 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Calendar specific styles */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.calendar-day {
+  min-height: 100px;
+  border: 1px solid var(--border);
+  padding: 4px;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-weight: bold;
+  padding: 4px;
+}
+
+.event-item {
+  margin: 2px 0;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-blue { background-color: #93c5fd; }
+.event-green { background-color: #86efac; }
+.event-red { background-color: #fca5a5; }
+.event-yellow { background-color: #fde68a; }
+.event-purple { background-color: #d8b4fe; }
+.event-pink { background-color: #f9a8d4; }
+.event-orange { background-color: #fdba74; }
+.event-gray { background-color: #d1d5db; }

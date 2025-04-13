@@ -1,91 +1,91 @@
-import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { db } from "@/lib/db";
-import authConfig from "@/auth.config";
-import { getUserById } from "@/data/user";
-import { getAccountByUserId } from "@/data/account";
+// src/auth.ts - For NextAuth v5
+import { PrismaClient } from "@prisma/client";
+import type { Session } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
 
-// Define the UserRole type if not automatically imported from Prisma
-type UserRole = "USER" | "ADMIN";
+// Initialize Prisma client
+const prisma = new PrismaClient();
 
-// Note: This version is compatible with beta.3
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
-  adapter: PrismaAdapter(db),
-  session: { strategy: "jwt" },
+// Define type for credentials
+interface CredentialsType {
+  email: string;
+  password: string;
+}
+
+// Define the auth configuration (v5 doesn't use NextAuthOptions or AuthOptions)
+export const authOptions = {
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        // Type safety check
+        const typedCredentials = credentials as CredentialsType;
+        
+        if (!typedCredentials?.email || !typedCredentials?.password) {
+          return null;
+        }
+
+        try {
+          const user = await prisma.user.findUnique({
+            where: {
+              email: typedCredentials.email
+            }
+          });
+
+          if (!user || !user.password) {
+            return null;
+          }
+
+          const isPasswordValid = await bcrypt.compare(
+            typedCredentials.password,
+            user.password
+          );
+
+          if (!isPasswordValid) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role || "USER"
+          };
+        } catch (error) {
+          console.error("Auth error:", error);
+          return null;
+        }
+      }
+    })
+  ],
+  session: {
+    strategy: "jwt" as const // Must be typed as literal "jwt" or "database" for NextAuth v5
+  },
+  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
   pages: {
     signIn: "/sign-in",
-    error: "/error",
-  },
-  events: {
-    async linkAccount({ user }) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { emailVerified: new Date() }
-      });
-    }
+    signUp: "/sign-up",
+    error: "/sign-in",
   },
   callbacks: {
-    async signIn({ user, account }) {
-      // Allow OAuth without email verification
-      if (account?.provider !== "credentials") return true;
-
-      const existingUser = await getUserById(user.id);
-
-      // Prevent sign in without email verification
-      if (!existingUser?.emailVerified) return false;
-
-      return true;
-    },
-    async session({ token, session }) {
-      if (token.sub && session.user) {
-        session.user.id = token.sub;
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
       }
-
-      // Set a default role if it's missing
-      if (session.user) {
-        session.user.role = (token.role as UserRole) || "USER";
-      }
-
-      if (session.user) {
-        session.user.name = token.name as string;
-        session.user.email = token.email as string;
-        session.user.isOAuth = token.isOAuth as boolean;
-      }
-
-      return session;
-    },
-    async jwt({ token }) {
-      if (!token.sub) return token;
-
-      const existingUser = await getUserById(token.sub);
-
-      if (!existingUser) return token;
-
-      const existingAccount = await getAccountByUserId(existingUser.id);
-
-      token.isOAuth = !!existingAccount;
-      token.name = existingUser.name;
-      token.email = existingUser.email;
-      token.role = existingUser.role;
-
       return token;
-    }
-  },
-  cookies: {
-    sessionToken: {
-      name: "next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production"
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id;
+        session.user.role = token.role;
       }
+      return session;
     }
-  },
-  ...authConfig,
-});
+  }
+};

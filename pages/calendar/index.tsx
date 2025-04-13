@@ -155,10 +155,18 @@ export default function CalendarPage() {
   // Return loading state if not authenticated yet
   if (loading || !authUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">Loading...</h2>
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem' }}>Loading...</h2>
+          <div style={{ 
+            width: '3rem', 
+            height: '3rem', 
+            borderRadius: '50%',
+            border: '4px solid #3b82f6', 
+            borderTopColor: 'transparent',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto'
+          }}></div>
         </div>
       </div>
     );
@@ -182,45 +190,45 @@ export default function CalendarPage() {
   // Show data loading state
   if (dataLoading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center">
-        <h1 className="text-4xl font-bold">Loading...</h1>
-        <p className="mt-4">Please wait while we retrieve your calendar</p>
+      <div style={{ display: 'flex', minHeight: '100vh', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold' }}>Loading...</h1>
+        <p style={{ marginTop: '1rem' }}>Please wait while we retrieve your calendar</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Your Calendar</h1>
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex gap-2">
-            <div className="text-sm text-gray-600">
-              Logged in as <span className="font-medium">{authUser?.name || 'User'}</span>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
+      <header style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Your Calendar</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <div style={{ fontSize: '0.875rem', color: '#4b5563' }}>
+              Logged in as <span style={{ fontWeight: '500' }}>{authUser?.name || 'User'}</span>
             </div>
             <button 
               onClick={logout}
-              className="text-sm text-red-600 hover:text-red-800"
+              style={{ fontSize: '0.875rem', color: '#dc2626', cursor: 'pointer', background: 'none', border: 'none' }}
             >
               Logout
             </button>
           </div>
-          <div className="flex gap-2">
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
             <Link
               href="/calendar/day"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
+              style={{ borderRadius: '0.25rem', backgroundColor: '#2563eb', padding: '0.5rem 1rem', color: 'white', textDecoration: 'none' }}
             >
               Day View
             </Link>
             <Link
               href="/calendar/week"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
+              style={{ borderRadius: '0.25rem', backgroundColor: '#2563eb', padding: '0.5rem 1rem', color: 'white', textDecoration: 'none' }}
             >
               Week View
             </Link>
             <Link
               href="/calendar/new-event"
-              className="rounded bg-green-600 px-4 py-2 text-white"
+              style={{ borderRadius: '0.25rem', backgroundColor: '#16a34a', padding: '0.5rem 1rem', color: 'white', textDecoration: 'none' }}
             >
               New Event
             </Link>
@@ -228,37 +236,37 @@ export default function CalendarPage() {
         </div>
       </header>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
-        <div className="flex items-center justify-between border-b pb-4 mb-4">
+      <div style={{ borderRadius: '0.5rem', border: '1px solid #e5e7eb', backgroundColor: 'white', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e5e7eb', paddingBottom: '1rem', marginBottom: '1rem' }}>
           <Link
             href={`/calendar?date=${prevMonth}`}
-            className="rounded bg-gray-100 px-3 py-1 hover:bg-gray-200"
+            style={{ borderRadius: '0.25rem', backgroundColor: '#f3f4f6', padding: '0.25rem 0.75rem', textDecoration: 'none', color: '#111827' }}
           >
             &larr; Previous
           </Link>
-          <h2 className="text-xl font-semibold">{formattedDate}</h2>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{formattedDate}</h2>
           <Link
             href={`/calendar?date=${nextMonth}`}
-            className="rounded bg-gray-100 px-3 py-1 hover:bg-gray-200"
+            style={{ borderRadius: '0.25rem', backgroundColor: '#f3f4f6', padding: '0.25rem 0.75rem', textDecoration: 'none', color: '#111827' }}
           >
             Next &rarr;
           </Link>
         </div>
         
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 border-b">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #e5e7eb' }}>
           {/* Day names */}
           {weekDays.map((day) => (
             <div
               key={day}
-              className="py-2 text-center text-sm font-medium text-gray-600"
+              style={{ padding: '0.5rem 0', textAlign: 'center', fontSize: '0.875rem', fontWeight: '500', color: '#4b5563' }}
             >
               {day}
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-7 divide-x divide-y">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderTop: '1px solid #e5e7eb' }}>
           {days.map((day) => {
             // Get events for this day
             const dayEvents = events.filter((event) => {
@@ -272,39 +280,97 @@ export default function CalendarPage() {
               );
             });
 
+            // Style based on month and current day
+            const dayStyle = {
+              minHeight: '120px', 
+              padding: '0.5rem',
+              borderRight: '1px solid #e5e7eb',
+              borderBottom: '1px solid #e5e7eb',
+              backgroundColor: isToday(day) ? '#ebf5ff' : 
+                              !isSameMonth(day, currentDate) ? '#f9fafb' : 'white',
+              color: !isSameMonth(day, currentDate) ? '#9ca3af' : 'inherit'
+            };
+
             return (
               <div
                 key={day.toString()}
-                className={`min-h-[120px] p-2 ${
-                  !isSameMonth(day, currentDate) ? "bg-gray-100 text-gray-400" : ""
-                } ${isToday(day) ? "bg-blue-50" : ""}`}
+                style={dayStyle}
               >
-                <div className="flex justify-between">
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <Link
                     href={`/calendar/day?date=${format(day, "yyyy-MM-dd")}`}
-                    className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-sm ${
-                      isToday(day) ? "bg-blue-500 text-white font-semibold" : ""
-                    }`}
+                    style={{ 
+                      display: 'inline-flex',
+                      height: '2rem',
+                      width: '2rem',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '9999px',
+                      fontSize: '0.875rem',
+                      ...(isToday(day) ? { backgroundColor: '#3b82f6', color: 'white', fontWeight: '600' } : {})
+                    }}
                   >
                     {format(day, "d")}
                   </Link>
                 </div>
 
-                <div className="mt-1 max-h-[80px] space-y-1 overflow-y-auto">
+                <div style={{ marginTop: '0.25rem', maxHeight: '80px', overflow: 'auto' }}>
                   {dayEvents.length > 0 && (
-                    <div className="space-y-1">
-                      {dayEvents.slice(0, 3).map((event) => (
-                        <button
-                          key={event.id}
-                          onClick={() => setSelectedEvent(event)}
-                          className={`block w-full truncate rounded-sm px-1 py-0.5 text-xs font-medium text-left ${event.color}`}
-                          title={`${event.title}${event.isAllDay ? ' (All day)' : ` (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}\n${event.description || ''}`}
-                        >
-                          {event.title}
-                        </button>
-                      ))}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                      {dayEvents.slice(0, 3).map((event) => {
+                        // Convert Tailwind color classes to inline styles
+                        let eventStyle = {
+                          display: 'block',
+                          width: '100%',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          borderRadius: '0.125rem',
+                          padding: '0.125rem 0.25rem',
+                          fontSize: '0.75rem',
+                          fontWeight: '500',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          border: 'none',
+                          backgroundColor: '#dbeafe', // Default blue
+                          color: '#1e40af'
+                        };
+                        
+                        // Map color classes to inline styles
+                        if (event.color.includes('green')) {
+                          eventStyle.backgroundColor = '#dcfce7';
+                          eventStyle.color = '#166534';
+                        } else if (event.color.includes('red')) {
+                          eventStyle.backgroundColor = '#fee2e2';
+                          eventStyle.color = '#b91c1c';
+                        } else if (event.color.includes('yellow')) {
+                          eventStyle.backgroundColor = '#fef9c3';
+                          eventStyle.color = '#854d0e';
+                        } else if (event.color.includes('purple')) {
+                          eventStyle.backgroundColor = '#f3e8ff';
+                          eventStyle.color = '#6b21a8';
+                        } else if (event.color.includes('indigo')) {
+                          eventStyle.backgroundColor = '#e0e7ff';
+                          eventStyle.color = '#3730a3';
+                        }
+                        
+                        return (
+                          <button
+                            key={event.id}
+                            onClick={() => {
+                              console.log("Event clicked:", event);
+                              alert(`Opening event: ${event.title}`);
+                              setSelectedEvent(event);
+                            }}
+                            style={eventStyle}
+                            title={`${event.title}${event.isAllDay ? ' (All day)' : ` (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}\n${event.description || ''}`}
+                          >
+                            {event.title}
+                          </button>
+                        );
+                      })}
                       {dayEvents.length > 3 && (
-                        <div className="px-1 text-xs text-gray-500">
+                        <div style={{ padding: '0 0.25rem', fontSize: '0.75rem', color: '#6b7280' }}>
                           + {dayEvents.length - 3} more
                         </div>
                       )}
@@ -317,19 +383,25 @@ export default function CalendarPage() {
         </div>
       </div>
       
-      <div className="mt-6 text-center text-gray-500 text-sm">
+      <div style={{ marginTop: '1.5rem', textAlign: 'center', color: '#6b7280', fontSize: '0.875rem' }}>
         <p>This is a demo calendar with sample events. Click on a day to view detailed schedule.</p>
-        <p className="mt-2">Logged in as: <span className="font-semibold">{authUser?.email || 'user@example.com'}</span></p>
-        <div className="mt-4 flex justify-center">
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 max-w-md">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800">Premium Features</h3>
-                <div className="mt-2 text-sm text-yellow-700">
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Event sharing - <span className="font-semibold">Requires Upgrade</span></li>
-                    <li>Recurring events - <span className="font-semibold">Requires Upgrade</span></li>
-                    <li>Calendar integrations - <span className="font-semibold">Requires Upgrade</span></li>
+        <p style={{ marginTop: '0.5rem' }}>Logged in as: <span style={{ fontWeight: '600' }}>{authUser?.email || 'user@example.com'}</span></p>
+        <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center' }}>
+          <div style={{ 
+            backgroundColor: '#fffbeb', 
+            borderLeftWidth: '4px', 
+            borderLeftColor: '#fbbf24', 
+            padding: '1rem', 
+            maxWidth: '28rem' 
+          }}>
+            <div style={{ display: 'flex' }}>
+              <div style={{ marginLeft: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.875rem', fontWeight: '500', color: '#854d0e' }}>Premium Features</h3>
+                <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#a16207' }}>
+                  <ul style={{ listStyleType: 'disc', paddingLeft: '1.25rem' }}>
+                    <li style={{ marginBottom: '0.25rem' }}>Event sharing - <span style={{ fontWeight: '600' }}>Requires Upgrade</span></li>
+                    <li style={{ marginBottom: '0.25rem' }}>Recurring events - <span style={{ fontWeight: '600' }}>Requires Upgrade</span></li>
+                    <li style={{ marginBottom: '0.25rem' }}>Calendar integrations - <span style={{ fontWeight: '600' }}>Requires Upgrade</span></li>
                   </ul>
                 </div>
               </div>
