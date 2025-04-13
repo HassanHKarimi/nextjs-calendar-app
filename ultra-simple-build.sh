@@ -579,19 +579,33 @@ EOF
 cp utils/event-modal.js pages/utils/
 cp utils/event-modal.js pages/calendar/utils/
 
-# Fix import paths in calendar files - macOS requires a backup extension for sed
+# Fix import paths in calendar files - different syntax for macOS vs Linux (Vercel)
 if [ -f pages/calendar/index.tsx ]; then
-  sed -i '' 's|import { EventModal } from "./components/event-modal"|import { EventModal } from "./utils/event-modal"|g' pages/calendar/index.tsx
+  if [ "$(uname)" = "Darwin" ]; then
+    # macOS requires an empty string for backup extension
+    sed -i '' 's|import { EventModal } from "./components/event-modal"|import { EventModal } from "./utils/event-modal"|g' pages/calendar/index.tsx
+  else
+    # Linux doesn't need the empty string
+    sed -i 's|import { EventModal } from "./components/event-modal"|import { EventModal } from "./utils/event-modal"|g' pages/calendar/index.tsx
+  fi
   grep -n "EventModal" pages/calendar/index.tsx | head -3
 fi
 
 if [ -f pages/calendar/day/index.tsx ]; then
-  sed -i '' 's|import { EventModal } from "../components/event-modal"|import { EventModal } from "../utils/event-modal"|g' pages/calendar/day/index.tsx
+  if [ "$(uname)" = "Darwin" ]; then
+    sed -i '' 's|import { EventModal } from "../components/event-modal"|import { EventModal } from "../utils/event-modal"|g' pages/calendar/day/index.tsx
+  else
+    sed -i 's|import { EventModal } from "../components/event-modal"|import { EventModal } from "../utils/event-modal"|g' pages/calendar/day/index.tsx
+  fi
   grep -n "EventModal" pages/calendar/day/index.tsx | head -3
 fi
 
 if [ -f pages/calendar/week/index.tsx ]; then
-  sed -i '' 's|import { EventModal } from "../components/event-modal"|import { EventModal } from "../utils/event-modal"|g' pages/calendar/week/index.tsx
+  if [ "$(uname)" = "Darwin" ]; then
+    sed -i '' 's|import { EventModal } from "../components/event-modal"|import { EventModal } from "../utils/event-modal"|g' pages/calendar/week/index.tsx
+  else
+    sed -i 's|import { EventModal } from "../components/event-modal"|import { EventModal } from "../utils/event-modal"|g' pages/calendar/week/index.tsx
+  fi
   grep -n "EventModal" pages/calendar/week/index.tsx | head -3
 fi
 
@@ -656,5 +670,9 @@ echo "All files in pages and src directory:"
 find pages src -type f | sort
 
 # Build the application with minimum features - using npx to ensure command is found
-echo "Skipping actual build in local test - this will run automatically on Vercel"
-# npx next build --no-lint
+if [ "$VERCEL" = "1" ]; then
+  echo "Running on Vercel - building the application"
+  npx next build --no-lint
+else
+  echo "Running locally - skipping build as it will run on Vercel"
+fi
