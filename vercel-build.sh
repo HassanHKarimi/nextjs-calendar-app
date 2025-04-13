@@ -1,4 +1,4 @@
 #!/bin/bash
 
-# Use the fixed vercel build script
-bash ./fixed-vercel-build.sh
+# Use the paths-fixed vercel build script
+bash ./vercel-build-paths.sh

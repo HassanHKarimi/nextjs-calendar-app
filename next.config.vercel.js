@@ -16,6 +16,19 @@ const nextConfig = {
         path: false,
       };
     }
+    
+    // Add path aliases for proper resolution
+    const path = require('path');
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname),
+      '@/components': path.resolve(__dirname, 'components'),
+      '@/lib': path.resolve(__dirname, 'lib'),
+      '@/data': path.resolve(__dirname, 'data'),
+      '@/schemas': path.resolve(__dirname, 'schemas'),
+      '@/auth': path.resolve(__dirname, 'auth.js'),
+    };
+    
     return config;
   },
   

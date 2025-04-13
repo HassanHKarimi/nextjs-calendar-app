@@ -1,8 +1,8 @@
 // Fallback _app.tsx for Pages Router
 import type { AppProps } from 'next/app'
 import '../src/app/globals.css'
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "../components/theme-provider";
+import { Toaster } from "../components/ui/toaster";
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });

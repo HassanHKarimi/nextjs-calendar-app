@@ -1,5 +1,5 @@
 // Fallback sign-up page for Pages Router
-import { SignUpForm } from "@/components/auth/sign-up-form";
+import { SignUpForm } from "../components/auth/sign-up-form";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";

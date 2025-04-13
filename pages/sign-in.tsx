@@ -1,5 +1,5 @@
 // Fallback sign-in page for Pages Router
-import { SignInForm } from "@/components/auth/sign-in-form";
+import { SignInForm } from "../components/auth/sign-in-form";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 // Import the handlers from the App Router auth implementation
-import { GET, POST } from '@/auth';
+import { GET, POST } from '../../../auth';
 
 // API routes for authentication - delegate to App Router handlers
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

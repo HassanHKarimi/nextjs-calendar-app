@@ -2,9 +2,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
-import { db } from "@/lib/db";
-import { RegisterSchema } from "@/schemas";
-import { getUserByEmail } from "@/data/user";
+import { db } from "../../../lib/db";
+import { RegisterSchema } from "../../../schemas";
+import { getUserByEmail } from "../../../data/user";
 
 export default async function handler(
   req: NextApiRequest,
