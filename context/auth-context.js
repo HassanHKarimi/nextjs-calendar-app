@@ -1,4 +1,4 @@
-// pages/auth/auth-context.js
+// context/auth-context.js - Moved from pages/auth/ to avoid routing conflicts
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 
