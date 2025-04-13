@@ -1,4 +1,10 @@
 /* Basic styles without any CSS frameworks */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -83,4 +89,25 @@ body {
   color: #e53e3e;
   font-size: 14px;
   margin-top: 4px;
+}
+
+/* Add some global styles for links */
+a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Make sure the app takes full height */
+html, body, #__next {
+  height: 100%;
+}
+
+/* Fix flexbox layout for Safari */
+#__next {
+  display: flex;
+  flex-direction: column;
 }
