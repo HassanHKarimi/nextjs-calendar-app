@@ -89,5 +89,3 @@ export const authOptions = {
     }
   }
 };
-
-// No longer need to export a handler directly in the auth.ts file for NextAuth v5

@@ -1,8 +1,4 @@
 /** @type {import('next').NextConfig} */
-
-// Check if we're running on Vercel
-const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
-
 const nextConfig = {
   // Basic React settings
   reactStrictMode: true,
@@ -31,8 +27,8 @@ const nextConfig = {
   
   // Disable TypeScript checking during build
   typescript: {
-    // Dangerously allow production builds to complete even with type errors
     ignoreBuildErrors: true,
+    tsconfigPath: "tsconfig.json"
   },
   
   // Disable ESLint during build
@@ -57,9 +53,5 @@ const nextConfig = {
     ];
   },
 };
-
-if (isVercel) {
-  console.log('Running on Vercel with config:', JSON.stringify(nextConfig, null, 2));
-}
 
 module.exports = nextConfig;

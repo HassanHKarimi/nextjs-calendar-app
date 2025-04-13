@@ -90,25 +90,155 @@ export default function Home() {
     }, 1000);
   };
 
+  const pageStyle = {
+    minHeight: '100vh',
+    backgroundColor: '#f9fafb',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    padding: '3rem 1.5rem'
+  };
+
+  const headerStyle = {
+    margin: '0 auto',
+    width: '100%',
+    maxWidth: '28rem',
+    textAlign: 'center'
+  };
+
+  const titleStyle = {
+    marginTop: '1.5rem',
+    fontSize: '1.875rem',
+    fontWeight: 'bold',
+    color: '#111827'
+  };
+
+  const subtitleStyle = {
+    marginTop: '0.5rem',
+    fontSize: '0.875rem',
+    color: '#6b7280'
+  };
+
+  const formContainerStyle = {
+    marginTop: '2rem',
+    margin: '2rem auto',
+    width: '100%',
+    maxWidth: '28rem'
+  };
+
+  const formStyle = {
+    backgroundColor: 'white',
+    padding: '2rem 1rem',
+    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+    borderRadius: '0.5rem'
+  };
+
+  const formGroupStyle = {
+    marginBottom: '1.5rem'
+  };
+
+  const labelStyle = {
+    display: 'block',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: '0.25rem'
+  };
+
+  const inputStyle = {
+    appearance: 'none',
+    width: '100%',
+    padding: '0.5rem 0.75rem',
+    border: '1px solid #d1d5db',
+    borderRadius: '0.375rem',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    fontSize: '0.875rem'
+  };
+
+  const errorStyle = {
+    backgroundColor: '#fee2e2',
+    borderLeft: '4px solid #f87171',
+    padding: '1rem',
+    marginBottom: '1rem'
+  };
+
+  const errorTextStyle = {
+    fontSize: '0.875rem',
+    color: '#b91c1c'
+  };
+
+  const buttonStyle = {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '0.5rem 1rem',
+    border: 'none',
+    borderRadius: '0.375rem',
+    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+    fontSize: '0.875rem',
+    fontWeight: '500',
+    color: 'white',
+    backgroundColor: '#2563eb',
+    cursor: 'pointer',
+    opacity: isLoading ? '0.5' : '1'
+  };
+
+  const dividerContainerStyle = {
+    marginTop: '1.5rem',
+    position: 'relative'
+  };
+
+  const dividerStyle = {
+    borderTop: '1px solid #e5e7eb',
+    position: 'absolute',
+    top: '50%',
+    width: '100%'
+  };
+
+  const dividerTextContainerStyle = {
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'center',
+    fontSize: '0.875rem'
+  };
+
+  const dividerTextStyle = {
+    padding: '0 0.5rem',
+    backgroundColor: 'white',
+    color: '#6b7280'
+  };
+
+  const demoInfoStyle = {
+    marginTop: '1.5rem',
+    fontSize: '0.875rem', 
+    color: '#6b7280'
+  };
+
+  const listStyle = {
+    listStyle: 'disc',
+    paddingLeft: '1.25rem',
+    marginTop: '0.5rem'
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+    <div style={pageStyle}>
+      <div style={headerStyle}>
+        <h2 style={titleStyle}>
           Calendar App Login
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p style={subtitleStyle}>
           Sign in to access your calendar
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleLogin}>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+      <div style={formContainerStyle}>
+        <div style={formStyle}>
+          <form onSubmit={handleLogin}>
+            <div style={formGroupStyle}>
+              <label htmlFor="email" style={labelStyle}>
                 Email address
               </label>
-              <div className="mt-1">
+              <div>
                 <input
                   id="email"
                   name="email"
@@ -117,17 +247,17 @@ export default function Home() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  style={inputStyle}
                   placeholder="user@example.com"
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <div style={formGroupStyle}>
+              <label htmlFor="password" style={labelStyle}>
                 Password
               </label>
-              <div className="mt-1">
+              <div>
                 <input
                   id="password"
                   name="password"
@@ -136,17 +266,17 @@ export default function Home() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  style={inputStyle}
                   placeholder="••••••"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-400 p-4">
-                <div className="flex">
-                  <div className="ml-3">
-                    <p className="text-sm text-red-700">
+              <div style={errorStyle}>
+                <div>
+                  <div>
+                    <p style={errorTextStyle}>
                       {error}
                     </p>
                   </div>
@@ -158,33 +288,29 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                style={buttonStyle}
               >
                 {isLoading ? 'Signing in...' : 'Sign in'}
               </button>
             </div>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  Demo Information
-                </span>
-              </div>
+          <div style={dividerContainerStyle}>
+            <div style={dividerStyle}></div>
+            <div style={dividerTextContainerStyle}>
+              <span style={dividerTextStyle}>
+                Demo Information
+              </span>
             </div>
+          </div>
 
-            <div className="mt-6 text-sm text-gray-500">
-              <p>This is a demo application.</p>
-              <ul className="list-disc pl-5 mt-2">
-                <li>Any email containing '@' and password with 6+ characters will work</li>
-                <li>Sample: user@example.com / password123</li>
-                <li>Authentication is required to create events and access certain features</li>
-              </ul>
-            </div>
+          <div style={demoInfoStyle}>
+            <p>This is a demo application.</p>
+            <ul style={listStyle}>
+              <li>Any email containing '@' and password with 6+ characters will work</li>
+              <li>Sample: user@example.com / password123</li>
+              <li>Authentication is required to create events and access certain features</li>
+            </ul>
           </div>
         </div>
       </div>
