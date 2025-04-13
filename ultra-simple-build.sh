@@ -842,7 +842,14 @@ find pages src -type f | sort
 # Build the application with minimum features - using npx to ensure command is found
 if [ "$VERCEL" = "1" ]; then
   echo "Running on Vercel - building the application"
+  echo "Making sure dist directory exists"
+  mkdir -p dist
+  echo "Using next.config.js with distDir: 'dist'"
+  cat next.config.js
+  echo "Building with next build --no-lint"
   npx next build --no-lint
+  echo "Checking contents of dist directory"
+  ls -la dist
 else
   echo "Running locally - skipping build as it will run on Vercel"
 fi
