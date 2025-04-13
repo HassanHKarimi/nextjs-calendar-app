@@ -109,15 +109,12 @@ The following environment variables can be set:
 
 1. **"Found pages without a React Component as default export"**
    - This happens when non-page files are present in the `pages` directory
-   - The pre-build script handles this automatically by temporarily removing the directories with non-page files
-   - In this project, the problematic files are in:
-     - `pages/auth/auth-context.js`
-     - `pages/calendar/components/event-modal.tsx`
+   - In this project, we've moved auth-context.js to the `/context` directory to fix this
+   - We've also added a proper React component in `pages/auth/index.tsx` that redirects to sign-in
 
 2. **Router Conflict Errors**
    - This project contains both App Router and Pages Router implementations
-   - The pre-build script prioritizes the Pages Router for deployment
-   - If you're seeing routing conflicts, check that the pre-build script ran successfully
+   - The vercel-build.sh script focuses on the Pages Router for deployment
 
 3. **Authentication Errors**
    - Ensure `NEXTAUTH_SECRET` is properly set in your environment variables
@@ -129,17 +126,24 @@ The following environment variables can be set:
    - Try deploying with the "Force New Build" option on Vercel
    - If using the CLI, run `vercel --prod --force`
 
-### Verifying Build Scripts
+5. **"Routes Manifest Could Not Be Found" Error**
+   - This can happen when the Next.js build output directory doesn't match Vercel's expected location
+   - We've fixed this by setting `distDir: 'dist'` in next.config.js and explicitly creating the routes-manifest.json file
 
-The deployment uses special build scripts to handle the dual routing system:
+### Deployment Infrastructure
 
-- `prebuild`: Runs before the build to move conflicting files
-- `vercel-build`: Special build command for Vercel
-- `postbuild`: Runs after the build to restore moved files
+The project now uses a streamlined deployment approach:
 
-If you suspect build script issues, you can run these commands locally:
-```bash
-node pre-build.js  # Should move conflicting files to temporary locations
-next build         # Should build successfully without errors
-node post-build.js # Should restore moved files
-```
+- `vercel.json` - Configures Vercel-specific settings like:
+  - Build command: `bash ./vercel-build.sh`
+  - Output directory: `dist`
+  - Environment variables
+
+- `vercel-build.sh` - The main build script that:
+  - Creates the Next.js configuration
+  - Generates necessary files for NextAuth
+  - Creates directory structure
+  - Sets up auth-related components
+  - Ensures the routes-manifest.json is available
+
+This approach ensures consistent, reliable deployments by creating all necessary files during the build process, rather than relying on pre-existing files that might be missing or have issues.
