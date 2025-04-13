@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "bash ./vercel-build.sh",
   "installCommand": "npm i --no-audit --no-fund --legacy-peer-deps && node install-deps.js && node prisma/migrate-and-seed.js",
-  "framework": "nextjs",
+  "framework": null,
   "outputDirectory": "dist",
   "env": {
     "VERCEL": "1",
