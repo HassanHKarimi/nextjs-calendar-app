@@ -12,6 +12,7 @@
     "NEXT_PUBLIC_DEMO_MODE": "true"
   },
   "rewrites": [
+    { "source": "/", "destination": "/index" },
     { "source": "/api/auth/:path*", "destination": "/api/auth/:path*" },
     { "source": "/calendar", "destination": "/calendar" },
     { "source": "/calendar/(.*)", "destination": "/calendar/$1" },
