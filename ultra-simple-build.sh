@@ -21,8 +21,8 @@ cat > src/auth.ts << 'EOF'
 // src/auth.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import type { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -35,18 +35,16 @@ interface CredentialsType {
   password: string;
 }
 
-// Create an auth handler with credentials
-export const authOptions = {
-  // Temporarily comment out adapter to avoid any issues
-  // adapter: PrismaAdapter(prisma),
+// Create an auth handler with credentials using proper types
+export const authOptions: NextAuthOptions = {
   providers: [
-    Credentials({
+    CredentialsProvider({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials: any) {
+      async authorize(credentials) {
         // Type safety check
         const typedCredentials = credentials as CredentialsType;
         
@@ -54,38 +52,43 @@ export const authOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: typedCredentials.email
+        try {
+          const user = await prisma.user.findUnique({
+            where: {
+              email: typedCredentials.email
+            }
+          });
+
+          if (!user || !user.password) {
+            return null;
           }
-        });
 
-        if (!user || !user.password) {
+          const isPasswordValid = await bcrypt.compare(
+            typedCredentials.password,
+            user.password
+          );
+
+          if (!isPasswordValid) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role || "USER"
+          };
+        } catch (error) {
+          console.error("Auth error:", error);
           return null;
         }
-
-        const isPasswordValid = await bcrypt.compare(
-          typedCredentials.password,
-          user.password
-        );
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role || "USER"
-        };
       }
     })
   ],
   session: {
-    strategy: "jwt"
+    strategy: "jwt" as const
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
   pages: {
     signIn: "/sign-in",
     signUp: "/sign-up",
@@ -100,16 +103,16 @@ export const authOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id;
-        session.user.role = token.role;
+      if (token && session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     }
   }
 };
 
-// Export NextAuth handler
+// Create the handler with typed options
 const handler = NextAuth(authOptions);
 
 // Export GET and POST handlers for API routes
@@ -124,6 +127,13 @@ cat > auth.js << 'EOF'
 // Use a direct export to ensure paths work during build
 import { authOptions, GET, POST } from "./src/auth";
 export { authOptions, GET, POST };
+EOF
+
+# Also create authOptions.js shortcut to minimize import issues
+cat > authOptions.js << 'EOF'
+// Direct export of auth options to prevent circular imports
+import { authOptions } from "./src/auth";
+export default authOptions;
 EOF
 
 # Create lib/db.ts file
@@ -480,6 +490,74 @@ export default function SignUpPage() {
       </div>
     </div>
   );
+}
+EOF
+
+# Create NextAuth API handler with proper types
+mkdir -p pages/api/auth
+cat > pages/api/auth/\\[...nextauth\\].ts << 'EOF'
+import NextAuth from "next-auth";
+
+// Import auth options directly to avoid circular dependencies
+import authOptions from "../../../authOptions";
+
+// API routes for authentication
+export default NextAuth(authOptions);
+EOF
+
+# Create registration API handler
+mkdir -p pages/api/register
+cat > pages/api/register/index.ts << 'EOF'
+// Simplified registration API handler
+import { NextApiRequest, NextApiResponse } from "next";
+import bcrypt from "bcryptjs";
+
+// Import from relative paths to avoid issues
+import { db } from "../../../lib/db";
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
+  }
+
+  try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Check if user already exists
+    const existingUser = await db.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already in use" });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const user = await db.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+      },
+    });
+
+    // Return the user without password
+    const { password: _, ...userWithoutPassword } = user;
+    return res.status(200).json(userWithoutPassword);
+  } catch (error) {
+    console.error("[REGISTER_API]", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 }
 EOF
 
