@@ -64,7 +64,7 @@ export const authOptions = {
     })
   ],
   session: {
-    strategy: "jwt"
+    strategy: "jwt" as const // Must be typed as literal "jwt" or "database" for NextAuth v5
   },
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
   pages: {

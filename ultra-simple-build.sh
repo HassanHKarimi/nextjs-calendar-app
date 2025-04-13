@@ -15,6 +15,7 @@ mkdir -p components/auth
 mkdir -p utils
 mkdir -p pages/utils
 mkdir -p pages/calendar/utils
+mkdir -p types
 
 # Create auth.ts file for NextAuth v5
 cat > src/auth.ts << 'EOF'
@@ -84,7 +85,7 @@ export const authOptions = {
     })
   ],
   session: {
-    strategy: "jwt"
+    strategy: "jwt" as const // Must be typed as literal "jwt" or "database" for NextAuth v5
   },
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
   pages: {
@@ -501,12 +502,16 @@ mkdir -p pages/api/auth
 cat > 'pages/api/auth/[...nextauth].ts' << 'EOF'
 // API Route for NextAuth v5
 import NextAuth from "next-auth";
+import type { NextAuthConfig } from "next-auth";
 
 // Import auth options from root to avoid circular dependencies
 import authOptions from "../../../authOptions";
 
+// Ensure the auth options match the expected NextAuthConfig type
+const typedAuthOptions = authOptions as NextAuthConfig;
+
 // Export the NextAuth handler
-export default NextAuth(authOptions);
+export default NextAuth(typedAuthOptions);
 EOF
 
 # Create registration API handler
@@ -619,6 +624,38 @@ rm -rf pages/calendar/components
 # Remove any files and config related to Tailwind or PostCSS
 rm -f tailwind.config.js postcss.config.js
 
+# Create custom type declarations for NextAuth v5
+cat > types/next-auth.d.ts << 'EOF'
+// Custom type declarations for NextAuth v5
+import { DefaultSession } from "next-auth";
+
+// Extend the built-in session types
+declare module "next-auth" {
+  interface Session extends DefaultSession {
+    user?: {
+      id?: string;
+      role?: string;
+    } & DefaultSession["user"];
+  }
+
+  // Extend the user type
+  interface User {
+    id: string;
+    role?: string;
+    name?: string;
+    email?: string;
+  }
+}
+
+// Extend the JWT type
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string;
+    role?: string;
+  }
+}
+EOF
+
 # Create a tsconfig.json file that allows implicit any types
 cat > tsconfig.json << 'EOF'
 {
@@ -651,7 +688,8 @@ cat > tsconfig.json << 'EOF'
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules"
