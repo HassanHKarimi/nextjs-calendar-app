@@ -29,6 +29,12 @@ import bcrypt from "bcryptjs";
 // Initialize Prisma client
 const prisma = new PrismaClient();
 
+// Define the credentials type for better type checking
+interface CredentialsType {
+  email: string;
+  password: string;
+}
+
 // Create an auth handler with credentials
 export const authOptions = {
   // Temporarily comment out adapter to avoid any issues
@@ -40,14 +46,17 @@ export const authOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+      async authorize(credentials: any) {
+        // Type safety check
+        const typedCredentials = credentials as CredentialsType;
+        
+        if (!typedCredentials?.email || !typedCredentials?.password) {
           return null;
         }
 
         const user = await prisma.user.findUnique({
           where: {
-            email: credentials.email
+            email: typedCredentials.email
           }
         });
 
@@ -56,7 +65,7 @@ export const authOptions = {
         }
 
         const isPasswordValid = await bcrypt.compare(
-          credentials.password,
+          typedCredentials.password,
           user.password
         );
 
