@@ -7,6 +7,7 @@ echo "Current working directory: $(pwd)"
 
 # Install required packages
 npm install @auth/prisma-adapter --save
+npm install tailwindcss postcss autoprefixer --save
 
 # Create required directories
 mkdir -p src/app
@@ -198,6 +199,75 @@ export const getUserById = async (id: string) => {
     return null;
   }
 };
+EOF
+
+# Create tailwind.config.js file
+cat > tailwind.config.js << 'EOF'
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: ["class"],
+  content: [
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+    }
+  },
+  plugins: [],
+}
+EOF
+
+# Create postcss.config.js file
+cat > postcss.config.js << 'EOF'
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
 EOF
 
 # Create src/app/globals.css file
@@ -1171,9 +1241,178 @@ fi
 # Remove components directory if exists
 rm -rf pages/calendar/components
 
+# Create fallback CSS file (without Tailwind)
+cat > src/app/fallback.css << 'EOF'
+/* Basic styles to use if Tailwind is not available */
+:root {
+  --background: 255, 255, 255;
+  --foreground: 0, 0, 0;
+  --border: 225, 225, 225;
+}
+
+.dark {
+  --background: 20, 20, 20;
+  --foreground: 255, 255, 255;
+  --border: 50, 50, 50;
+}
+
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.calendar-day {
+  min-height: 100px;
+  border: 1px solid rgb(var(--border));
+  padding: 4px;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-weight: bold;
+  padding: 4px;
+}
+
+.event-item {
+  margin: 2px 0;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-blue { background-color: #93c5fd; }
+.event-green { background-color: #86efac; }
+.event-red { background-color: #fca5a5; }
+.event-yellow { background-color: #fde68a; }
+.event-purple { background-color: #d8b4fe; }
+.event-pink { background-color: #f9a8d4; }
+.event-orange { background-color: #fdba74; }
+.event-gray { background-color: #d1d5db; }
+EOF
+
+# Create simple fallback app
+cat > pages/_app.fallback.tsx << 'EOF'
+// Fallback _app.tsx that doesn't use Tailwind
+import type { AppProps } from 'next/app'
+import '../src/app/fallback.css'
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export default function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <div className={inter.className}>
+      <Component {...pageProps} />
+    </div>
+  );
+}
+EOF
+
+# Create a backup of original _app.tsx and try to use the fallback if build fails
+cp pages/_app.tsx pages/_app.original.tsx
+
+# Create tailwind init script
+cat > tailwind-init.js << 'EOF'
+const fs = require('fs');
+const { execSync } = require('child_process');
+
+// Try to initialize tailwind
+try {
+  execSync('npx tailwindcss init -p', { stdio: 'inherit' });
+  console.log('Tailwind CSS initialized successfully');
+} catch (error) {
+  console.error('Failed to initialize Tailwind CSS:', error);
+  
+  // If tailwind init fails, use the fallback CSS
+  console.log('Using fallback CSS instead of Tailwind');
+  
+  // Copy fallback app to _app.tsx
+  try {
+    fs.copyFileSync('pages/_app.fallback.tsx', 'pages/_app.tsx');
+    console.log('Using fallback _app.tsx without Tailwind');
+  } catch (copyError) {
+    console.error('Failed to copy fallback app:', copyError);
+  }
+  
+  // Replace globals.css with simplified version
+  try {
+    const simpleCSS = `
+/* Simple CSS without Tailwind directives */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --border: 214.3 31.8% 91.4%;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+}
+
+.calendar-day {
+  min-height: 100px;
+  border: 1px solid hsl(var(--border));
+  padding: 4px;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-weight: bold;
+  padding: 4px;
+}
+
+.event-item {
+  margin: 2px 0;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-blue { background-color: #93c5fd; }
+.event-green { background-color: #86efac; }
+.event-red { background-color: #fca5a5; }
+.event-yellow { background-color: #fde68a; }
+.event-purple { background-color: #d8b4fe; }
+.event-pink { background-color: #f9a8d4; }
+.event-orange { background-color: #fdba74; }
+.event-gray { background-color: #d1d5db; }
+`;
+    fs.writeFileSync('src/app/globals.css', simpleCSS);
+    console.log('Created simplified globals.css without Tailwind directives');
+  } catch (cssError) {
+    console.error('Failed to create simplified CSS:', cssError);
+  }
+}
+EOF
+
+# Run tailwind init script
+node tailwind-init.js
+
 # Show debug info
 echo "All files in pages and src directory:"
 find pages src -type f | sort
 
-# Build the application
+# Build the application with extra flags for troubleshooting
 next build --no-lint
