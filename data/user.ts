@@ -1,5 +1,5 @@
 // data/user.ts
-import { db } from "@/lib/db";
+import { db } from "../lib/db";
 
 // Function to get a user by email
 export const getUserByEmail = async (email: string) => {

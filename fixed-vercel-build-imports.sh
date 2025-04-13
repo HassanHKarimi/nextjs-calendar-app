@@ -28,4 +28,16 @@ fix_imports "pages/api/register/index.ts" '@/data/user' '../../../data/user'
 fix_imports "pages/sign-in.tsx" '@/components/auth/sign-in-form' '../components/auth/sign-in-form'
 fix_imports "pages/sign-up.tsx" '@/components/auth/sign-up-form' '../components/auth/sign-up-form'
 
+# Fix data module
+fix_imports "data/user.ts" '@/lib/db' '../lib/db'
+
+# Import order matters for correct build
+echo "Creating build order file"
+echo "
+import '../lib/db';
+import '../data/user';
+import '../schemas';
+import '../auth';
+" > build-order.js
+
 echo "Import fixes completed"
