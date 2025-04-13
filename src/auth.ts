@@ -1,61 +1,75 @@
 // src/auth.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+// For NextAuth v5, the correct type is AuthOptions, not NextAuthOptions
+import type { AuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 // Initialize Prisma client
 const prisma = new PrismaClient();
 
-// Create an auth handler with credentials
-export const authOptions = {
-  adapter: PrismaAdapter(prisma),
+// Define the credentials type for better type checking
+interface CredentialsType {
+  email: string;
+  password: string;
+}
+
+// Create an auth handler with credentials using proper types
+export const authOptions: AuthOptions = {
   providers: [
-    Credentials({
+    CredentialsProvider({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        // Type safety check
+        const typedCredentials = credentials as CredentialsType;
+        
+        if (!typedCredentials?.email || !typedCredentials?.password) {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
+        try {
+          const user = await prisma.user.findUnique({
+            where: {
+              email: typedCredentials.email
+            }
+          });
+
+          if (!user || !user.password) {
+            return null;
           }
-        });
 
-        if (!user || !user.password) {
+          const isPasswordValid = await bcrypt.compare(
+            typedCredentials.password,
+            user.password
+          );
+
+          if (!isPasswordValid) {
+            return null;
+          }
+
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role || "USER"
+          };
+        } catch (error) {
+          console.error("Auth error:", error);
           return null;
         }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
-        if (!isPasswordValid) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role || "USER"
-        };
       }
     })
   ],
   session: {
-    strategy: "jwt"
+    strategy: "jwt" as const
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
   pages: {
     signIn: "/sign-in",
     signUp: "/sign-up",
@@ -70,16 +84,16 @@ export const authOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id;
-        session.user.role = token.role;
+      if (token && session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
       }
       return session;
     }
   }
 };
 
-// Export NextAuth handler
+// Create the handler with typed options
 const handler = NextAuth(authOptions);
 
 // Export GET and POST handlers for API routes
