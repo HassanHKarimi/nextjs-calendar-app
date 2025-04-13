@@ -3,13 +3,23 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
+// Diagnostic logging
+console.log("[DIAGNOSTIC] Index page component loaded");
+
 export default function Home() {
+  console.log("[DIAGNOSTIC] Home component rendering");
+  
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  // Log when component mounts
+  useEffect(() => {
+    console.log("[DIAGNOSTIC] Home component mounted");
+  }, []);
   
   // Check if already authenticated
   useEffect(() => {

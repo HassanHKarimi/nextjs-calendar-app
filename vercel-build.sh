@@ -460,6 +460,82 @@ if [ -d "./.next/static" ] && [ ! -d "./dist/static" ]; then
   cp -r ./.next/static/* ./dist/static/
 fi
 
+# Create a static fallback HTML file for debugging
+echo "Creating static fallback HTML page..."
+cat > ./dist/index.html << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calendar App - Static Fallback</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      color: #333;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 { color: #2563eb; }
+    .diagnostic { margin-top: 2rem; text-align: left; background: #f0f0f0; padding: 1rem; border-radius: 4px; }
+    code { font-family: monospace; white-space: pre; color: #333; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Calendar App - Static Fallback Page</h1>
+    <p>This is a static fallback page used for debugging. If you're seeing this, it means:</p>
+    <ul>
+      <li>The static fallback HTML is being served instead of the Next.js app</li>
+      <li>Vercel is serving static files correctly from the output directory</li>
+      <li>The Next.js app may have an issue with routing or rendering</li>
+    </ul>
+    
+    <div class="diagnostic">
+      <h2>Diagnostic Information</h2>
+      <p>Current URL: <code id="currentUrl">Loading...</code></p>
+      <p>Timestamp: <code id="timestamp">Loading...</code></p>
+      <p>User Agent: <code id="userAgent">Loading...</code></p>
+    </div>
+    
+    <p>Check browser console for additional diagnostic information.</p>
+  </div>
+  
+  <script>
+    // Print diagnostic info
+    console.log('[FALLBACK_DIAGNOSTIC] Static fallback page loaded at:', new Date().toISOString());
+    console.log('[FALLBACK_DIAGNOSTIC] URL:', window.location.href);
+    console.log('[FALLBACK_DIAGNOSTIC] Path:', window.location.pathname);
+    
+    // Update page elements
+    document.getElementById('currentUrl').textContent = window.location.href;
+    document.getElementById('timestamp').textContent = new Date().toISOString();
+    document.getElementById('userAgent').textContent = navigator.userAgent;
+    
+    // Try to detect rewrite issues
+    if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+      console.log('[FALLBACK_DIAGNOSTIC] Root path detected - Next.js routing may not be working');
+    }
+  </script>
+</body>
+</html>
+EOF
+
 echo "Vercel build script completed successfully"
 echo "Contents of dist directory:"
 ls -la ./dist/
