@@ -25,6 +25,12 @@ const nextConfig = {
   // Set the output directory to match what's in vercel.json
   distDir: 'dist',
   
+  // Configure static HTML output for better deployment
+  output: 'export',
+  
+  // Important for static export - don't use image optimization
+  images: { unoptimized: true },
+  
   // Disable TypeScript checking during build
   typescript: {
     ignoreBuildErrors: true,
@@ -39,23 +45,8 @@ const nextConfig = {
   // External packages config to support NextAuth
   serverExternalPackages: ["@auth/core"],
 
-  // Add rewrites for NextAuth and Calendar routes
-  async rewrites() {
-    return [
-      {
-        source: "/",
-        destination: "/index",
-      },
-      {
-        source: "/api/auth/:path*",
-        destination: "/api/auth/:path*",
-      },
-      {
-        source: "/calendar/:path*",
-        destination: "/calendar/:path*",
-      }
-    ];
-  },
+  // NOTE: Rewrites only work in server mode, not with static export
+  // For static export, we rely on the HTML files being properly named
 };
 
 module.exports = nextConfig;

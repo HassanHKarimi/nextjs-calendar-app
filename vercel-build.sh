@@ -9,8 +9,8 @@ export NODE_OPTIONS="--max-old-space-size=4096"
 echo "Starting Vercel build script..."
 
 # Prepare for Next.js build
-echo "Installing React, React DOM, TypeScript and type definitions..."
-npm install --no-save react react-dom next typescript @types/react @types/react-dom @types/node
+echo "Installing React, React DOM, TypeScript and additional dependencies for static export..."
+npm install --no-save react react-dom next typescript @types/react @types/react-dom @types/node sharp
 
 # Create the Next.js config file
 cat > next.config.js << 'EOF'
@@ -41,6 +41,12 @@ const nextConfig = {
   // Set the output directory to match what's in vercel.json
   distDir: 'dist',
   
+  // Configure static HTML output for better deployment
+  output: 'export',
+  
+  // Important for static export - don't use image optimization
+  images: { unoptimized: true },
+  
   // Disable TypeScript checking during build
   typescript: {
     ignoreBuildErrors: true,
@@ -54,24 +60,6 @@ const nextConfig = {
 
   // External packages config to support NextAuth
   serverExternalPackages: ["@auth/core"],
-
-  // Add rewrites for NextAuth and Calendar routes
-  async rewrites() {
-    return [
-      {
-        source: "/",
-        destination: "/index",
-      },
-      {
-        source: "/api/auth/:path*",
-        destination: "/api/auth/:path*",
-      },
-      {
-        source: "/calendar/:path*",
-        destination: "/calendar/:path*",
-      }
-    ];
-  },
 };
 
 module.exports = nextConfig;
@@ -314,8 +302,8 @@ EOF
 mkdir -p types
 touch types/next-env.d.ts
 
-# Now run the Next.js build
-echo "Running Next.js build..."
+# Now run the Next.js build with static export
+echo "Running Next.js build with static export..."
 SKIP_TYPECHECK=true npx next build --no-lint
 
 # Create a routes-manifest.json if it doesn't exist already
@@ -460,8 +448,10 @@ if [ -d "./.next/static" ] && [ ! -d "./dist/static" ]; then
   cp -r ./.next/static/* ./dist/static/
 fi
 
-# Create a static fallback HTML file for debugging
-echo "Creating static fallback HTML page..."
+# Check if index.html already exists from static export
+if [ ! -f "./dist/index.html" ]; then
+  # Create a static fallback HTML file for debugging
+  echo "Index.html not found from export, creating static fallback..."
 cat > ./dist/index.html << 'EOF'
 <!DOCTYPE html>
 <html>
@@ -535,6 +525,7 @@ cat > ./dist/index.html << 'EOF'
 </body>
 </html>
 EOF
+fi
 
 echo "Vercel build script completed successfully"
 echo "Contents of dist directory:"
