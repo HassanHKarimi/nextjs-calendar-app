@@ -1,23 +1,20 @@
-// src/auth.ts
-import { NextApiRequest, NextApiResponse } from "next";
-import NextAuth from "next-auth";
-// For NextAuth v5, the correct type is AuthOptions, not NextAuthOptions
-import type { AuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+// src/auth.ts - For NextAuth v5
 import { PrismaClient } from "@prisma/client";
+import type { Session } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
 // Initialize Prisma client
 const prisma = new PrismaClient();
 
-// Define the credentials type for better type checking
+// Define type for credentials
 interface CredentialsType {
   email: string;
   password: string;
 }
 
-// Create an auth handler with credentials using proper types
-export const authOptions: AuthOptions = {
+// Define the auth configuration (v5 doesn't use NextAuthOptions or AuthOptions)
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -67,7 +64,7 @@ export const authOptions: AuthOptions = {
     })
   ],
   session: {
-    strategy: "jwt" as const
+    strategy: "jwt"
   },
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
   pages: {
@@ -85,16 +82,12 @@ export const authOptions: AuthOptions = {
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.id = token.id;
+        session.user.role = token.role;
       }
       return session;
     }
   }
 };
 
-// Create the handler with typed options
-const handler = NextAuth(authOptions);
-
-// Export GET and POST handlers for API routes
-export const { GET, POST } = handler;
+// No longer need to export a handler directly in the auth.ts file for NextAuth v5

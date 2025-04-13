@@ -16,27 +16,25 @@ mkdir -p utils
 mkdir -p pages/utils
 mkdir -p pages/calendar/utils
 
-# Create auth.ts file
+# Create auth.ts file for NextAuth v5
 cat > src/auth.ts << 'EOF'
-// src/auth.ts
-import { NextApiRequest, NextApiResponse } from "next";
-import NextAuth from "next-auth";
-import type { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+// src/auth.ts - For NextAuth v5
 import { PrismaClient } from "@prisma/client";
+import type { Session } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
 // Initialize Prisma client
 const prisma = new PrismaClient();
 
-// Define the credentials type for better type checking
+// Define type for credentials
 interface CredentialsType {
   email: string;
   password: string;
 }
 
-// Create an auth handler with credentials using proper types
-export const authOptions: NextAuthOptions = {
+// Define the auth configuration (v5 doesn't use NextAuthOptions or AuthOptions)
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -86,7 +84,7 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   session: {
-    strategy: "jwt" as const
+    strategy: "jwt"
   },
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
   pages: {
@@ -104,34 +102,39 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.id = token.id;
+        session.user.role = token.role;
       }
       return session;
     }
   }
 };
 
-// Create the handler with typed options
-const handler = NextAuth(authOptions);
-
-// Export GET and POST handlers for API routes
-export const { GET, POST } = handler;
+// No longer need to export a handler directly in the auth.ts file for NextAuth v5
 EOF
 
 # Create auth.js that exports directly from src/auth.ts
 cat > auth.js << 'EOF'
 // This is a compatibility file for NextAuth.js
 // Re-exports auth configuration from src/auth
+// NextAuth v5 doesn't export GET and POST handlers from the auth config
 
 // Use a direct export to ensure paths work during build
-import { authOptions, GET, POST } from "./src/auth";
-export { authOptions, GET, POST };
+import { authOptions } from "./src/auth";
+import NextAuth from "next-auth";
+
+// Create the handler with the auth options
+const handler = NextAuth(authOptions);
+
+// Export the handler for API routes
+export default handler;
+export { authOptions };
 EOF
 
 # Also create authOptions.js shortcut to minimize import issues
 cat > authOptions.js << 'EOF'
 // Direct export of auth options to prevent circular imports
+// For NextAuth v5, we directly import the object without type annotations
 import { authOptions } from "./src/auth";
 export default authOptions;
 EOF
@@ -493,15 +496,16 @@ export default function SignUpPage() {
 }
 EOF
 
-# Create NextAuth API handler with proper types
+# Create NextAuth API handler with proper types for v5
 mkdir -p pages/api/auth
 cat > 'pages/api/auth/[...nextauth].ts' << 'EOF'
+// API Route for NextAuth v5
 import NextAuth from "next-auth";
 
-// Import auth options directly to avoid circular dependencies
+// Import auth options from root to avoid circular dependencies
 import authOptions from "../../../authOptions";
 
-// API routes for authentication
+// Export the NextAuth handler
 export default NextAuth(authOptions);
 EOF
 
