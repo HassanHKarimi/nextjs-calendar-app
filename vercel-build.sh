@@ -8,6 +8,10 @@ export NODE_OPTIONS="--max-old-space-size=4096"
 # Print directory contents before build
 echo "Starting Vercel build script..."
 
+# Prepare for Next.js build
+echo "Installing React and React DOM if needed..."
+npm install --no-save react react-dom next
+
 # Create the Next.js config file
 cat > next.config.js << 'EOF'
 /** @type {import('next').NextConfig} */
@@ -264,8 +268,17 @@ declare module "next-auth/jwt" {
 }
 EOF
 
-# Create a minimal routes-manifest.json if needed
-cat > ./dist/routes-manifest.json << 'EOF'
+# Create required directories
+mkdir -p src/app lib data schemas components/ui components/auth utils pages/utils pages/calendar/utils context types dist
+
+# Now run the Next.js build
+echo "Running Next.js build..."
+npx next build --no-lint
+
+# Create a routes-manifest.json if it doesn't exist already
+if [ ! -f "./dist/routes-manifest.json" ]; then
+  echo "routes-manifest.json not found, creating..."
+  cat > ./dist/routes-manifest.json << 'EOF'
 {
   "version": 3,
   "pages404": true,
@@ -369,5 +382,41 @@ cat > ./dist/routes-manifest.json << 'EOF'
   }
 }
 EOF
+fi
+
+# Check if we have a next.config.js in .next
+if [ -f "./.next/next.config.js" ]; then
+  echo "Copying next.config.js from .next to dist..."
+  cp ./.next/next.config.js ./dist/
+fi
+
+# If we have a .next/BUILD_ID, copy it to dist
+if [ -f "./.next/BUILD_ID" ]; then
+  echo "Copying BUILD_ID from .next to dist..."
+  cp ./.next/BUILD_ID ./dist/
+fi
+
+# Check for other necessary files
+for file in build-manifest.json prerender-manifest.json react-loadable-manifest.json; do
+  if [ -f "./.next/$file" ] && [ ! -f "./dist/$file" ]; then
+    echo "Copying $file from .next to dist..."
+    cp "./.next/$file" "./dist/"
+  fi
+done
+
+# Copy server and static directories if needed
+if [ -d "./.next/server" ] && [ ! -d "./dist/server" ]; then
+  echo "Copying server directory from .next to dist..."
+  mkdir -p ./dist/server
+  cp -r ./.next/server/* ./dist/server/
+fi
+
+if [ -d "./.next/static" ] && [ ! -d "./dist/static" ]; then
+  echo "Copying static directory from .next to dist..."
+  mkdir -p ./dist/static
+  cp -r ./.next/static/* ./dist/static/
+fi
 
 echo "Vercel build script completed successfully"
+echo "Contents of dist directory:"
+ls -la ./dist/
