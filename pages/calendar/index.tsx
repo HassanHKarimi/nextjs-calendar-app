@@ -147,6 +147,7 @@ export default function CalendarPage() {
   const [authUser, setAuthUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [dataLoading, setDataLoading] = useState(true);
+  const [pageReady, setPageReady] = useState(false);
   const dateParam = router.query.date as string | undefined;
   const [currentDate, setCurrentDate] = useState(new Date(2025, 3, 17)); // April 17, 2025
   const [events, setEvents] = useState(SAMPLE_EVENTS);
@@ -193,7 +194,11 @@ export default function CalendarPage() {
       }
     }
     // Simulate loading time for data
-    const timer = setTimeout(() => setDataLoading(false), 500);
+    const timer = setTimeout(() => {
+      setDataLoading(false);
+      // Add a small delay before showing the page for smooth transition
+      setTimeout(() => setPageReady(true), 100);
+    }, 300);
     return () => clearTimeout(timer);
   }, [dateParam]);
   
@@ -254,7 +259,9 @@ export default function CalendarPage() {
     <div style={{ 
       width: '1200px', 
       margin: '0 auto', 
-      padding: '2rem 1rem'
+      padding: '2rem 1rem',
+      opacity: pageReady ? 1 : 0,
+      transition: 'opacity 0.3s ease-in-out'
     }}>
       <div style={{ 
         borderRadius: '0.5rem', 

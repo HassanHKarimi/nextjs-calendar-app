@@ -126,13 +126,14 @@ const HOURS = Array.from({ length: 12 }, (_, i) => i + 8); // 8 AM to 7 PM
 export default function WeekView() {
   const router = useRouter();
   // Handle authentication errors gracefully
-  const [authUser, setAuthUser] = useState(null);
+  const [authUser, setAuthUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [dataLoading, setDataLoading] = useState(true);
+  const [pageReady, setPageReady] = useState(false);
   const dateParam = router.query.date as string;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<any[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
   
   // Use effect to check auth status client-side
   useEffect(() => {
@@ -174,8 +175,12 @@ export default function WeekView() {
       setEvents(createSampleWeekEvents(weekStart));
     }
     
-    // Simulate loading time
-    const timer = setTimeout(() => setDataLoading(false), 500);
+    // Simulate loading time with smoother transitions
+    const timer = setTimeout(() => {
+      setDataLoading(false);
+      // Add a small delay before showing the page for smooth transition
+      setTimeout(() => setPageReady(true), 100);
+    }, 300);
     return () => clearTimeout(timer);
   }, [dateParam]);
   
@@ -241,7 +246,10 @@ export default function WeekView() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8" style={{
+      opacity: pageReady ? 1 : 0,
+      transition: 'opacity 0.3s ease-in-out'
+    }}>
       <header className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Weekly Calendar</h1>
         <div className="flex items-center gap-4">
