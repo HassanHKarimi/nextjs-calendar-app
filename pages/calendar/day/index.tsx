@@ -215,132 +215,256 @@ export default function DayView() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8" style={{
+    <div style={{ 
+      width: '1200px', 
+      margin: '0 auto', 
+      padding: '2rem 1rem',
       opacity: pageReady ? 1 : 0,
       transition: 'opacity 0.3s ease-in-out'
     }}>
-      <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Daily Calendar</h1>
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex gap-2">
-            <div className="text-sm text-gray-600">
-              Logged in as <span className="font-medium">{authUser?.name || 'User'}</span>
+      <div style={{ 
+        borderRadius: '0.5rem', 
+        backgroundColor: 'white', 
+        boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+        overflow: 'hidden'
+      }}>
+        {/* Header section */}
+        <div style={{ 
+          padding: '1.5rem', 
+          borderBottom: '1px solid #e5e7eb'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Daily Calendar</h1>
+            <div>
+              <span style={{ fontSize: '0.875rem', color: '#4b5563' }}>
+                Logged in as <span style={{ fontWeight: '500' }}>{authUser?.name || 'User'}</span>
+              </span>
+              <button 
+                onClick={logout}
+                style={{ fontSize: '0.875rem', color: '#4b5563', cursor: 'pointer', background: 'none', border: 'none', marginLeft: '8px' }}
+              >
+                Logout
+              </button>
             </div>
-            <button 
-              onClick={logout}
-              className="text-sm text-red-600 hover:text-red-800"
-            >
-              Logout
-            </button>
           </div>
-          <div className="flex gap-2">
-            <Link
-              href="/calendar"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
-            >
-              Month View
-            </Link>
-            <Link
-              href="/calendar/week"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
-            >
-              Week View
-            </Link>
-            <Link
-              href="/calendar/new-event"
-              className="rounded bg-green-600 px-4 py-2 text-white"
-            >
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ 
+              display: 'flex', 
+              position: 'relative',
+              backgroundColor: '#f3f4f6',
+              borderRadius: '0.5rem',
+              padding: '0.25rem',
+              width: '320px'
+            }}>
+              {/* Month toggle */}
+              <Link href="/calendar" style={{ 
+                position: 'relative',
+                zIndex: 10,
+                flex: '1',
+                textAlign: 'center',
+                padding: '0.5rem 0',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: router.pathname === '/calendar' ? 'white' : '#111827',
+                textDecoration: 'none'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  Month
+                </span>
+              </Link>
+
+              {/* Week toggle */}
+              <Link href="/calendar/week" style={{ 
+                position: 'relative',
+                zIndex: 10,
+                flex: '1',
+                textAlign: 'center',
+                padding: '0.5rem 0',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: router.pathname === '/calendar/week' ? 'white' : '#111827',
+                textDecoration: 'none'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                    <line x1="3" y1="16" x2="21" y2="16"></line>
+                  </svg>
+                  Week
+                </span>
+              </Link>
+
+              {/* Day toggle */}
+              <Link href="/calendar/day" style={{ 
+                position: 'relative',
+                zIndex: 10,
+                flex: '1',
+                textAlign: 'center',
+                padding: '0.5rem 0',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: router.pathname === '/calendar/day' ? 'white' : '#111827',
+                textDecoration: 'none'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  Day
+                </span>
+              </Link>
+
+              {/* Sliding background */}
+              <div style={{
+                position: 'absolute',
+                top: '0.25rem',
+                left: router.pathname === '/calendar' 
+                  ? '0.25rem' 
+                  : router.pathname === '/calendar/week'
+                    ? 'calc(33.333% + 0.125rem)'
+                    : 'calc(66.667% + 0rem)',
+                width: 'calc(33.333% - 0.125rem)',
+                height: 'calc(100% - 0.5rem)',
+                backgroundColor: '#111827',
+                borderRadius: '0.375rem',
+                transition: 'left 0.3s ease',
+                zIndex: 1
+              }}></div>
+            </div>
+
+            <Link href="/calendar/new-event" style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.25rem', 
+              padding: '0.5rem 1rem', 
+              backgroundColor: '#111827', 
+              color: 'white', 
+              borderRadius: '0.25rem',
+              border: 'none',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              textDecoration: 'none'
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
               New Event
             </Link>
           </div>
         </div>
-      </header>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
-        <div className="flex items-center justify-between border-b pb-4 mb-4">
-          <Link
-            href={`/calendar/day?date=${prevDay}`}
-            className="rounded bg-gray-100 px-3 py-1 hover:bg-gray-200"
-          >
-            &larr; Previous Day
-          </Link>
-          <h2 className="text-xl font-semibold">{formattedDate}</h2>
-          <Link
-            href={`/calendar/day?date=${nextDay}`}
-            className="rounded bg-gray-100 px-3 py-1 hover:bg-gray-200"
-          >
-            Next Day &rarr;
-          </Link>
-        </div>
-        
-        {/* Day schedule view */}
-        <div className="mt-4 relative">
-          {/* Hour indicators */}
-          <div className="border-l border-gray-200 pl-4">
-            {HOURS.map(hour => (
-              <div key={hour} className="flex items-start h-[60px] border-t border-gray-200">
-                <div className="text-xs text-gray-500 -mt-2 -ml-10 w-8 pr-2 text-right">
-                  {hour === 12 ? '12 PM' : hour < 12 ? `${hour} AM` : `${hour-12} PM`}
-                </div>
-              </div>
-            ))}
+        {/* Calendar content */}
+        <div style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <Link
+              href={`/calendar/day?date=${prevDay}`}
+              style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                &larr; Previous Day
+              </span>
+            </Link>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{formattedDate}</h2>
+            <Link
+              href={`/calendar/day?date=${nextDay}`}
+              style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                Next Day &rarr;
+              </span>
+            </Link>
           </div>
           
-          {/* Events */}
-          <div className="absolute top-0 left-14 right-4">
-            {events.map(event => {
-              const { top, height } = getEventPosition(event);
-              return (
-                <div
-                  key={event.id}
-                  onClick={() => setSelectedEvent(event)}
-                  className={`absolute rounded-sm p-2 shadow-sm border-l-4 border-l-blue-500 ${event.color} w-full overflow-hidden cursor-pointer hover:opacity-90`}
-                  style={{ 
-                    top: `${top}px`, 
-                    height: `${height}px`,
-                    maxWidth: 'calc(100% - 8px)'
-                  }}
-                >
-                  <div className="font-semibold text-sm">
-                    {event.title}
+          {/* Day schedule view */}
+          <div style={{ position: 'relative', marginTop: '1rem' }}>
+            {/* Hour indicators */}
+            <div style={{ borderLeft: '1px solid #e5e7eb', paddingLeft: '1rem' }}>
+              {HOURS.map(hour => (
+                <div key={hour} style={{ 
+                  display: 'flex', 
+                  alignItems: 'flex-start', 
+                  height: '60px', 
+                  borderTop: '1px solid #e5e7eb' 
+                }}>
+                  <div style={{ 
+                    fontSize: '0.75rem', 
+                    color: '#6b7280', 
+                    marginTop: '-0.5rem', 
+                    marginLeft: '-2.5rem', 
+                    width: '2rem', 
+                    paddingRight: '0.5rem', 
+                    textAlign: 'right' 
+                  }}>
+                    {hour === 12 ? '12 PM' : hour < 12 ? `${hour} AM` : `${hour-12} PM`}
                   </div>
-                  <div className="text-xs mt-1">
-                    {format(new Date(event.startDate), 'h:mm a')} - {format(new Date(event.endDate), 'h:mm a')}
+                </div>
+              ))}
+            </div>
+            
+            {/* Events */}
+            <div style={{ position: 'absolute', top: 0, left: '3.5rem', right: '1rem' }}>
+              {events.map(event => {
+                const { top, height } = getEventPosition(event);
+                return (
+                  <div
+                    key={event.id}
+                    onClick={() => setSelectedEvent(event)}
+                    style={{ 
+                      position: 'absolute',
+                      top: `${top}px`, 
+                      height: `${height}px`,
+                      maxWidth: 'calc(100% - 8px)',
+                      width: '100%',
+                      padding: '0.5rem',
+                      borderRadius: '0.25rem',
+                      borderLeft: '4px solid #3b82f6',
+                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                      overflow: 'hidden',
+                      cursor: 'pointer',
+                      backgroundColor: event.color?.split(' ')[0] || '#dbeafe',
+                      color: event.color?.split(' ')[1] || '#1e40af',
+                      transition: 'opacity 0.2s ease',
+                      ':hover': {
+                        opacity: 0.9
+                      }
+                    }}
+                  >
+                    <div style={{ fontWeight: '600', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                      {event.title}
+                    </div>
+                    <div style={{ fontSize: '0.75rem' }}>
+                      {format(new Date(event.startDate), 'h:mm a')} - {format(new Date(event.endDate), 'h:mm a')}
+                    </div>
+                    {height > 60 && event.location && (
+                      <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        📍 {event.location}
+                      </div>
+                    )}
+                    {height > 80 && event.description && (
+                      <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {event.description}
+                      </div>
+                    )}
                   </div>
-                  {height > 60 && (
-                    <div className="text-xs mt-1 truncate">
-                      {event.location && `📍 ${event.location}`}
-                    </div>
-                  )}
-                  {height > 80 && (
-                    <div className="text-xs mt-1 line-clamp-2">
-                      {event.description}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-      
-      <div className="mt-6 text-center text-gray-500 text-sm">
-        <p>This is a demo calendar with sample events.</p>
-        <p className="mt-2">Logged in as: <span className="font-semibold">{authUser?.email || 'user@example.com'}</span></p>
-        
-        <div className="mt-4 flex justify-center">
-          <div className="bg-indigo-50 border-l-4 border-indigo-400 p-4 max-w-md">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-indigo-800">Pro Calendar Features</h3>
-                <div className="mt-2 text-sm text-indigo-700">
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Full day schedule export - <span className="font-semibold">Requires Upgrade</span></li>
-                    <li>Time blocking - <span className="font-semibold">Requires Upgrade</span></li>
-                    <li>Email notifications - <span className="font-semibold">Requires Upgrade</span></li>
-                  </ul>
-                </div>
-              </div>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -545,7 +545,20 @@ export default function CalendarPage() {
                                 border: 'none',
                                 backgroundColor: bgColor,
                                 color: textColor,
-                                maxWidth: '100%'
+                                maxWidth: '100%',
+                                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.transform = 'scale(1.02)';
+                                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                                e.currentTarget.style.zIndex = '10';
+                                e.currentTarget.style.position = 'relative';
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.boxShadow = 'none';
+                                e.currentTarget.style.zIndex = 'auto';
+                                e.currentTarget.style.position = 'static';
                               }}
                               title={`${event.title}${event.isAllDay ? ' (All day)' : ` (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}\n${event.description || ''}`}
                             >

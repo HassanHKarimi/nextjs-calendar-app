@@ -20,12 +20,23 @@
 - Modern, clean UI with minimal borders and subtle shadows
 - Use grid layouts for calendar display
 - Navigation buttons should follow the design in the monthly view
+- Implement subtle hover effects on interactive elements
 
 ### Calendar Event Display
 - Color code events based on their type/title for visual organization
 - Limit displayed events in calendar cells to prevent overflow
 - Provide clear date navigation with previous/next controls
 - Maintain consistent event styling across all calendar views
+- Use scale, shadow, and z-index for hover effects on events
+- Keep hover effect styling consistent across day, week, and month views
+
+### Event Interactions
+- Add hover effects to all calendar events for better UX
+- Use transform: scale(1.02) and box-shadow on hover
+- Manage z-index to bring hovered events to the foreground
+- Consider position changes for month view to prevent layout issues
+- Implement onMouseOver and onMouseOut event handlers for interactions
+- Use transition properties for smooth animation effects
 
 ### Authentication
 - Support both demo mode and database authentication
@@ -46,6 +57,7 @@
 - Filter events properly for each calendar cell
 - Ensure responsive design across all calendar views
 - Use consistent styling between all calendar views
+- Implement similar hover effects across all views
 
 ### Type Safety
 - Properly type all React components
@@ -53,6 +65,7 @@
 - Handle nullable values with optional chaining
 - Provide fallback values for potentially undefined properties
 - Pay attention to authUser type usage
+- Define Event interface for use across components
 
 ### Deployment
 - Build configuration is critical - follow the Vercel deployment instructions
@@ -65,6 +78,7 @@
 - Intuitive navigation between calendar views
 - Fast performance
 - Visually distinct event categories
+- Interactive UI elements with hover effects
 
 ## Project Evolution
 - Original implementation used Tailwind CSS, now uses inline styles
@@ -72,6 +86,7 @@
 - Demo mode was added to simplify usage without database
 - Recent UI update to monthly view established new design patterns
 - Event color coding now based on event type/title
+- Hover effects added to all calendar views for consistent interaction
 
 ## Known Challenges
 - Maintaining static export compatibility
@@ -80,4 +95,6 @@
 - Managing events without server-side persistence in demo mode
 - Type safety with authentication objects
 - Limited space for displaying multiple events in calendar cells
-- Consistent event styling across different calendar views 
+- Consistent event styling across different calendar views
+- Performance optimization for hover effects on mobile devices
+- Z-index management for overlapping events on hover 

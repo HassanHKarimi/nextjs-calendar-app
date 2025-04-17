@@ -15,9 +15,21 @@ import {
 } from "date-fns";
 import { EventModal } from "../utils/event-modal";
 
+// Define Event interface
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  location?: string;
+  isAllDay: boolean;
+  color?: string;
+}
+
 // Sample event data for week view
-const createSampleWeekEvents = (weekStart: Date) => {
-  const events = [];
+const createSampleWeekEvents = (weekStart: Date): Event[] => {
+  const events: Event[] = [];
   
   // Monday morning meeting (first day of week)
   const monday = new Date(weekStart);
@@ -132,8 +144,8 @@ export default function WeekView() {
   const [pageReady, setPageReady] = useState(false);
   const dateParam = router.query.date as string;
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState<any[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   
   // Use effect to check auth status client-side
   useEffect(() => {
@@ -225,7 +237,7 @@ export default function WeekView() {
   const nextWeek = format(addWeeks(currentDate, 1), "yyyy-MM-dd");
 
   // Event positioning helper for a specific day
-  const getDayEvents = (day: Date) => {
+  const getDayEvents = (day: Date): Event[] => {
     return events.filter(event => {
       const eventStart = new Date(event.startDate);
       const eventEnd = new Date(event.endDate);
@@ -237,7 +249,7 @@ export default function WeekView() {
   };
 
   // Position calculation for events
-  const getEventPosition = (event: any) => {
+  const getEventPosition = (event: Event) => {
     const startHour = new Date(event.startDate).getHours() + (new Date(event.startDate).getMinutes() / 60);
     const endHour = new Date(event.endDate).getHours() + (new Date(event.endDate).getMinutes() / 60);
     const top = Math.max(0, (startHour - 8) * 60); // 8 AM is the start of our grid (0px)
@@ -246,171 +258,323 @@ export default function WeekView() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8" style={{
+    <div style={{ 
+      maxWidth: '100%', 
+      width: '1200px', 
+      margin: '0 auto', 
+      padding: '2rem 1rem',
       opacity: pageReady ? 1 : 0,
       transition: 'opacity 0.3s ease-in-out'
     }}>
-      <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Weekly Calendar</h1>
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex gap-2">
-            <div className="text-sm text-gray-600">
-              Logged in as <span className="font-medium">{authUser?.name || 'User'}</span>
+      <div style={{ 
+        borderRadius: '0.5rem', 
+        backgroundColor: 'white', 
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        overflow: 'hidden'
+      }}>
+        {/* Header section */}
+        <div style={{ 
+          padding: '1.5rem', 
+          borderBottom: '1px solid #e5e7eb'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Weekly Calendar</h1>
+            <div>
+              <span style={{ fontSize: '0.875rem', color: '#4b5563' }}>
+                Logged in as <span style={{ fontWeight: '500' }}>{authUser?.name || 'User'}</span>
+              </span>
+              <button 
+                onClick={logout}
+                style={{ fontSize: '0.875rem', color: '#4b5563', cursor: 'pointer', background: 'none', border: 'none', marginLeft: '8px' }}
+              >
+                Logout
+              </button>
             </div>
-            <button 
-              onClick={logout}
-              className="text-sm text-red-600 hover:text-red-800"
-            >
-              Logout
-            </button>
           </div>
-          <div className="flex gap-2">
-            <Link
-              href="/calendar"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
-            >
-              Month View
-            </Link>
-            <Link
-              href="/calendar/day"
-              className="rounded bg-blue-600 px-4 py-2 text-white"
-            >
-              Day View
-            </Link>
-            <Link
-              href="/calendar/new-event"
-              className="rounded bg-green-600 px-4 py-2 text-white"
-            >
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ 
+              display: 'flex', 
+              position: 'relative',
+              backgroundColor: '#f3f4f6',
+              borderRadius: '0.5rem',
+              padding: '0.25rem',
+              width: '320px'
+            }}>
+              {/* Month toggle */}
+              <Link href="/calendar" style={{ 
+                position: 'relative',
+                zIndex: 10,
+                flex: '1',
+                textAlign: 'center',
+                padding: '0.5rem 0',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: router.pathname === '/calendar' ? 'white' : '#111827',
+                textDecoration: 'none'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  Month
+                </span>
+              </Link>
+
+              {/* Week toggle */}
+              <Link href="/calendar/week" style={{ 
+                position: 'relative',
+                zIndex: 10,
+                flex: '1',
+                textAlign: 'center',
+                padding: '0.5rem 0',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: router.pathname === '/calendar/week' ? 'white' : '#111827',
+                textDecoration: 'none'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                    <line x1="3" y1="16" x2="21" y2="16"></line>
+                  </svg>
+                  Week
+                </span>
+              </Link>
+
+              {/* Day toggle */}
+              <Link href="/calendar/day" style={{ 
+                position: 'relative',
+                zIndex: 10,
+                flex: '1',
+                textAlign: 'center',
+                padding: '0.5rem 0',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: router.pathname === '/calendar/day' ? 'white' : '#111827',
+                textDecoration: 'none'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  Day
+                </span>
+              </Link>
+
+              {/* Sliding background */}
+              <div style={{
+                position: 'absolute',
+                top: '0.25rem',
+                left: router.pathname === '/calendar' 
+                  ? '0.25rem' 
+                  : router.pathname === '/calendar/week'
+                    ? 'calc(33.333% + 0.125rem)'
+                    : 'calc(66.667% + 0rem)',
+                width: 'calc(33.333% - 0.125rem)',
+                height: 'calc(100% - 0.5rem)',
+                backgroundColor: '#111827',
+                borderRadius: '0.375rem',
+                transition: 'left 0.3s ease',
+                zIndex: 1
+              }}></div>
+            </div>
+
+            <Link href="/calendar/new-event" style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.25rem', 
+              padding: '0.5rem 1rem', 
+              backgroundColor: '#111827', 
+              color: 'white', 
+              borderRadius: '0.25rem',
+              border: 'none',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              textDecoration: 'none'
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
               New Event
             </Link>
           </div>
         </div>
-      </header>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
-        <div className="flex items-center justify-between border-b pb-4 mb-4">
-          <Link
-            href={`/calendar/week?date=${prevWeek}`}
-            className="rounded bg-gray-100 px-3 py-1 hover:bg-gray-200"
-          >
-            &larr; Previous Week
-          </Link>
-          <h2 className="text-xl font-semibold">{formattedDateRange}</h2>
-          <Link
-            href={`/calendar/week?date=${nextWeek}`}
-            className="rounded bg-gray-100 px-3 py-1 hover:bg-gray-200"
-          >
-            Next Week &rarr;
-          </Link>
-        </div>
-        
-        {/* Week view grid */}
-        <div className="mt-4 flex">
-          {/* Time column */}
-          <div className="w-16 pr-2 flex-shrink-0">
-            <div className="h-12 border-b border-transparent"></div>
-            {HOURS.map(hour => (
-              <div key={hour} className="h-[60px] text-xs text-gray-500 text-right">
-                {hour === 12 ? '12 PM' : hour < 12 ? `${hour} AM` : `${hour-12} PM`}
-              </div>
-            ))}
+        {/* Calendar content */}
+        <div style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <Link
+              href={`/calendar/week?date=${prevWeek}`}
+              style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                &larr; Previous Week
+              </span>
+            </Link>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{formattedDateRange}</h2>
+            <Link
+              href={`/calendar/week?date=${nextWeek}`}
+              style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                Next Week &rarr;
+              </span>
+            </Link>
           </div>
           
-          {/* Day columns */}
-          <div className="flex-grow grid grid-cols-7 divide-x">
-            {/* Day headers */}
-            {weekDays.map((day, index) => (
-              <div key={day.toString()} className="text-center">
-                <div className="h-12 flex flex-col justify-center border-b">
-                  <div className="text-xs text-gray-500">{format(day, "EEE")}</div>
-                  <Link href={`/calendar/day?date=${format(day, "yyyy-MM-dd")}`}>
-                    <div className={`text-sm font-medium ${isSameDay(day, new Date()) ? "bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center mx-auto" : ""}`}>
-                      {format(day, "d")}
-                    </div>
-                  </Link>
+          {/* Week view grid */}
+          <div style={{ display: 'flex', marginTop: '1rem' }}>
+            {/* Time column */}
+            <div style={{ width: '4rem', paddingRight: '0.5rem', flexShrink: 0 }}>
+              <div style={{ height: '3rem', borderBottom: '1px solid transparent' }}></div>
+              {HOURS.map(hour => (
+                <div key={hour} style={{ height: '60px', fontSize: '0.75rem', color: '#6b7280', textAlign: 'right' }}>
+                  {hour === 12 ? '12 PM' : hour < 12 ? `${hour} AM` : `${hour-12} PM`}
                 </div>
-                
-                {/* All day events */}
-                <div className="min-h-[20px] bg-gray-50 p-1">
-                  {getDayEvents(day)
-                    .filter(event => event.isAllDay)
-                    .slice(0, 1)
-                    .map(event => (
-                      <div 
-                        key={event.id} 
-                        onClick={() => setSelectedEvent(event)}
-                        className={`text-xs p-1 rounded truncate ${event.color} cursor-pointer hover:opacity-90`}
-                        title={event.title}
-                      >
-                        {event.title}
+              ))}
+            </div>
+            
+            {/* Day columns */}
+            <div style={{ flexGrow: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderLeft: '1px solid #e5e7eb' }}>
+              {/* Day headers */}
+              {weekDays.map((day, index) => (
+                <div key={day.toString()} style={{ textAlign: 'center' }}>
+                  <div style={{ height: '3rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', borderBottom: '1px solid #e5e7eb' }}>
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>{format(day, "EEE")}</div>
+                    <Link href={`/calendar/day?date=${format(day, "yyyy-MM-dd")}`} style={{ textDecoration: 'none' }}>
+                      <div style={{ 
+                        fontSize: '0.875rem', 
+                        fontWeight: 500, 
+                        color: '#111827',
+                        ...(isSameDay(day, new Date()) ? {
+                          backgroundColor: '#dbeafe',
+                          color: '#1e40af',
+                          borderRadius: '9999px',
+                          width: '2rem',
+                          height: '2rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          margin: '0 auto'
+                        } : {})
+                      }}>
+                        {format(day, "d")}
                       </div>
-                    ))}
-                  {getDayEvents(day).filter(event => event.isAllDay).length > 1 && (
-                    <div className="text-xs text-gray-500 px-1">
-                      + {getDayEvents(day).filter(event => event.isAllDay).length - 1} more
-                    </div>
-                  )}
-                </div>
-                
-                {/* Time slots */}
-                <div className="relative">
-                  {HOURS.map(hour => (
-                    <div key={hour} className="h-[60px] border-b border-gray-100"></div>
-                  ))}
+                    </Link>
+                  </div>
                   
-                  {/* Events */}
-                  {getDayEvents(day)
-                    .filter(event => !event.isAllDay)
-                    .map(event => {
-                      const { top, height } = getEventPosition(event);
-                      return (
-                        <div
-                          key={event.id}
+                  {/* All day events */}
+                  <div style={{ minHeight: '1.25rem', backgroundColor: '#f9fafb', padding: '0.25rem', borderBottom: '1px solid #e5e7eb' }}>
+                    {getDayEvents(day)
+                      .filter(event => event.isAllDay)
+                      .slice(0, 1)
+                      .map(event => (
+                        <div 
+                          key={event.id} 
                           onClick={() => setSelectedEvent(event)}
-                          className={`absolute mx-1 rounded-sm px-1 shadow-sm text-xs ${event.color} overflow-hidden cursor-pointer hover:opacity-90`}
                           style={{ 
-                            top: `${top}px`, 
-                            height: `${height}px`,
-                            left: '2px',
-                            right: '2px'
+                            fontSize: '0.75rem', 
+                            padding: '0.25rem', 
+                            borderRadius: '0.25rem', 
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            cursor: 'pointer',
+                            backgroundColor: event.color?.split(' ')[0] || '#dbeafe',
+                            color: event.color?.split(' ')[1] || '#1e40af',
+                            transition: 'transform 0.2s ease, box-shadow 0.2s ease'
                           }}
-                          title={`${event.title}\n${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')}\n${event.description || ''}`}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.01)';
+                            e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                          title={event.title}
                         >
-                          <div className="font-medium truncate">
-                            {event.title}
-                          </div>
-                          {height >= 30 && (
-                            <div className="text-[10px] truncate">
-                              {format(new Date(event.startDate), 'h:mm a')}
-                            </div>
-                          )}
+                          {event.title}
                         </div>
-                      );
-                    })}
+                      ))}
+                    {getDayEvents(day).filter(event => event.isAllDay).length > 1 && (
+                      <div style={{ fontSize: '0.75rem', color: '#6b7280', padding: '0 0.25rem' }}>
+                        + {getDayEvents(day).filter(event => event.isAllDay).length - 1} more
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Time slots */}
+                  <div style={{ position: 'relative' }}>
+                    {HOURS.map(hour => (
+                      <div key={hour} style={{ height: '60px', borderBottom: '1px solid #f3f4f6', borderRight: '1px solid #f3f4f6' }}></div>
+                    ))}
+                    
+                    {/* Events */}
+                    {getDayEvents(day)
+                      .filter(event => !event.isAllDay)
+                      .map(event => {
+                        const { top, height } = getEventPosition(event);
+                        return (
+                          <div
+                            key={event.id}
+                            onClick={() => setSelectedEvent(event)}
+                            style={{ 
+                              position: 'absolute',
+                              top: `${top}px`, 
+                              height: `${height}px`,
+                              left: '0.125rem',
+                              right: '0.125rem',
+                              fontSize: '0.75rem',
+                              borderRadius: '0.25rem',
+                              padding: '0.25rem',
+                              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                              overflow: 'hidden',
+                              cursor: 'pointer',
+                              backgroundColor: event.color?.split(' ')[0] || '#dbeafe',
+                              color: event.color?.split(' ')[1] || '#1e40af',
+                              transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.transform = 'scale(1.02)';
+                              e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                              e.currentTarget.style.zIndex = '10';
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.transform = 'scale(1)';
+                              e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.1)';
+                              e.currentTarget.style.zIndex = 'auto';
+                            }}
+                            title={`${event.title}\n${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')}\n${event.description || ''}`}
+                          >
+                            <div style={{ fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {event.title}
+                            </div>
+                            {height >= 30 && (
+                              <div style={{ fontSize: '0.625rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {format(new Date(event.startDate), 'h:mm a')}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      
-      <div className="mt-6 text-center text-gray-500 text-sm">
-        <p>This is a demo calendar with sample events. Click on a day to view detailed schedule.</p>
-        <p className="mt-2">Logged in as: <span className="font-semibold">{authUser?.email || 'user@example.com'}</span></p>
-        
-        <div className="mt-4 flex justify-center">
-          <div className="bg-purple-50 border-l-4 border-purple-400 p-4 max-w-md">
-            <div className="flex">
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-purple-800">Team Calendar Features</h3>
-                <div className="mt-2 text-sm text-purple-700">
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Team member availability view - <span className="font-semibold">Requires Team Plan</span></li>
-                    <li>Meeting scheduling assistant - <span className="font-semibold">Requires Team Plan</span></li>
-                    <li>Shared calendar permissions - <span className="font-semibold">Requires Team Plan</span></li>
-                  </ul>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
