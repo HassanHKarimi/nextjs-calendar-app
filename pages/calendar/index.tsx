@@ -144,7 +144,7 @@ const SAMPLE_EVENTS = [
 export default function CalendarPage() {
   const router = useRouter();
   // State hooks - always declare ALL hooks unconditionally
-  const [authUser, setAuthUser] = useState(null);
+  const [authUser, setAuthUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [dataLoading, setDataLoading] = useState(true);
   const dateParam = router.query.date as string | undefined;
@@ -251,259 +251,318 @@ export default function CalendarPage() {
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <header style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Your Calendar</h1>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div>
-            <span style={{ fontSize: '0.875rem', color: '#4b5563' }}>
-              Logged in as <span style={{ fontWeight: '500' }}>{authUser?.name || 'clause-thing-oven'}</span>
-            </span>
-            <button 
-              onClick={logout}
-              style={{ fontSize: '0.875rem', color: '#4b5563', cursor: 'pointer', background: 'none', border: 'none', marginLeft: '8px' }}
-            >
-              Logout
-            </button>
+    <div style={{ 
+      width: '1200px', 
+      margin: '0 auto', 
+      padding: '2rem 1rem'
+    }}>
+      <div style={{ 
+        borderRadius: '0.5rem', 
+        backgroundColor: 'white', 
+        boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+        overflow: 'hidden'
+      }}>
+        {/* Header section */}
+        <div style={{ 
+          padding: '1.5rem', 
+          borderBottom: '1px solid #e5e7eb'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+            <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Your Calendar</h1>
+            <div>
+              <span style={{ fontSize: '0.875rem', color: '#4b5563' }}>
+                Logged in as <span style={{ fontWeight: '500' }}>{(authUser as any)?.name || 'clause-thing-oven'}</span>
+              </span>
+              <button 
+                onClick={logout}
+                style={{ fontSize: '0.875rem', color: '#4b5563', cursor: 'pointer', background: 'none', border: 'none', marginLeft: '8px' }}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ 
+              display: 'flex', 
+              position: 'relative',
+              backgroundColor: '#f3f4f6',
+              borderRadius: '0.5rem',
+              padding: '0.25rem',
+              width: '320px'
+            }}>
+              {/* Month toggle */}
+              <Link href="/calendar" style={{ 
+                position: 'relative',
+                zIndex: 10,
+                flex: '1',
+                textAlign: 'center',
+                padding: '0.5rem 0',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: router.pathname === '/calendar' ? 'white' : '#111827',
+                textDecoration: 'none'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  Month
+                </span>
+              </Link>
+
+              {/* Week toggle */}
+              <Link href="/calendar/week" style={{ 
+                position: 'relative',
+                zIndex: 10,
+                flex: '1',
+                textAlign: 'center',
+                padding: '0.5rem 0',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: router.pathname === '/calendar/week' ? 'white' : '#111827',
+                textDecoration: 'none'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                    <line x1="3" y1="16" x2="21" y2="16"></line>
+                  </svg>
+                  Week
+                </span>
+              </Link>
+
+              {/* Day toggle */}
+              <Link href="/calendar/day" style={{ 
+                position: 'relative',
+                zIndex: 10,
+                flex: '1',
+                textAlign: 'center',
+                padding: '0.5rem 0',
+                borderRadius: '0.375rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                color: router.pathname === '/calendar/day' ? 'white' : '#111827',
+                textDecoration: 'none'
+              }}>
+                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  Day
+                </span>
+              </Link>
+
+              {/* Sliding background */}
+              <div style={{
+                position: 'absolute',
+                top: '0.25rem',
+                left: router.pathname === '/calendar' 
+                  ? '0.25rem' 
+                  : router.pathname === '/calendar/week'
+                    ? 'calc(33.333% + 0.125rem)'
+                    : 'calc(66.667% + 0rem)',
+                width: 'calc(33.333% - 0.125rem)',
+                height: 'calc(100% - 0.5rem)',
+                backgroundColor: '#111827',
+                borderRadius: '0.375rem',
+                transition: 'left 0.3s ease',
+                zIndex: 1
+              }}></div>
+            </div>
+
+            <Link href="/calendar/new-event" style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.25rem', 
+              padding: '0.5rem 1rem', 
+              backgroundColor: '#111827', 
+              color: 'white', 
+              borderRadius: '0.25rem',
+              border: 'none',
+              fontSize: '0.875rem',
+              fontWeight: '500',
+              textDecoration: 'none'
+            }}>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              New Event
+            </Link>
           </div>
         </div>
-      </header>
 
-      <div style={{ display: 'flex', marginBottom: '1rem', gap: '0.5rem' }}>
-        <button style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.25rem', 
-          padding: '0.5rem 1rem', 
-          backgroundColor: '#111827', 
-          color: 'white', 
-          borderRadius: '0.25rem',
-          border: 'none',
-          fontSize: '0.875rem',
-          fontWeight: '500',
-          cursor: 'pointer'
-        }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          Month
-        </button>
-        <Link href="/calendar/week" style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.25rem', 
-          padding: '0.5rem 1rem', 
-          backgroundColor: 'white', 
-          color: '#111827', 
-          borderRadius: '0.25rem',
-          border: '1px solid #e5e7eb',
-          fontSize: '0.875rem',
-          fontWeight: '500',
-          textDecoration: 'none'
-        }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-            <line x1="3" y1="16" x2="21" y2="16"></line>
-          </svg>
-          Week
-        </Link>
-        <Link href="/calendar/day" style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.25rem', 
-          padding: '0.5rem 1rem', 
-          backgroundColor: 'white', 
-          color: '#111827', 
-          borderRadius: '0.25rem',
-          border: '1px solid #e5e7eb',
-          fontSize: '0.875rem',
-          fontWeight: '500',
-          textDecoration: 'none'
-        }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          Day
-        </Link>
-        
-        <div style={{ flexGrow: 1 }}></div>
-        
-        <Link href="/calendar/new-event" style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.25rem', 
-          padding: '0.5rem 1rem', 
-          backgroundColor: '#111827', 
-          color: 'white', 
-          borderRadius: '0.25rem',
-          border: 'none',
-          fontSize: '0.875rem',
-          fontWeight: '500',
-          textDecoration: 'none'
-        }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          New Event
-        </Link>
-      </div>
-
-      <div style={{ borderRadius: '0.5rem', border: '1px solid #e5e7eb', backgroundColor: 'white', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <Link
-            href={`/calendar?date=${prevMonth}`}
-            style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
-          >
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              &larr; Previous
-            </span>
-          </Link>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{formattedDate}</h2>
-          <Link
-            href={`/calendar?date=${nextMonth}`}
-            style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
-          >
-            <span style={{ display: 'flex', alignItems: 'center' }}>
-              Next &rarr;
-            </span>
-          </Link>
-        </div>
-        
-        {/* Calendar grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
-          {/* Day names */}
-          {weekDays.map((day) => (
-            <div
-              key={day}
-              style={{ padding: '0.75rem 0', textAlign: 'center', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}
+        {/* Calendar content */}
+        <div style={{ padding: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <Link
+              href={`/calendar?date=${prevMonth}`}
+              style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
             >
-              {day}
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderTop: '1px solid #e5e7eb' }}>
-          {days.map((day) => {
-            // Get events for this day
-            const dayEvents = events.filter((event) => {
-              const eventStart = new Date(event.startDate);
-              const eventEnd = new Date(event.endDate);
-              
-              return (
-                (day >= eventStart && day <= eventEnd) ||
-                isSameDay(day, eventStart) ||
-                isSameDay(day, eventEnd)
-              );
-            });
-
-            // Style based on month and current day
-            const dayStyle = {
-              height: '120px', 
-              padding: '0.5rem',
-              borderRight: '1px solid #e5e7eb',
-              borderBottom: '1px solid #e5e7eb',
-              backgroundColor: isToday(day) ? '#ebf5ff' : 
-                              !isSameMonth(day, currentDate) ? '#f9fafb' : 'white',
-              color: !isSameMonth(day, currentDate) ? '#9ca3af' : 'inherit',
-              position: 'relative' as const
-            };
-
-            return (
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                &larr; Previous
+              </span>
+            </Link>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{formattedDate}</h2>
+            <Link
+              href={`/calendar?date=${nextMonth}`}
+              style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                Next &rarr;
+              </span>
+            </Link>
+          </div>
+          
+          {/* Calendar grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', width: '100%' }}>
+            {/* Day names */}
+            {weekDays.map((day) => (
               <div
-                key={day.toString()}
-                style={dayStyle}
+                key={day}
+                style={{ padding: '0.75rem 0', textAlign: 'center', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}
               >
-                <div style={{ fontSize: '0.875rem', padding: '0.25rem' }}>
-                  {format(day, "d")}
-                </div>
-
-                <div style={{ marginTop: '0.25rem', maxHeight: '80px', overflow: 'hidden' }}>
-                  {dayEvents.length > 0 && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                      {dayEvents.slice(0, 3).map((event) => {
-                        // Set event background colors based on event type/title
-                        let bgColor = '#e0f2fe'; // Default light blue
-                        let textColor = '#0c4a6e';
-                        
-                        if (event.title.includes('Client Meeting')) {
-                          bgColor = '#dcfce7'; // Light green
-                          textColor = '#166534';
-                        } else if (event.title.includes('Team Standup')) {
-                          bgColor = '#fee2e2'; // Light red
-                          textColor = '#991b1b';
-                        } else if (event.title.includes('Project')) {
-                          bgColor = '#fee2e2'; // Light red
-                          textColor = '#991b1b';
-                        } else if (event.title.includes('Design')) {
-                          bgColor = '#f5d0fe'; // Light purple
-                          textColor = '#86198f';
-                        } else if (event.title.includes('1:1')) {
-                          bgColor = '#dbeafe'; // Light blue
-                          textColor = '#1e40af';
-                        } else if (event.title.includes('Review')) {
-                          bgColor = '#fef9c3'; // Light yellow
-                          textColor = '#854d0e';
-                        } else if (event.title.includes('UI/UX')) {
-                          bgColor = '#fef9c3'; // Light yellow
-                          textColor = '#854d0e';
-                        } else if (event.title.includes('Team Meeting')) {
-                          bgColor = '#dbeafe'; // Light blue
-                          textColor = '#1e40af';
-                        } else if (event.title.includes('Product')) {
-                          bgColor = '#dbeafe'; // Light blue
-                          textColor = '#1e40af';
-                        } else if (event.title.includes('API')) {
-                          bgColor = '#e9d5ff'; // Light purple
-                          textColor = '#6b21a8';
-                        } else if (event.title.includes('Code')) {
-                          bgColor = '#fef9c3'; // Light yellow
-                          textColor = '#854d0e';
-                        }
-                        
-                        return (
-                          <div
-                            key={event.id}
-                            onClick={() => {
-                              setSelectedEvent(event);
-                            }}
-                            style={{
-                              display: 'block',
-                              width: '100%',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              borderRadius: '0.25rem',
-                              padding: '0.25rem 0.5rem',
-                              fontSize: '0.75rem',
-                              fontWeight: '500',
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              border: 'none',
-                              backgroundColor: bgColor,
-                              color: textColor
-                            }}
-                            title={`${event.title}${event.isAllDay ? ' (All day)' : ` (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}\n${event.description || ''}`}
-                          >
-                            {event.title}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                {day}
               </div>
-            );
-          })}
+            ))}
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderTop: '1px solid #e5e7eb', width: '100%' }}>
+            {days.map((day) => {
+              // Get events for this day
+              const dayEvents = events.filter((event) => {
+                const eventStart = new Date(event.startDate);
+                const eventEnd = new Date(event.endDate);
+                
+                return (
+                  (day >= eventStart && day <= eventEnd) ||
+                  isSameDay(day, eventStart) ||
+                  isSameDay(day, eventEnd)
+                );
+              });
+
+              // Style based on month and current day
+              const dayStyle = {
+                height: '120px', 
+                padding: '0.5rem',
+                borderRight: '1px solid #e5e7eb',
+                borderBottom: '1px solid #e5e7eb',
+                backgroundColor: isToday(day) ? '#ebf5ff' : 
+                                !isSameMonth(day, currentDate) ? '#f9fafb' : 'white',
+                color: !isSameMonth(day, currentDate) ? '#9ca3af' : 'inherit',
+                position: 'relative' as const
+              };
+
+              return (
+                <div
+                  key={day.toString()}
+                  style={dayStyle}
+                >
+                  <div style={{ fontSize: '0.875rem', padding: '0.25rem' }}>
+                    {format(day, "d")}
+                  </div>
+
+                  <div style={{ marginTop: '0.25rem', maxHeight: '80px', overflow: 'hidden' }}>
+                    {dayEvents.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                        {dayEvents.slice(0, 3).map((event) => {
+                          // Set event background colors based on event type/title
+                          let bgColor = '#e0f2fe'; // Default light blue
+                          let textColor = '#0c4a6e';
+                          
+                          if (event.title.includes('Client Meeting')) {
+                            bgColor = '#dcfce7'; // Light green
+                            textColor = '#166534';
+                          } else if (event.title.includes('Team Standup')) {
+                            bgColor = '#fee2e2'; // Light red
+                            textColor = '#991b1b';
+                          } else if (event.title.includes('Project')) {
+                            bgColor = '#fee2e2'; // Light red
+                            textColor = '#991b1b';
+                          } else if (event.title.includes('Design')) {
+                            bgColor = '#f5d0fe'; // Light purple
+                            textColor = '#86198f';
+                          } else if (event.title.includes('1:1')) {
+                            bgColor = '#dbeafe'; // Light blue
+                            textColor = '#1e40af';
+                          } else if (event.title.includes('Review')) {
+                            bgColor = '#fef9c3'; // Light yellow
+                            textColor = '#854d0e';
+                          } else if (event.title.includes('UI/UX')) {
+                            bgColor = '#fef9c3'; // Light yellow
+                            textColor = '#854d0e';
+                          } else if (event.title.includes('Team Meeting')) {
+                            bgColor = '#dbeafe'; // Light blue
+                            textColor = '#1e40af';
+                          } else if (event.title.includes('Product')) {
+                            bgColor = '#dbeafe'; // Light blue
+                            textColor = '#1e40af';
+                          } else if (event.title.includes('API')) {
+                            bgColor = '#e9d5ff'; // Light purple
+                            textColor = '#6b21a8';
+                          } else if (event.title.includes('Code')) {
+                            bgColor = '#fef9c3'; // Light yellow
+                            textColor = '#854d0e';
+                          }
+                          
+                          return (
+                            <div
+                              key={event.id}
+                              onClick={() => {
+                                setSelectedEvent(event);
+                              }}
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                borderRadius: '0.25rem',
+                                padding: '0.25rem 0.5rem',
+                                fontSize: '0.75rem',
+                                fontWeight: '500',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                border: 'none',
+                                backgroundColor: bgColor,
+                                color: textColor,
+                                maxWidth: '100%'
+                              }}
+                              title={`${event.title}${event.isAllDay ? ' (All day)' : ` (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}\n${event.description || ''}`}
+                            >
+                              {event.title.length > 18 ? `${event.title.substring(0, 18)}...` : event.title}
+                            </div>
+                          );
+                        })}
+                        {dayEvents.length > 3 && (
+                          <div style={{ 
+                            fontSize: '0.75rem', 
+                            color: '#6b7280', 
+                            padding: '0.125rem 0.5rem',
+                            textAlign: 'left'
+                          }}>
+                            + {dayEvents.length - 3} more
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
       
