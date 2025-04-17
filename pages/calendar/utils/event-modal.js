@@ -67,13 +67,13 @@ export const EventModal = ({ event, onClose }) => {
     }}>
       <div style={{
         backgroundColor: 'white',
-        borderRadius: '8px',
+        borderRadius: '0.5rem',
         padding: '24px',
         width: '90%',
         maxWidth: '500px',
         maxHeight: '90vh',
         overflow: 'auto',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
       }}>
         <div style={{
           display: 'flex',
@@ -154,8 +154,11 @@ export const EventModal = ({ event, onClose }) => {
               borderRadius: '4px',
               color: '#444',
               fontWeight: 500,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'background-color 0.2s ease-in-out'
             }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e5e7eb'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
           >
             Close
           </button>
