@@ -1,0 +1,83 @@
+# Next.js Calendar App - Cursor Rules
+
+## Project Patterns
+
+### Static Export Mode
+- MUST maintain `output: 'export'` in next.config.js
+- All functionality must work in static HTML export mode
+- No server-side rendering or API routes should be relied upon
+
+### Styling
+- Use inline styles instead of Tailwind CSS or other class-based systems
+- Example: `<div style={{ marginTop: '1rem', color: '#333' }}>`
+- Global styles should be in a global CSS file when needed
+- Use semantic color coding for events based on their type/title
+- Fixed height for calendar cells ensures consistent layout
+
+### UI Components
+- Use SVG icons for better visual appearance
+- Consistent spacing and font sizes across components
+- Modern, clean UI with minimal borders and subtle shadows
+- Use grid layouts for calendar display
+- Navigation buttons should follow the design in the monthly view
+
+### Calendar Event Display
+- Color code events based on their type/title for visual organization
+- Limit displayed events in calendar cells to prevent overflow
+- Provide clear date navigation with previous/next controls
+- Maintain consistent event styling across all calendar views
+
+### Authentication
+- Support both demo mode and database authentication
+- Demo mode uses client-side storage
+- Database mode uses NextAuth.js with PostgreSQL
+- Type safety for auth properties needs attention (authUser.name issue)
+- Always provide fallback values for auth properties that might be undefined
+
+### Component Structure
+- Pages should be in the `/pages` directory following Next.js Pages Router patterns
+- Reusable components should be in the `/components` directory
+- Context providers should be in the `/context` directory
+- Use typed state management with useState<any> for complex objects
+
+### Calendar Views
+- Support day, week, and month views
+- Handle event display and creation in all views
+- Filter events properly for each calendar cell
+- Ensure responsive design across all calendar views
+- Use consistent styling between all calendar views
+
+### Type Safety
+- Properly type all React components
+- Use TypeScript interfaces for event objects
+- Handle nullable values with optional chaining
+- Provide fallback values for potentially undefined properties
+- Pay attention to authUser type usage
+
+### Deployment
+- Build configuration is critical - follow the Vercel deployment instructions
+- Use environment variables for configuration
+- Test static export locally before deployment
+
+## User Preferences
+- Clean, responsive UI
+- Simple event management
+- Intuitive navigation between calendar views
+- Fast performance
+- Visually distinct event categories
+
+## Project Evolution
+- Original implementation used Tailwind CSS, now uses inline styles
+- Project supports both Pages Router and App Router, but deployment uses Pages Router
+- Demo mode was added to simplify usage without database
+- Recent UI update to monthly view established new design patterns
+- Event color coding now based on event type/title
+
+## Known Challenges
+- Maintaining static export compatibility
+- Handling authentication in static mode
+- Ensuring proper calendar view rendering
+- Managing events without server-side persistence in demo mode
+- Type safety with authentication objects
+- Limited space for displaying multiple events in calendar cells
+- Consistent event styling across different calendar views 
