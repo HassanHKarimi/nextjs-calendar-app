@@ -1,11 +1,66 @@
 # System Patterns: Next.js Calendar App
 
 ## Architecture Overview
-The application follows a client-side architecture with static generation:
-- **Next.js Pages Router**: Core routing and page structure
-- **Static Export Mode**: Pre-rendered HTML with client-side interactivity
-- **Client-Side State Management**: React context and useState for application state
-- **Demo/Database Modes**: Dual implementation approach based on environment settings
+
+### Client-Side Navigation
+- Uses Next.js router for client-side navigation
+- Implements shallow routing for view changes
+- Maintains URL synchronization with view state
+- Handles view transitions without full page reloads
+
+### State Management
+- Uses React useState for local state management
+- Implements URL-based state synchronization
+- Maintains view state in sync with URL parameters
+- Handles loading states for smooth transitions
+
+### Component Structure
+- Main calendar container in pages/calendar/index.tsx
+- Modular view components (month, week, day)
+- Shared event modal component
+- Reusable UI components for navigation and controls
+
+### Event Handling
+- Client-side event filtering and display
+- Semantic color coding based on event type
+- Interactive event display with hover effects
+- Modal-based event details view
+
+### Styling Patterns
+- Inline styles for component-specific styling
+- Consistent color schemes for event types
+- Responsive layout using CSS Grid
+- Interactive transitions and animations
+
+### Authentication Flow
+- Session-based authentication
+- Client-side auth state management
+- Protected route handling
+- Demo mode support
+
+### Data Management
+- Client-side event data handling
+- Date manipulation using date-fns
+- Event filtering and sorting
+- Cache management for performance
+
+### Navigation Patterns
+- View-based navigation (month/week/day)
+- Date-based navigation (prev/next)
+- URL parameter synchronization
+- Shallow routing for view changes
+
+### Error Handling
+- Client-side error boundaries
+- Loading state management
+- Authentication error handling
+- Data validation checks
+
+### Performance Patterns
+- Optimized event rendering
+- Lazy loading of views
+- Transition animations
+- Efficient state updates
 
 ## Component Structure
 - **Page Components**: Main views defined in `/pages` directory (day, week, month views)
