@@ -264,149 +264,86 @@ export default function CalendarPage() {
       transition: 'opacity 0.3s ease-in-out'
     }}>
       <div style={{ 
-        borderRadius: '0.5rem', 
+        borderRadius: '1rem', 
         backgroundColor: 'white', 
-        boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
         overflow: 'hidden'
       }}>
-        {/* Header section */}
+        {/* Calendar Header */}
         <div style={{ 
           padding: '1.5rem', 
-          borderBottom: '1px solid #e5e7eb'
+          borderBottom: '1px solid #e5e7eb',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-            <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Your Calendar</h1>
-            <div>
-              <span style={{ fontSize: '0.875rem', color: '#4b5563' }}>
-                Logged in as <span style={{ fontWeight: '500' }}>{(authUser as any)?.name || 'clause-thing-oven'}</span>
-              </span>
+          <div>
+            <h1 style={{ 
+              fontSize: '1.5rem', 
+              fontWeight: 600, 
+              color: '#1f2937',
+              marginBottom: '0.5rem'
+            }}>
+              {formattedDate}
+            </h1>
+            <p style={{ 
+              fontSize: '0.875rem', 
+              color: '#6b7280',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
+              <span>Logged in as:</span>
+              <span style={{ fontWeight: 500, color: '#1f2937' }}>{authUser.name}</span>
               <button 
                 onClick={logout}
-                style={{ fontSize: '0.875rem', color: '#4b5563', cursor: 'pointer', background: 'none', border: 'none', marginLeft: '8px' }}
+                style={{
+                  marginLeft: '1rem',
+                  padding: '0.25rem 0.75rem',
+                  fontSize: '0.75rem',
+                  color: '#ef4444',
+                  backgroundColor: '#fee2e2',
+                  border: 'none',
+                  borderRadius: '0.375rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#fecaca'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fee2e2'}
               >
                 Logout
               </button>
-            </div>
+            </p>
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ 
-              display: 'flex', 
-              position: 'relative',
-              backgroundColor: '#f3f4f6',
-              borderRadius: '0.5rem',
-              padding: '0.25rem',
-              width: '320px'
-            }}>
-              {/* Month toggle */}
-              <Link href="/calendar" style={{ 
-                position: 'relative',
-                zIndex: 10,
-                flex: '1',
-                textAlign: 'center',
-                padding: '0.5rem 0',
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <Link 
+              href={`/calendar/month?date=${prevMonth}`}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#f3f4f6',
+                color: '#4b5563',
                 borderRadius: '0.375rem',
+                textDecoration: 'none',
                 fontSize: '0.875rem',
-                fontWeight: '500',
-                color: router.pathname === '/calendar' ? 'white' : '#111827',
-                textDecoration: 'none'
-              }}>
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
-                  Month
-                </span>
-              </Link>
-
-              {/* Week toggle */}
-              <Link href="/calendar/week" style={{ 
-                position: 'relative',
-                zIndex: 10,
-                flex: '1',
-                textAlign: 'center',
-                padding: '0.5rem 0',
-                borderRadius: '0.375rem',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: router.pathname === '/calendar/week' ? 'white' : '#111827',
-                textDecoration: 'none'
-              }}>
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                    <line x1="3" y1="16" x2="21" y2="16"></line>
-                  </svg>
-                  Week
-                </span>
-              </Link>
-
-              {/* Day toggle */}
-              <Link href="/calendar/day" style={{ 
-                position: 'relative',
-                zIndex: 10,
-                flex: '1',
-                textAlign: 'center',
-                padding: '0.5rem 0',
-                borderRadius: '0.375rem',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                color: router.pathname === '/calendar/day' ? 'white' : '#111827',
-                textDecoration: 'none'
-              }}>
-                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
-                  Day
-                </span>
-              </Link>
-
-              {/* Sliding background */}
-              <div style={{
-                position: 'absolute',
-                top: '0.25rem',
-                left: router.pathname === '/calendar' 
-                  ? '0.25rem' 
-                  : router.pathname === '/calendar/week'
-                    ? 'calc(33.333% + 0.125rem)'
-                    : 'calc(66.667% + 0rem)',
-                width: 'calc(33.333% - 0.125rem)',
-                height: 'calc(100% - 0.5rem)',
-                backgroundColor: '#111827',
-                borderRadius: '0.375rem',
-                transition: 'left 0.3s ease',
-                zIndex: 1
-              }}></div>
-            </div>
-
-            <Link href="/calendar/new-event" style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.25rem', 
-              padding: '0.5rem 1rem', 
-              backgroundColor: '#111827', 
-              color: 'white', 
-              borderRadius: '0.25rem',
-              border: 'none',
-              fontSize: '0.875rem',
-              fontWeight: '500',
-              textDecoration: 'none'
-            }}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              New Event
+                fontWeight: 500,
+                transition: 'all 0.2s',
+                ...(router.pathname === '/calendar/month' && {
+                  backgroundColor: '#3b82f6',
+                  color: 'white'
+                })
+              }}
+              onMouseOver={(e) => {
+                if (router.pathname !== '/calendar/month') {
+                  e.currentTarget.style.backgroundColor = '#e5e7eb';
+                }
+              }}
+              onMouseOut={(e) => {
+                if (router.pathname !== '/calendar/month') {
+                  e.currentTarget.style.backgroundColor = '#f3f4f6';
+                }
+              }}
+            >
+              Month View
             </Link>
           </div>
         </div>
@@ -439,14 +376,25 @@ export default function CalendarPage() {
             {weekDays.map((day) => (
               <div
                 key={day}
-                style={{ padding: '0.75rem 0', textAlign: 'center', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}
+                style={{ 
+                  padding: '0.75rem 0', 
+                  textAlign: 'center', 
+                  fontSize: '14px', 
+                  fontWeight: '500', 
+                  color: '#4b5563' 
+                }}
               >
                 {day}
               </div>
             ))}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderTop: '1px solid #e5e7eb', width: '100%' }}>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(7, 1fr)', 
+            width: '100%',
+            borderTop: '1px solid #e5e7eb'
+          }}>
             {days.map((day) => {
               // Get events for this day
               const dayEvents = events.filter((event) => {
@@ -477,7 +425,20 @@ export default function CalendarPage() {
                   key={day.toString()}
                   style={dayStyle}
                 >
-                  <div style={{ fontSize: '0.875rem', padding: '0.25rem' }}>
+                  <div style={{ 
+                    fontSize: isToday(day) ? '16px' : '14px', 
+                    fontWeight: isToday(day) ? 'bold' : 'normal',
+                    padding: '0.25rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: isToday(day) ? '24px' : 'auto',
+                    height: isToday(day) ? '24px' : 'auto',
+                    borderRadius: isToday(day) ? '50%' : '0',
+                    backgroundColor: isToday(day) ? '#3b82f6' : 'transparent',
+                    color: isToday(day) ? 'white' : 'inherit',
+                    margin: isToday(day) ? '0 auto' : '0'
+                  }}>
                     {format(day, "d")}
                   </div>
 
@@ -486,41 +447,41 @@ export default function CalendarPage() {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         {dayEvents.slice(0, 3).map((event) => {
                           // Set event background colors based on event type/title
-                          let bgColor = '#e0f2fe'; // Default light blue
-                          let textColor = '#0c4a6e';
+                          let bgColor = '#e8f0fe'; // Default light blue
+                          let textColor = '#1e40af';
                           
                           if (event.title.includes('Client Meeting')) {
-                            bgColor = '#dcfce7'; // Light green
+                            bgColor = '#e6f4ea'; // Light green
                             textColor = '#166534';
                           } else if (event.title.includes('Team Standup')) {
-                            bgColor = '#fee2e2'; // Light red
+                            bgColor = '#fce8e6'; // Light red
                             textColor = '#991b1b';
                           } else if (event.title.includes('Project')) {
-                            bgColor = '#fee2e2'; // Light red
+                            bgColor = '#fce8e6'; // Light red
                             textColor = '#991b1b';
                           } else if (event.title.includes('Design')) {
-                            bgColor = '#f5d0fe'; // Light purple
+                            bgColor = '#f3e8fd'; // Light purple
                             textColor = '#86198f';
                           } else if (event.title.includes('1:1')) {
-                            bgColor = '#dbeafe'; // Light blue
+                            bgColor = '#e8f0fe'; // Light blue
                             textColor = '#1e40af';
                           } else if (event.title.includes('Review')) {
-                            bgColor = '#fef9c3'; // Light yellow
+                            bgColor = '#fef7e0'; // Light yellow
                             textColor = '#854d0e';
                           } else if (event.title.includes('UI/UX')) {
-                            bgColor = '#fef9c3'; // Light yellow
+                            bgColor = '#fef7e0'; // Light yellow
                             textColor = '#854d0e';
                           } else if (event.title.includes('Team Meeting')) {
-                            bgColor = '#dbeafe'; // Light blue
+                            bgColor = '#e8f0fe'; // Light blue
                             textColor = '#1e40af';
                           } else if (event.title.includes('Product')) {
-                            bgColor = '#dbeafe'; // Light blue
+                            bgColor = '#e8f0fe'; // Light blue
                             textColor = '#1e40af';
                           } else if (event.title.includes('API')) {
-                            bgColor = '#e9d5ff'; // Light purple
+                            bgColor = '#f3e8fd'; // Light purple
                             textColor = '#6b21a8';
                           } else if (event.title.includes('Code')) {
-                            bgColor = '#fef9c3'; // Light yellow
+                            bgColor = '#fef7e0'; // Light yellow
                             textColor = '#854d0e';
                           }
                           
@@ -536,9 +497,9 @@ export default function CalendarPage() {
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
-                                borderRadius: '0.25rem',
+                                borderRadius: '6px',
                                 padding: '0.25rem 0.5rem',
-                                fontSize: '0.75rem',
+                                fontSize: '13px',
                                 fontWeight: '500',
                                 textAlign: 'left',
                                 cursor: 'pointer',
@@ -546,17 +507,18 @@ export default function CalendarPage() {
                                 backgroundColor: bgColor,
                                 color: textColor,
                                 maxWidth: '100%',
-                                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                                transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
                               }}
                               onMouseOver={(e) => {
                                 e.currentTarget.style.transform = 'scale(1.02)';
-                                e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
                                 e.currentTarget.style.zIndex = '10';
                                 e.currentTarget.style.position = 'relative';
                               }}
                               onMouseOut={(e) => {
                                 e.currentTarget.style.transform = 'scale(1)';
-                                e.currentTarget.style.boxShadow = 'none';
+                                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)';
                                 e.currentTarget.style.zIndex = 'auto';
                                 e.currentTarget.style.position = 'static';
                               }}
@@ -568,7 +530,7 @@ export default function CalendarPage() {
                         })}
                         {dayEvents.length > 3 && (
                           <div style={{ 
-                            fontSize: '0.75rem', 
+                            fontSize: '13px', 
                             color: '#6b7280', 
                             padding: '0.125rem 0.5rem',
                             textAlign: 'left'
