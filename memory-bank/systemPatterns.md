@@ -1,66 +1,167 @@
 # System Patterns: Next.js Calendar App
 
 ## Architecture Overview
+The calendar app follows a component-based architecture using Next.js Pages Router. Each view (month, week, day) is implemented as a separate page component with shared utilities and components.
 
-### Client-Side Navigation
-- Uses Next.js router for client-side navigation
-- Implements shallow routing for view changes
-- Maintains URL synchronization with view state
-- Handles view transitions without full page reloads
+## View Patterns
 
-### State Management
-- Uses React useState for local state management
-- Implements URL-based state synchronization
-- Maintains view state in sync with URL parameters
-- Handles loading states for smooth transitions
+### Common View Structure
+```typescript
+export default function CalendarView() {
+  // State management
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  
+  // Authentication check
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+  
+  // Data loading
+  useEffect(() => {
+    loadEvents();
+  }, [currentDate]);
+  
+  return (
+    <div>
+      <Header />
+      <Navigation />
+      <ViewContent />
+      <EventModal />
+    </div>
+  );
+}
+```
 
-### Component Structure
-- Main calendar container in pages/calendar/index.tsx
-- Modular view components (month, week, day)
-- Shared event modal component
-- Reusable UI components for navigation and controls
+### View Navigation
+- Each view (month/week/day) has its own route
+- Navigation preserves date context through URL parameters
+- Consistent header with view switcher across all views
+- Previous/Next navigation buttons for date changes
 
-### Event Handling
-- Client-side event filtering and display
-- Semantic color coding based on event type
-- Interactive event display with hover effects
-- Modal-based event details view
+### Event Display Patterns
+1. Month View:
+   - Grid layout with day cells
+   - Events shown as colored cards
+   - Overflow handling with "+X more" indicator
+
+2. Week View:
+   - Hourly grid with day columns
+   - All-day events at the top
+   - Time-based events positioned by start/end time
+   - Event overlap handling
+
+3. Day View:
+   - Detailed hourly grid
+   - Full event details visible
+   - Precise time positioning
+   - Event stacking for overlaps
+
+## Component Patterns
+
+### Event Components
+```typescript
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  location?: string;
+  isAllDay: boolean;
+  color?: string;
+}
+
+// Event positioning calculation
+const getEventPosition = (event: Event) => {
+  const startHour = new Date(event.startDate).getHours();
+  const endHour = new Date(event.endDate).getHours();
+  return {
+    top: (startHour - START_HOUR) * HOUR_HEIGHT,
+    height: (endHour - startHour) * HOUR_HEIGHT
+  };
+};
+```
+
+### Interactive Elements
+- Hover effects on all event cards
+- Scale transform on hover
+- Z-index management for overlapping events
+- Smooth transitions for all interactions
 
 ### Styling Patterns
-- Inline styles for component-specific styling
-- Consistent color schemes for event types
-- Responsive layout using CSS Grid
-- Interactive transitions and animations
+- Inline styles for consistent appearance
+- Semantic color coding based on event type
+- Responsive grid layouts
+- Consistent spacing and typography
 
-### Authentication Flow
-- Session-based authentication
-- Client-side auth state management
-- Protected route handling
-- Demo mode support
+## Data Management
 
-### Data Management
-- Client-side event data handling
-- Date manipulation using date-fns
-- Event filtering and sorting
-- Cache management for performance
+### Event State Management
+- Events loaded based on current view
+- Filtered by date range
+- Cached for performance
+- Updated through modal interactions
 
-### Navigation Patterns
-- View-based navigation (month/week/day)
-- Date-based navigation (prev/next)
-- URL parameter synchronization
-- Shallow routing for view changes
+### Date Handling
+```typescript
+// Date navigation
+const nextDate = () => {
+  const newDate = addPeriod(currentDate, 1);
+  router.push(`/calendar/${view}?date=${format(newDate, 'yyyy-MM-dd')}`);
+};
 
-### Error Handling
-- Client-side error boundaries
-- Loading state management
-- Authentication error handling
-- Data validation checks
+const prevDate = () => {
+  const newDate = subPeriod(currentDate, 1);
+  router.push(`/calendar/${view}?date=${format(newDate, 'yyyy-MM-dd')}`);
+};
+```
 
-### Performance Patterns
-- Optimized event rendering
-- Lazy loading of views
-- Transition animations
-- Efficient state updates
+## Authentication Pattern
+```typescript
+// Client-side auth check
+useEffect(() => {
+  const checkAuth = () => {
+    const storedAuth = sessionStorage.getItem('calendarAuth');
+    if (storedAuth) {
+      const auth = JSON.parse(storedAuth);
+      if (auth.isAuthenticated) {
+        setAuthUser(auth.user);
+      } else {
+        router.push('/');
+      }
+    } else {
+      router.push('/');
+    }
+  };
+  checkAuth();
+}, []);
+```
+
+## Error Handling
+- Graceful fallbacks for loading states
+- Error boundaries for component failures
+- Type checking for all data operations
+
+## Performance Patterns
+- Event memoization for large datasets
+- Optimized rendering for time-based views
+- Lazy loading for modal components
+- Efficient date calculations
+
+## Responsive Design
+- Grid-based layouts that adapt to screen size
+- Flexible event card sizing
+- Mobile-first approach
+- Touch-friendly interactions
+
+## Future Patterns (Planned)
+- Drag-and-drop event management
+- Event recurrence handling
+- Calendar sharing
+- Real-time updates
+- Advanced search functionality
 
 ## Component Structure
 - **Page Components**: Main views defined in `/pages` directory (day, week, month views)

@@ -1,36 +1,37 @@
-# Active Context: Next.js Calendar App
+# Active Context
 
 ## Current Focus
-- Calendar interface improvements and view management
-- Client-side navigation implementation
-- UI/UX enhancements for better user experience
+- Day and Week views have been implemented and integrated with the main calendar
+- Navigation between views is now fully functional
+- Event display and interaction is consistent across all views
 
 ## Recent Changes
-- Implemented client-side navigation for calendar views (month, week, day)
-- Added view state management with URL synchronization
-- Improved header styling and navigation controls
-- Added placeholders for week and day views
-- Enhanced event display with semantic color coding
-- Implemented smooth transitions between views
-
-## Active Decisions
-- Using client-side navigation to prevent full page reloads
-- Maintaining view state in sync with URL parameters
-- Implementing semantic color coding for different event types
-- Using consistent styling patterns across all views
+- Added Day view with hourly grid and event display
+- Added Week view with daily columns and hourly grid
+- Implemented consistent navigation header across all views
+- Added view switcher buttons with consistent styling
+- Events now have hover effects and proper positioning in all views
 
 ## Next Steps
-1. Implement week view functionality
-2. Implement day view functionality
-3. Add event creation/editing in all views
-4. Enhance event display in week/day views
-5. Add drag-and-drop functionality for events
+1. Implement event creation/editing in day and week views
+2. Add drag-and-drop functionality for events
+3. Improve event overlap handling in week view
+4. Add time indicators and current time marker
+5. Implement event recurrence
+
+## Active Decisions
+- Using inline styles for consistent styling across components
+- Maintaining separate routes for each view (/calendar, /calendar/week, /calendar/day)
+- Using consistent event color coding based on event type/title
+- Implementing hover effects for better event interaction
+- Using grid layout for time-based views
 
 ## Current Considerations
-- Need to maintain consistent styling across all views
-- Consider performance optimizations for large event sets
-- Plan for responsive design adaptations
-- Consider accessibility improvements for navigation
+- Need to optimize performance for large number of events
+- Consider adding mini-calendar for quick date navigation
+- May need to implement event caching for better performance
+- Consider adding keyboard navigation support
+- Think about mobile responsiveness improvements
 
 ## Open Questions
 - How to best handle hover effects for overlapping events
