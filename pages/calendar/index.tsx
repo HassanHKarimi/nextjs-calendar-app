@@ -283,8 +283,8 @@ export default function CalendarPage() {
               alignItems: 'center',
               gap: '6px',
               padding: '8px 16px',
-              backgroundColor: router.pathname === '/calendar' ? '#111827' : 'transparent',
-              color: router.pathname === '/calendar' ? 'white' : '#111827',
+              backgroundColor: !router.query.view || router.query.view === 'month' ? '#111827' : 'transparent',
+              color: !router.query.view || router.query.view === 'month' ? 'white' : '#111827',
               borderRadius: '12px',
               textDecoration: 'none',
               fontSize: '14px',
@@ -301,14 +301,14 @@ export default function CalendarPage() {
             Month
           </Link>
           <Link 
-            href="/calendar/week"
+            href="/calendar?view=week"
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
               padding: '8px 16px',
-              backgroundColor: router.pathname === '/calendar/week' ? '#111827' : 'transparent',
-              color: router.pathname === '/calendar/week' ? 'white' : '#111827',
+              backgroundColor: router.query.view === 'week' ? '#111827' : 'transparent',
+              color: router.query.view === 'week' ? 'white' : '#111827',
               borderRadius: '12px',
               textDecoration: 'none',
               fontSize: '14px',
@@ -325,14 +325,14 @@ export default function CalendarPage() {
             Week
           </Link>
           <Link 
-            href="/calendar/day"
+            href="/calendar?view=day"
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
               padding: '8px 16px',
-              backgroundColor: router.pathname === '/calendar/day' ? '#111827' : 'transparent',
-              color: router.pathname === '/calendar/day' ? 'white' : '#111827',
+              backgroundColor: router.query.view === 'day' ? '#111827' : 'transparent',
+              color: router.query.view === 'day' ? 'white' : '#111827',
               borderRadius: '12px',
               textDecoration: 'none',
               fontSize: '14px',
