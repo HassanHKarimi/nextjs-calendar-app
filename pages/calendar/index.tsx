@@ -155,10 +155,15 @@ export default function CalendarPage() {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   
   // Handle view changes
-  const handleViewChange = (view: string) => {
+  const handleViewChange = (view: 'month' | 'week' | 'day') => {
+    if (view === 'month') {
+      router.push('/calendar');
+    } else if (view === 'week') {
+      router.push('/calendar/week');
+    } else if (view === 'day') {
+      router.push('/calendar/day');
+    }
     setCurrentView(view);
-    // Update URL without full page refresh
-    router.push(`/calendar?view=${view}`, undefined, { shallow: true });
   };
 
   // Use effect to sync view with URL

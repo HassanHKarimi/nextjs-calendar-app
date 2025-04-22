@@ -253,102 +253,103 @@ export default function DayView() {
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
       <Head>
         <title>Day View - Calendar App</title>
       </Head>
       
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '1.5rem',
-      }}>
-        <h1 style={{ 
-          fontSize: '1.5rem', 
-          fontWeight: 'bold',
-          color: '#1e293b'
-        }}>Day View</h1>
-        
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button 
-            onClick={() => router.push(`/calendar/day?date=${prevDay}`)}
-            style={{
-              padding: '0.5rem 0.75rem',
-              borderRadius: '0.375rem',
-              border: 'none',
-              backgroundColor: '#f1f5f9',
-              color: '#334155',
-              cursor: 'pointer',
-              fontWeight: '500',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem',
-              transition: 'background-color 0.2s ease',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#e2e8f0';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#f1f5f9';
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path fillRule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
-            </svg>
-            Previous
-          </button>
+      <div style={{ padding: '1rem', backgroundColor: 'white', borderBottom: '1px solid #e5e7eb' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              onClick={() => {
+                const newDate = subDays(currentDate, 1);
+                router.push(`/calendar/day?date=${format(newDate, 'yyyy-MM-dd')}`);
+              }}
+              style={{
+                padding: '0.5rem 1rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0.375rem',
+                backgroundColor: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => {
+                const newDate = addDays(currentDate, 1);
+                router.push(`/calendar/day?date=${format(newDate, 'yyyy-MM-dd')}`);
+              }}
+              style={{
+                padding: '0.5rem 1rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0.375rem',
+                backgroundColor: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              Next
+            </button>
+          </div>
+          
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <Link href="/calendar" style={{ textDecoration: 'none' }}>
+              <button
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0.375rem',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Month View
+              </button>
+            </Link>
+            <Link href="/calendar/week" style={{ textDecoration: 'none' }}>
+              <button
+                style={{
+                  padding: '0.5rem 1rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0.375rem',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Week View
+              </button>
+            </Link>
+            <button
+              style={{
+                padding: '0.5rem 1rem',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0.375rem',
+                backgroundColor: '#f3f4f6',
+                cursor: 'pointer'
+              }}
+            >
+              Day View
+            </button>
+          </div>
           
           <button
-            onClick={() => router.push('/calendar')}
+            onClick={logout}
             style={{
-              padding: '0.5rem 0.75rem',
+              padding: '0.5rem 1rem',
+              border: '1px solid #e5e7eb',
               borderRadius: '0.375rem',
-              border: 'none',
-              backgroundColor: '#3b82f6',
-              color: 'white',
-              cursor: 'pointer',
-              fontWeight: '500',
-              transition: 'background-color 0.2s ease',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#2563eb';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#3b82f6';
+              backgroundColor: 'white',
+              cursor: 'pointer'
             }}
           >
-            Today
-          </button>
-          
-          <button 
-            onClick={() => router.push(`/calendar/day?date=${nextDay}`)}
-            style={{
-              padding: '0.5rem 0.75rem',
-              borderRadius: '0.375rem',
-              border: 'none',
-              backgroundColor: '#f1f5f9',
-              color: '#334155',
-              cursor: 'pointer',
-              fontWeight: '500',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.25rem',
-              transition: 'background-color 0.2s ease',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = '#e2e8f0';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = '#f1f5f9';
-            }}
-          >
-            Next
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path fillRule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
-            </svg>
+            Logout
           </button>
         </div>
+        
+        <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>
+          {format(currentDate, 'EEEE, MMMM d, yyyy')}
+        </h2>
       </div>
       
       <div style={{
