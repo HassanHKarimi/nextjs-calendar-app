@@ -1,21 +1,21 @@
 .day-container {
-  @apply w-full overflow-x-auto;
+  @apply overflow-x-auto w-full border border-gray-100 rounded-lg;
 }
 
 .day-header {
-  @apply flex flex-col items-center justify-center h-16 mb-4;
+  @apply flex flex-col items-center justify-center py-4 border-b border-gray-100;
 }
 
 .day-name {
-  @apply text-sm text-gray-500;
+  @apply text-lg font-medium;
 }
 
 .day-number {
-  @apply text-2xl font-medium text-gray-900;
+  @apply text-3xl font-bold mt-1;
 }
 
 .day-number-current {
-  @apply bg-blue-100 text-blue-800 rounded-full w-10 h-10 flex items-center justify-center;
+  @apply text-blue-600;
 }
 
 .day-all-day-row {
@@ -23,11 +23,11 @@
 }
 
 .day-grid {
-  @apply flex min-w-[600px];
+  @apply grid grid-cols-[60px_1fr] min-w-[600px];
 }
 
 .day-time-column {
-  @apply w-16 flex-shrink-0;
+  @apply border-r border-gray-100;
 }
 
 .day-time-header {
@@ -35,11 +35,11 @@
 }
 
 .day-time-label {
-  @apply h-[60px] text-xs text-gray-500 text-right pr-2 pt-0.5;
+  @apply h-[60px] px-2 py-1 text-xs text-gray-500 text-center font-medium border-b border-gray-100;
 }
 
 .day-event-container {
-  @apply relative flex-1 min-w-[200px] border-l border-gray-200;
+  @apply relative;
 }
 
 .day-hour-cell {
@@ -47,15 +47,9 @@
 }
 
 .day-event {
-  @apply absolute w-[95%] left-[2.5%] bg-blue-100 text-blue-800 rounded p-2 text-xs overflow-hidden transition-all duration-200 ease-in-out;
-}
-
-.day-event:hover {
-  @apply transform scale-[1.02] shadow-md z-10;
-}
-
-.day-event.all-day {
-  @apply static w-full mb-1;
+  @apply absolute left-2 right-2 p-2 rounded border-l-4
+         overflow-hidden cursor-pointer transition-all duration-200 
+         transform hover:scale-[1.02] hover:shadow-md z-[1] hover:z-[10];
 }
 
 .day-event-title {
@@ -63,11 +57,11 @@
 }
 
 .day-event-time {
-  @apply text-[10px] mt-1;
+  @apply text-xs opacity-75 mt-1;
 }
 
 .day-event-location {
-  @apply text-[10px] mt-1 text-gray-600;
+  @apply text-xs mt-1 italic;
 }
 
 .day-event-description {

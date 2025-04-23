@@ -1,45 +1,45 @@
 .week-container {
-  @apply w-full overflow-x-auto;
+  @apply overflow-x-auto w-full border border-gray-100 rounded-lg;
 }
 
 .week-grid {
-  @apply flex min-w-[800px];
+  @apply grid grid-cols-8 min-w-[768px] border-t border-l border-gray-100;
 }
 
 .week-time-column {
-  @apply w-16 flex-shrink-0;
+  @apply min-w-[60px] border-r border-gray-100;
 }
 
 .week-time-header {
-  @apply h-16;
+  @apply h-16 border-b border-gray-100;
 }
 
 .week-time-label {
-  @apply h-[60px] text-xs text-gray-500 text-right pr-2 pt-0.5;
+  @apply h-[60px] px-2 py-1 text-xs text-gray-500 text-center font-medium border-b border-gray-100;
 }
 
 .week-day-column {
-  @apply flex-1 min-w-[100px] border-l border-gray-200;
+  @apply flex-1 min-w-[100px] border-r border-gray-100 last:border-r-0;
 }
 
 .week-day-header {
-  @apply h-16 p-1 flex flex-col items-center justify-center;
+  @apply h-16 p-2 border-b border-gray-100 flex flex-col items-center justify-center;
 }
 
 .week-day-name {
-  @apply text-xs text-gray-500;
+  @apply text-xs text-gray-500 font-medium;
 }
 
 .week-day-number {
-  @apply text-sm font-medium text-gray-900;
+  @apply text-sm font-medium mt-1;
 }
 
 .week-day-number-current {
   @apply bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center;
 }
 
-.week-all-day-row {
-  @apply h-6 border-b border-gray-200 bg-gray-50 p-1;
+.week-day-current {
+  @apply bg-blue-50;
 }
 
 .week-event-container {
@@ -50,16 +50,10 @@
   @apply h-[60px] border-b border-gray-100;
 }
 
-.week-event {
-  @apply block w-full text-xs p-1 bg-blue-100 text-blue-800 rounded truncate mb-0.5;
-}
-
 .week-day-event {
-  @apply absolute w-[95%] left-[2.5%] bg-blue-100 text-blue-800 rounded p-1 text-xs overflow-hidden transition-all duration-200 ease-in-out;
-}
-
-.week-day-event:hover {
-  @apply transform scale-[1.02] shadow-md z-10;
+  @apply absolute left-0 right-0 mx-1 p-1 text-xs rounded border-l-4
+         overflow-hidden cursor-pointer transition-all duration-200 
+         transform hover:scale-[1.02] hover:shadow-md z-[1] hover:z-[10];
 }
 
 .week-event-title {
@@ -67,11 +61,7 @@
 }
 
 .week-event-time {
-  @apply text-[10px] mt-0.5;
-}
-
-.week-day-current {
-  @apply bg-blue-50;
+  @apply text-xs opacity-75 mt-1;
 }
 
 .week-day-gray {
@@ -80,10 +70,6 @@
 
 .week-day-events {
   @apply mt-1 space-y-1;
-}
-
-.week-day-event {
-  @apply text-xs p-0.5 rounded truncate cursor-pointer transition-all duration-200 ease-in-out;
 }
 
 .week-event-hover {

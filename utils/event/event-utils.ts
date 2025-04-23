@@ -23,23 +23,23 @@ export const getEventColorClass = (eventTitle: string): string => {
   const title = eventTitle.toLowerCase();
   
   if (title.includes('meeting') || title.includes('sync') || title.includes('standup')) {
-    return 'bg-blue-200 hover:bg-blue-300 border-blue-300';
+    return 'event-blue';
   } else if (title.includes('lunch') || title.includes('dinner') || title.includes('breakfast')) {
-    return 'bg-green-200 hover:bg-green-300 border-green-300';
+    return 'event-green';
   } else if (title.includes('interview') || title.includes('review')) {
-    return 'bg-purple-200 hover:bg-purple-300 border-purple-300';
+    return 'event-purple';
   } else if (title.includes('deadline') || title.includes('due') || title.includes('submit')) {
-    return 'bg-red-200 hover:bg-red-300 border-red-300';
+    return 'event-red';
   } else if (title.includes('planning') || title.includes('strategy')) {
-    return 'bg-yellow-200 hover:bg-yellow-300 border-yellow-300';
+    return 'event-yellow';
   } else if (title.includes('workshop') || title.includes('training')) {
-    return 'bg-indigo-200 hover:bg-indigo-300 border-indigo-300';
+    return 'event-indigo';
   } else if (title.includes('call') || title.includes('chat')) {
-    return 'bg-teal-200 hover:bg-teal-300 border-teal-300';
+    return 'event-pink';
   }
   
   // Default color
-  return 'bg-gray-200 hover:bg-gray-300 border-gray-300';
+  return 'event-gray';
 };
 
 /**

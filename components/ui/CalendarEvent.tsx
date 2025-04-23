@@ -35,7 +35,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   if (isCompact) {
     return (
       <div 
-        className={`px-1 py-0.5 mb-1 text-xs rounded cursor-pointer border-l-4 truncate transition-all duration-200 ${colorClass}`}
+        className={`px-1 py-1 mb-1 text-xs rounded cursor-pointer truncate transition-all duration-200 
+                   transform hover:scale-[1.02] hover:shadow-sm z-[1] hover:z-[10] ${colorClass}`}
         onClick={handleClick}
       >
         <span className="font-medium">{event.title}</span>
@@ -45,7 +46,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   
   return (
     <div 
-      className={`px-2 py-1 mb-1 text-sm rounded cursor-pointer border-l-4 truncate transition-all duration-200 transform hover:scale-[1.02] hover:shadow-sm ${colorClass}`}
+      className={`px-2 py-1 mb-1 text-sm rounded cursor-pointer truncate transition-all duration-200 
+                 transform hover:scale-[1.02] hover:shadow-md z-[1] hover:z-[10] ${colorClass}`}
       onClick={handleClick}
     >
       <div className="font-medium">{event.title}</div>

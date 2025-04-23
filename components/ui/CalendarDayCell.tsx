@@ -18,7 +18,8 @@ export default function CalendarDayCell({ day, currentMonth, events, onEventClic
   const cellClasses = `
     month-day-cell 
     ${isTodayDate ? 'month-day-cell-current' : ''}
-    ${!isCurrentMonth ? 'text-gray-400' : ''}
+    ${!isCurrentMonth ? 'text-gray-300' : ''}
+    h-full
   `.trim();
 
   // Day number classes
@@ -32,7 +33,7 @@ export default function CalendarDayCell({ day, currentMonth, events, onEventClic
         {format(day, 'd')}
       </div>
       
-      <div className="mt-1 max-h-[80px] overflow-hidden">
+      <div className="mt-1 max-h-[calc(100%-30px)] overflow-hidden">
         {events.length > 0 && (
           <div className="flex flex-col gap-1">
             {events.slice(0, 3).map((event) => (
