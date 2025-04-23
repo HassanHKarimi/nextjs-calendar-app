@@ -7,6 +7,13 @@
 - All functionality must work in static HTML export mode
 - No server-side rendering or API routes should be relied upon
 
+### Routing and Views
+- URL-based navigation with format: `/calendar?view=month|week|day&date=yyyy-MM-dd`
+- Single main calendar page with conditional rendering based on view parameter
+- All views (month, week, day) should use consistent component structure
+- Prefer component-based views over separate page files
+- Navigation uses URL parameters rather than distinct page routes
+
 ### Styling
 - Use Tailwind CSS with custom component classes
 - Component-specific styles are in dedicated CSS files under styles/components/
@@ -22,6 +29,13 @@
 - Use grid layouts for calendar display
 - Navigation buttons should follow the design in the monthly view
 - Implement subtle hover effects on interactive elements
+
+### Calendar View Components
+- Each view (Month/Week/Day) should have its own component
+- Views should share a common component structure pattern
+- Calendar cell components should be reusable across views
+- Calendar event components should be reusable across views
+- Navigation should be handled by the parent calendar component
 
 ### Calendar Event Display
 - Color code events based on their type/title for visual organization
@@ -51,6 +65,7 @@
 - Reusable components should be in the `/components` directory
 - Context providers should be in the `/context` directory
 - Use typed state management with useState<any> for complex objects
+- Component hierarchy: Calendar > [MonthView/WeekView/DayView] > CalendarCell > CalendarEvent
 
 ### Calendar Views
 - Support day, week, and month views
@@ -82,12 +97,13 @@
 - Interactive UI elements with hover effects
 
 ## Project Evolution
-- Original implementation used Tailwind CSS, now uses inline styles
+- Original implementation used inline styles, now transitioning to Tailwind CSS classes
 - Project supports both Pages Router and App Router, but deployment uses Pages Router
 - Demo mode was added to simplify usage without database
 - Recent UI update to monthly view established new design patterns
 - Event color coding now based on event type/title
 - Hover effects added to all calendar views for consistent interaction
+- Month view refactored to use component-based structure and CSS classes
 
 ## Known Challenges
 - Maintaining static export compatibility
@@ -98,4 +114,6 @@
 - Limited space for displaying multiple events in calendar cells
 - Consistent event styling across different calendar views
 - Performance optimization for hover effects on mobile devices
-- Z-index management for overlapping events on hover 
+- Z-index management for overlapping events on hover
+- Inconsistent implementation between month and week/day views
+- Conflicts between URL parameters and separate page files 

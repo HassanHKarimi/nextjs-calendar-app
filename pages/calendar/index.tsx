@@ -2,9 +2,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, subDays, addWeeks, subWeeks, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
 import { EventModal } from "./utils/event-modal";
 import MonthView from "../../components/MonthView";
+import WeekView from "../../components/WeekView";
+import DayView from "../../components/DayView";
 
 // Sample event data
 const SAMPLE_EVENTS = [
@@ -492,7 +494,7 @@ export default function CalendarPage() {
                 </Link>
               </div>
               
-              {/* Use the new MonthView component */}
+              {/* Use the MonthView component */}
               <MonthView 
                 currentDate={currentDate} 
                 events={events} 
@@ -502,17 +504,69 @@ export default function CalendarPage() {
           )}
 
           {currentView === 'week' && (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Week View</h2>
-              <p style={{ color: '#6b7280' }}>Week view is coming soon!</p>
-            </div>
+            <>
+              {/* Week view navigation */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <Link
+                  href={`/calendar?date=${format(subWeeks(currentDate, 1), 'yyyy-MM-dd')}&view=week`}
+                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                    &larr; Previous
+                  </span>
+                </Link>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>
+                  {format(startOfWeek(currentDate), "MMM d")} - {format(endOfWeek(currentDate), "MMM d, yyyy")}
+                </h2>
+                <Link
+                  href={`/calendar?date=${format(addWeeks(currentDate, 1), 'yyyy-MM-dd')}&view=week`}
+                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                    Next &rarr;
+                  </span>
+                </Link>
+              </div>
+              
+              {/* Use the WeekView component */}
+              <WeekView 
+                currentDate={currentDate} 
+                events={events} 
+                onEventClick={(event) => setSelectedEvent(event)} 
+              />
+            </>
           )}
 
           {currentView === 'day' && (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Day View</h2>
-              <p style={{ color: '#6b7280' }}>Day view is coming soon!</p>
-            </div>
+            <>
+              {/* Day view navigation */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                <Link
+                  href={`/calendar?date=${format(subDays(currentDate, 1), 'yyyy-MM-dd')}&view=day`}
+                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                    &larr; Previous
+                  </span>
+                </Link>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{format(currentDate, 'EEEE, MMMM d, yyyy')}</h2>
+                <Link
+                  href={`/calendar?date=${format(addDays(currentDate, 1), 'yyyy-MM-dd')}&view=day`}
+                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                    Next &rarr;
+                  </span>
+                </Link>
+              </div>
+              
+              {/* Use the DayView component */}
+              <DayView 
+                currentDate={currentDate} 
+                events={events} 
+                onEventClick={(event) => setSelectedEvent(event)} 
+              />
+            </>
           )}
         </div>
       </div>
