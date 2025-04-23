@@ -1,4 +1,105 @@
-# System Patterns: Next.js Calendar App
+# System Patterns
+
+## Navigation Architecture
+- Shared CalendarNavigation component for consistent UI
+- View switching handled through router
+- URL parameters for deep linking
+- Consistent navigation patterns across all views
+- Single source of truth for current view state
+
+## Component Structure
+### Shared Components
+- `CalendarNavigation`: Main navigation component
+- `EventModal`: Reusable event display/edit modal
+- Event components for different view contexts
+
+### View Components
+- `MonthView`: Calendar grid with event display
+- `WeekView`: Weekly schedule with hourly grid
+- `DayView`: Daily schedule with hourly grid
+
+### Component Patterns
+- Consistent prop interfaces
+- Shared styling patterns
+- Common event handling
+- Unified navigation approach
+
+## Event Management
+- Consistent event display across views
+- Standardized event positioning
+- Hover effects and interactions
+- Event color coding system
+- Overflow handling for multiple events
+
+## State Management
+- URL-based view state
+- Local state for UI interactions
+- Session storage for auth
+- Consistent state updates
+- Props for shared state
+
+## Styling Patterns
+- Inline styles for components
+- Consistent color schemes
+- Responsive design principles
+- Interactive element styling
+- Grid-based layouts
+
+## Authentication Flow
+- Session-based auth
+- Protected routes
+- Auth state management
+- Login persistence
+- Secure routing
+
+## Error Handling
+- Graceful fallbacks
+- Loading states
+- Auth error handling
+- Data validation
+- Type safety
+
+## Code Organization
+- Feature-based directory structure
+- Shared utilities
+- Type definitions
+- Component reuse
+- Clean imports
+
+## Performance Patterns
+- Optimized rendering
+- Event caching
+- Lazy loading
+- State optimization
+- Transition handling
+
+## Testing Strategy
+- Component testing
+- Integration tests
+- Auth testing
+- Event handling tests
+- Navigation testing
+
+## Security Patterns
+- Protected routes
+- Data validation
+- Safe state management
+- Secure auth flow
+- Input sanitization
+
+## Accessibility
+- Semantic HTML
+- ARIA labels
+- Keyboard navigation
+- Focus management
+- Screen reader support
+
+## Mobile Support
+- Responsive design
+- Touch interactions
+- Mobile-first approach
+- Adaptive layouts
+- Performance optimization
 
 ## Architecture Overview
 The calendar app follows a component-based architecture using Next.js Pages Router. Each view (month, week, day) is implemented as a separate page component with shared utilities and components.

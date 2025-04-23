@@ -1,18 +1,109 @@
 # Technical Context
 
 ## Technology Stack
-
-### Core Technologies
 - Next.js (Pages Router)
-- React 18
 - TypeScript
+- React
 - date-fns for date manipulation
+- Session-based authentication
+- Static HTML export mode
 
-### Development Tools
-- VS Code
-- ESLint
-- TypeScript compiler
-- Git for version control
+## Development Setup
+- Node.js environment
+- npm/yarn package management
+- VS Code recommended
+- ESLint + Prettier
+- Git version control
+
+## Key Dependencies
+- Next.js for routing and SSG
+- React for UI components
+- TypeScript for type safety
+- date-fns for date operations
+- ESLint for code quality
+
+## Component Architecture
+### Shared Components
+- CalendarNavigation
+  - View switching
+  - Auth status
+  - Navigation controls
+- EventModal
+  - Event display
+  - Event editing
+  - Consistent styling
+
+### View Components
+- MonthView
+  - Calendar grid
+  - Event display
+  - Date navigation
+- WeekView
+  - Hourly grid
+  - Event positioning
+  - Week navigation
+- DayView
+  - Hourly grid
+  - Event display
+  - Day navigation
+
+## Technical Constraints
+- Static export requirement
+- No server-side operations
+- Client-side data management
+- Browser storage limitations
+- Performance considerations
+
+## Development Patterns
+- Component-based architecture
+- Shared utilities
+- Type-safe development
+- Consistent styling
+- Clean code practices
+
+## Build Configuration
+- Static HTML export
+- TypeScript compilation
+- Asset optimization
+- Bundle analysis
+- Development mode
+
+## Testing Requirements
+- Component testing
+- Integration testing
+- Event handling
+- Navigation flows
+- Authentication
+
+## Performance Considerations
+- Event rendering optimization
+- State management
+- Component lazy loading
+- Cache implementation
+- Bundle size optimization
+
+## Security Implementation
+- Session-based auth
+- Protected routes
+- Data validation
+- Safe state management
+- Input sanitization
+
+## Deployment Strategy
+- Static file hosting
+- CDN distribution
+- Cache policies
+- Asset optimization
+- Performance monitoring
+
+## Code Organization
+```src/```
+- ```components/``` - Reusable UI components
+- ```pages/``` - Next.js pages and routing
+- ```types/``` - TypeScript definitions
+- ```utils/``` - Shared utilities
+- ```styles/``` - Global styles
+- ```context/``` - React context providers
 
 ## Key Technical Decisions
 
@@ -80,32 +171,6 @@ interface Event {
 - Client-side auth checks
 - Protected routes
 - Demo mode support
-
-## Technical Constraints
-
-### Static Export
-- Must work with `next export`
-- No server-side rendering
-- No API routes
-- Client-side data management
-
-### Browser Support
-- Modern browsers only
-- No IE11 support required
-- CSS Grid support required
-- Flexbox support required
-
-### Performance Requirements
-- Fast view switching
-- Smooth animations
-- Efficient event rendering
-- Responsive UI
-
-### Mobile Considerations
-- Touch-friendly interface
-- Responsive grid layouts
-- Optimized for various screen sizes
-- Touch event handling
 
 ## Development Patterns
 
