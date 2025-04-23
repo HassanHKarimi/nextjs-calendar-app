@@ -1,0 +1,61 @@
+@layer components {
+  .week-container {
+    @apply overflow-x-auto;
+  }
+
+  .week-time-column {
+    @apply w-16 pr-2 flex-shrink-0;
+  }
+
+  .week-time-header {
+    @apply h-12 border-b border-transparent;
+  }
+
+  .week-time-label {
+    @apply h-[60px] text-xs text-gray-500 text-right;
+  }
+
+  .week-grid {
+    @apply flex-grow grid grid-cols-7 border-l border-gray-200;
+  }
+
+  .week-day-header {
+    @apply h-12 flex flex-col justify-center items-center text-center border-b border-gray-200;
+  }
+
+  .week-day-name {
+    @apply text-xs text-gray-500;
+  }
+
+  .week-day-number {
+    @apply text-sm font-medium text-gray-900;
+  }
+
+  .week-day-number-current {
+    @apply bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center mx-auto;
+  }
+
+  .week-all-day-row {
+    @apply min-h-[1.25rem] bg-gray-50 p-1 border-b border-gray-200;
+  }
+
+  .week-event-container {
+    @apply relative;
+  }
+
+  .week-hour-cell {
+    @apply h-[60px] border-b border-r border-gray-100;
+  }
+
+  .week-event {
+    @apply absolute text-xs rounded p-1 shadow-sm overflow-hidden cursor-pointer;
+  }
+
+  .week-event-title {
+    @apply font-medium whitespace-nowrap overflow-hidden text-ellipsis;
+  }
+
+  .week-event-time {
+    @apply text-[10px] whitespace-nowrap overflow-hidden text-ellipsis;
+  }
+} 

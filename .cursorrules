@@ -8,11 +8,12 @@
 - No server-side rendering or API routes should be relied upon
 
 ### Styling
-- Use inline styles instead of Tailwind CSS or other class-based systems
-- Example: `<div style={{ marginTop: '1rem', color: '#333' }}>`
-- Global styles should be in a global CSS file when needed
+- Use Tailwind CSS with custom component classes
+- Component-specific styles are in dedicated CSS files under styles/components/
+- Global styles in styles/index.css
 - Use semantic color coding for events based on their type/title
 - Fixed height for calendar cells ensures consistent layout
+- Import all component styles in styles/index.css
 
 ### UI Components
 - Use SVG icons for better visual appearance

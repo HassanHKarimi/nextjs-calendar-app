@@ -1,0 +1,45 @@
+@layer components {
+  .calendar-navigation {
+    @apply flex justify-between items-center p-4 border-b border-gray-200;
+  }
+
+  .calendar-navigation-title {
+    @apply text-2xl font-bold;
+  }
+
+  .calendar-navigation-controls {
+    @apply flex items-center gap-4;
+  }
+
+  .view-switcher {
+    @apply flex bg-gray-100 rounded-2xl p-1;
+  }
+
+  .view-button {
+    @apply flex items-center gap-1.5 py-2 px-4 rounded-xl border-none text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out;
+  }
+
+  .view-button-active {
+    @apply bg-gray-900 text-white;
+  }
+
+  .view-button-inactive {
+    @apply bg-transparent text-gray-900;
+  }
+
+  .new-event-button {
+    @apply flex items-center gap-1.5 py-2 px-4 bg-gray-900 text-white rounded-xl border-none text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out;
+  }
+
+  .user-info {
+    @apply flex items-center gap-4;
+  }
+
+  .user-name {
+    @apply text-gray-500;
+  }
+
+  .logout-button {
+    @apply py-2 px-4 bg-red-100 text-red-700 rounded-xl border-none text-sm font-medium cursor-pointer;
+  }
+} 

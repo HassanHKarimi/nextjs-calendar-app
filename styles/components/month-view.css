@@ -1,0 +1,37 @@
+@layer components {
+  .month-container {
+    @apply overflow-hidden;
+  }
+
+  .month-header {
+    @apply text-sm text-center font-semibold p-2 border-b border-gray-200;
+  }
+
+  .month-day {
+    @apply min-h-[100px] relative bg-white border-r border-b border-gray-200 p-1;
+  }
+
+  .month-day-gray {
+    @apply bg-gray-50 text-gray-400;
+  }
+
+  .month-day-current {
+    @apply bg-blue-50;
+  }
+
+  .month-day-number {
+    @apply text-sm font-medium;
+  }
+
+  .month-day-events {
+    @apply mt-1 space-y-1;
+  }
+
+  .month-day-event {
+    @apply text-xs p-0.5 rounded truncate cursor-pointer transition-all duration-200 ease-in-out;
+  }
+
+  .month-event-hover {
+    @apply transform scale-[1.01] shadow-sm z-10 relative;
+  }
+} 

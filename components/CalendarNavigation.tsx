@@ -15,42 +15,14 @@ export default function CalendarNavigation({
   onLogout 
 }: CalendarNavigationProps) {
   return (
-    <div style={{ 
-      display: 'flex', 
-      justifyContent: 'space-between', 
-      alignItems: 'center',
-      padding: '1rem',
-      borderBottom: '1px solid #e5e7eb'
-    }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Your Calendar</h1>
+    <div className="calendar-navigation">
+      <h1 className="calendar-navigation-title">Your Calendar</h1>
 
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '1rem' 
-      }}>
-        <div style={{
-          display: 'flex',
-          backgroundColor: '#f3f4f6',
-          borderRadius: '16px',
-          padding: '4px'
-        }}>
+      <div className="calendar-navigation-controls">
+        <div className="view-switcher">
           <button 
             onClick={() => onViewChange('month')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 16px',
-              backgroundColor: currentView === 'month' ? '#111827' : 'transparent',
-              color: currentView === 'month' ? 'white' : '#111827',
-              borderRadius: '12px',
-              border: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
+            className={`view-button ${currentView === 'month' ? 'view-button-active' : 'view-button-inactive'}`}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -62,20 +34,7 @@ export default function CalendarNavigation({
           </button>
           <button 
             onClick={() => onViewChange('week')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 16px',
-              backgroundColor: currentView === 'week' ? '#111827' : 'transparent',
-              color: currentView === 'week' ? 'white' : '#111827',
-              borderRadius: '12px',
-              border: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
+            className={`view-button ${currentView === 'week' ? 'view-button-active' : 'view-button-inactive'}`}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -87,20 +46,7 @@ export default function CalendarNavigation({
           </button>
           <button 
             onClick={() => onViewChange('day')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 16px',
-              backgroundColor: currentView === 'day' ? '#111827' : 'transparent',
-              color: currentView === 'day' ? 'white' : '#111827',
-              borderRadius: '12px',
-              border: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease'
-            }}
+            className={`view-button ${currentView === 'day' ? 'view-button-active' : 'view-button-inactive'}`}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -118,20 +64,7 @@ export default function CalendarNavigation({
             const router = useRouter();
             router.push('/calendar/event/new');
           }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '8px 16px',
-            backgroundColor: '#111827',
-            color: 'white',
-            borderRadius: '12px',
-            border: 'none',
-            fontSize: '14px',
-            fontWeight: '500',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease'
-          }}
+          className="new-event-button"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -140,22 +73,13 @@ export default function CalendarNavigation({
           New Event
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ color: '#6b7280' }}>
+        <div className="user-info">
+          <span className="user-name">
             Logged in as {authUser?.name || 'User'}
           </span>
           <button
             onClick={onLogout}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#fee2e2',
-              color: '#b91c1c',
-              borderRadius: '12px',
-              border: 'none',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer'
-            }}
+            className="logout-button"
           >
             Logout
           </button>

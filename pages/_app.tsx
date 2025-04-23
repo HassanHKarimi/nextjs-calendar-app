@@ -1,7 +1,7 @@
 // Minimal _app.tsx without any CSS frameworks
 import type { AppProps } from 'next/app'
 import { useEffect, useState, Suspense } from 'react'
-import '../src/app/styles.css'
+import '../styles/index.css'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 

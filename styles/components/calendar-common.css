@@ -1,0 +1,129 @@
+@layer components {
+  /* Layout */
+  .calendar-container {
+    @apply min-h-screen bg-gray-50;
+  }
+
+  .calendar-content {
+    @apply max-w-full w-[1200px] mx-auto p-8 opacity-0 transition-opacity duration-300 ease-in-out;
+  }
+
+  .calendar-content-ready {
+    @apply opacity-100;
+  }
+
+  .calendar-card {
+    @apply rounded-lg bg-white shadow-md overflow-hidden;
+  }
+
+  .calendar-card-inner {
+    @apply p-6;
+  }
+
+  /* Events */
+  .event {
+    @apply text-xs p-1 rounded whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer transition-all duration-200 ease-in-out;
+  }
+
+  .event-hover {
+    @apply transform scale-[1.02] shadow-md z-10;
+  }
+
+  .event-blue {
+    @apply bg-event-blue-light text-event-blue-dark;
+  }
+
+  .event-green {
+    @apply bg-event-green-light text-event-green-dark;
+  }
+
+  .event-purple {
+    @apply bg-event-purple-light text-event-purple-dark;
+  }
+
+  .event-yellow {
+    @apply bg-event-yellow-light text-event-yellow-dark;
+  }
+
+  .event-red {
+    @apply bg-event-red-light text-event-red-dark;
+  }
+
+  /* Navigation */
+  .calendar-date-nav {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  .nav-button {
+    @apply text-gray-900 cursor-pointer bg-transparent border-none;
+  }
+
+  .date-heading {
+    @apply text-xl font-semibold;
+  }
+
+  /* Grid Layouts */
+  .month-grid {
+    @apply grid grid-cols-7 border-l border-t border-gray-200;
+  }
+
+  .week-grid {
+    @apply flex;
+  }
+
+  .day-grid {
+    @apply relative;
+  }
+
+  /* Day cells */
+  .day-cell {
+    @apply p-1 border-r border-b border-gray-200 min-h-[100px];
+  }
+
+  .day-cell-current {
+    @apply bg-blue-50;
+  }
+
+  .day-header {
+    @apply text-xs text-gray-500 mb-1;
+  }
+
+  .day-number {
+    @apply text-sm font-medium text-gray-900;
+  }
+
+  .day-number-current {
+    @apply bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mx-auto;
+  }
+
+  /* Hour cells */
+  .hour-cell {
+    @apply h-[60px] border-b border-gray-100 relative;
+  }
+
+  .hour-label {
+    @apply text-xs text-gray-500 text-right pr-2;
+  }
+
+  /* Event modifiers */
+  .all-day-events {
+    @apply min-h-[1.25rem] bg-gray-50 p-1 border-b border-gray-200;
+  }
+
+  .event-more {
+    @apply text-xs text-gray-500 p-0 px-1;
+  }
+
+  /* Loading states */
+  .loading-container {
+    @apply flex min-h-screen flex-col items-center justify-center;
+  }
+
+  .loading-text {
+    @apply text-4xl font-bold;
+  }
+
+  .loading-subtext {
+    @apply mt-4;
+  }
+} 

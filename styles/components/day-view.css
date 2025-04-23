@@ -1,0 +1,41 @@
+@layer components {
+  .day-container {
+    @apply overflow-x-auto;
+  }
+
+  .day-hours-column {
+    @apply border-l border-gray-200 pl-4 relative;
+  }
+
+  .day-hour-row {
+    @apply flex items-start h-[60px] border-t border-gray-200;
+  }
+
+  .day-hour-label {
+    @apply text-xs text-gray-500 mt-[-0.5rem] ml-[-2.5rem] w-8 pr-2 text-right;
+  }
+
+  .day-events-container {
+    @apply absolute top-0 left-14 right-4;
+  }
+
+  .day-event {
+    @apply absolute p-2 rounded-md border-l-4 border-blue-500 shadow-sm overflow-hidden cursor-pointer;
+  }
+
+  .day-event-title {
+    @apply font-semibold text-sm mb-1;
+  }
+
+  .day-event-time {
+    @apply text-xs;
+  }
+
+  .day-event-location {
+    @apply text-xs mt-1 whitespace-nowrap overflow-hidden text-ellipsis;
+  }
+
+  .day-event-description {
+    @apply text-xs mt-1 line-clamp-2 overflow-hidden;
+  }
+} 
