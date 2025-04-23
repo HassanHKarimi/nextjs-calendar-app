@@ -1,12 +1,158 @@
 # Technical Context
 
-## Technology Stack
-- Next.js (Pages Router)
-- TypeScript
-- React
-- date-fns for date manipulation
-- Session-based authentication
-- Static HTML export mode
+## Technologies Used
+
+### Frontend Framework
+- Next.js (v13)
+- React (v18)
+- TypeScript for type safety
+- Static export mode (output: 'export' in next.config.js)
+
+### Styling
+- Tailwind CSS for responsive design and utility classes
+- CSS Modules for component-specific styling
+- Dedicated CSS files in styles/components/ for each major component
+- Custom color scheme with pastel colors for events
+- CSS custom properties for consistent theming
+
+### Date Handling
+- date-fns library for date manipulation and formatting
+- Custom utility functions for calendar-specific date operations
+
+### State Management
+- React Context API for global state management
+- React Hooks (useState, useEffect, useContext) for component-level state
+- URL parameters for view state persistence
+
+### Authentication
+- NextAuth.js for authentication (when database mode is enabled)
+- Demo mode using localStorage for quick testing without database
+- Support for both authenticated and unauthenticated states
+
+### Data Storage
+- PostgreSQL database (in database mode)
+- Client-side storage with localStorage (in demo mode)
+- API routes for data operations (in database mode)
+
+### Deployment
+- Static export configuration for any static file hosting
+- Environment variables for configuration
+
+## Development Setup
+
+### Required Environment Variables
+- `NEXTAUTH_URL`: URL for NextAuth (required for authentication)
+- `NEXTAUTH_SECRET`: Secret for NextAuth sessions
+- `DATABASE_URL`: PostgreSQL connection string (when using database mode)
+
+### Development Commands
+- `npm run dev`: Start development server
+- `npm run build`: Build project for production
+- `npm run start`: Start production server
+- `npm run export`: Generate static export
+
+### Project Structure
+- `/pages`: Next.js Pages Router components
+- `/components`: Reusable React components
+  - `/components/ui`: UI components like CalendarDayCell and CalendarEvent
+- `/styles`: CSS files
+  - `/styles/components`: Component-specific CSS files
+- `/utils`: Utility functions
+  - `/utils/event`: Event-related utilities
+  - `/utils/date`: Date-related utilities
+- `/context`: React Context definitions
+- `/public`: Static assets
+- `/types`: TypeScript type definitions
+
+## Component Architecture
+
+### Calendar Components
+- `CalendarPage`: Main calendar page component
+  - Handles view state and navigation
+  - Contains conditional rendering for different views
+  - Manages authentication state
+- `MonthView`: Displays calendar in month format
+  - Uses `CalendarDayCell` for each day in the month
+- `WeekView`: Displays calendar in week format
+  - Uses time-based grid for events
+- `DayView`: Displays calendar in day format
+  - Uses time-based grid for events
+- `CalendarNavigation`: Common navigation component for all views
+  - Handles date navigation (prev/next)
+  - Displays current view period
+
+### UI Components
+- `CalendarDayCell`: Renders a single day cell in month view
+  - Displays date and day-specific events
+  - Handles styling based on current month and today
+- `CalendarEvent`: Renders a single event
+  - Supports compact and expanded modes
+  - Handles event styling and color coding
+  - Manages hover effects and interactions
+- `EventModal`: Modal for creating and editing events
+  - Form for event details
+  - Validation and submission handling
+
+## Styling Approach
+
+### CSS Organization
+- Global styles in `styles/index.css`
+- Component-specific styles in dedicated files:
+  - `styles/components/MonthView.css`
+  - `styles/components/WeekView.css`
+  - `styles/components/DayView.css`
+  - `styles/components/CalendarEvent.css`
+  - `styles/components/CalendarNavigation.css`
+
+### Style Patterns
+- Calendar grid uses CSS Grid for layout
+- Events use flexbox for internal layout
+- Consistent spacing with Tailwind's spacing scale
+- Responsive design with breakpoints for different screen sizes
+- Interactive elements have hover/focus states
+- Events use left border accent for color coding
+- Subtle shadows and scale transforms for hover effects
+
+### Color System
+- Pastel color palette for event categories
+- High contrast for text to ensure readability
+- Subtle background colors for different states (today, current month, other month)
+- Consistent border colors for structural elements
+
+## Technical Constraints
+
+### Static Export Mode
+- No server-side rendering available
+- No API routes in production (only used in development)
+- All data operations must be client-side in production
+- Authentication must work without server components
+
+### Performance Considerations
+- Calendar views must handle large numbers of events efficiently
+- Event rendering should be optimized to prevent layout thrashing
+- Complex views (week/day) need efficient rendering strategies
+
+### Browser Compatibility
+- Support for modern browsers (Chrome, Firefox, Safari, Edge)
+- Responsive design for mobile and desktop
+- Touch interaction support for mobile devices
+
+## Dependencies
+
+### Core Dependencies
+- next: ^13.0.0
+- react: ^18.2.0
+- react-dom: ^18.2.0
+- typescript: ^5.0.0
+- date-fns: ^2.29.3
+- tailwindcss: ^3.2.4
+- next-auth: ^4.19.2 (when using authentication)
+
+### Development Dependencies
+- eslint: ^8.33.0
+- prettier: ^2.8.3
+- postcss: ^8.4.21
+- autoprefixer: ^10.4.13
 
 ## Development Setup
 - Node.js environment
@@ -46,13 +192,6 @@
   - Hourly grid
   - Event display
   - Day navigation
-
-## Technical Constraints
-- Static export requirement
-- No server-side operations
-- Client-side data management
-- Browser storage limitations
-- Performance considerations
 
 ## Development Patterns
 - Component-based architecture
