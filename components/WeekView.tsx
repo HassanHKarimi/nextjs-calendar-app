@@ -7,7 +7,7 @@ import {
   isSameDay,
   addHours
 } from 'date-fns';
-import { Event } from '@/types/Event';
+import { Event } from '@/utils/event/event-utils';
 
 interface WeekViewProps {
   currentDate: Date;
@@ -31,8 +31,8 @@ export default function WeekView({ currentDate, events, onEventClick }: WeekView
   // Filter events for a specific day
   const getDayEvents = (day: Date): Event[] => {
     return events.filter(event => {
-      const eventStart = new Date(event.startDate);
-      const eventEnd = new Date(event.endDate);
+      const eventStart = new Date(event.start);
+      const eventEnd = new Date(event.end);
       
       // Check if the event occurs on this day
       return (
@@ -45,8 +45,8 @@ export default function WeekView({ currentDate, events, onEventClick }: WeekView
 
   // Position calculation for events
   const getEventPosition = (event: Event) => {
-    const startHour = new Date(event.startDate).getHours() + (new Date(event.startDate).getMinutes() / 60);
-    const endHour = new Date(event.endDate).getHours() + (new Date(event.endDate).getMinutes() / 60);
+    const startHour = new Date(event.start).getHours() + (new Date(event.start).getMinutes() / 60);
+    const endHour = new Date(event.end).getHours() + (new Date(event.end).getMinutes() / 60);
     const top = Math.max(0, (startHour - 8) * 60); // 8 AM is the start of our grid (0px)
     const height = Math.min(12 * 60, (endHour - startHour) * 60); // Cap at the bottom of our grid
     return { top, height };
@@ -75,23 +75,6 @@ export default function WeekView({ currentDate, events, onEventClick }: WeekView
               </div>
             </div>
 
-            {/* All-day events */}
-            <div className="week-all-day-row">
-              {getDayEvents(day)
-                .filter(event => event.isAllDay)
-                .slice(0, 1)
-                .map(event => (
-                  <div 
-                    key={event.id} 
-                    onClick={() => onEventClick(event)}
-                    className={`week-event ${isSameDay(day, new Date()) ? 'week-day-current' : ''}`}
-                    title={event.title}
-                  >
-                    {event.title.length > 10 ? `${event.title.substring(0, 10)}...` : event.title}
-                  </div>
-                ))}
-            </div>
-
             {/* Hourly grid */}
             <div className="week-event-container">
               {HOURS.map(hour => (
@@ -99,30 +82,28 @@ export default function WeekView({ currentDate, events, onEventClick }: WeekView
               ))}
 
               {/* Events */}
-              {getDayEvents(day)
-                .filter(event => !event.isAllDay)
-                .map(event => {
-                  const { top, height } = getEventPosition(event);
-                  return (
-                    <div
-                      key={event.id}
-                      onClick={() => onEventClick(event)}
-                      className="week-day-event"
-                      style={{
-                        top: `${top}px`,
-                        height: `${height}px`,
-                      }}
-                      title={`${event.title} (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}
-                    >
-                      <div className="week-event-title">{event.title}</div>
-                      {height > 30 && (
-                        <div className="week-event-time">
-                          {format(new Date(event.startDate), 'h:mm a')}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+              {getDayEvents(day).map(event => {
+                const { top, height } = getEventPosition(event);
+                return (
+                  <div
+                    key={event.id}
+                    onClick={() => onEventClick(event)}
+                    className="week-day-event"
+                    style={{
+                      top: `${top}px`,
+                      height: `${height}px`,
+                    }}
+                    title={`${event.title} (${format(new Date(event.start), 'h:mm a')} - ${format(new Date(event.end), 'h:mm a')})`}
+                  >
+                    <div className="week-event-title">{event.title}</div>
+                    {height > 30 && (
+                      <div className="week-event-time">
+                        {format(new Date(event.start), 'h:mm a')}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         ))}

@@ -36,4 +36,25 @@
 
 .month-event-more {
   @apply text-xs text-gray-500 p-0 px-1;
+}
+
+/* Added for new component structure */
+.month-view {
+  @apply flex flex-col h-full;
+}
+
+.month-header {
+  @apply grid grid-cols-7 text-center border-b py-2 font-semibold text-gray-500;
+}
+
+.month-body {
+  @apply flex flex-col flex-1;
+}
+
+.month-row {
+  @apply grid grid-cols-7 flex-1 border-b border-gray-200 last:border-b-0;
+}
+
+.month-day-container {
+  @apply border-r border-gray-200 last:border-r-0;
 } 

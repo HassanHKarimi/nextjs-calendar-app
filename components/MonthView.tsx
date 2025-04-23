@@ -1,6 +1,6 @@
 import React from 'react';
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, format } from 'date-fns';
-import { Event } from '@/types/Event';
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, format } from 'date-fns';
+import { Event, filterEventsForDay } from '@/utils/event/event-utils';
 import CalendarDayCell from './ui/CalendarDayCell';
 
 interface MonthViewProps {
@@ -9,73 +9,69 @@ interface MonthViewProps {
   onEventClick: (event: Event) => void;
 }
 
-export default function MonthView({ currentDate, events, onEventClick }: MonthViewProps) {
-  // Get all dates for the current month view (including days from prev/next months that appear in the grid)
+const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick }) => {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
-  const calendarStart = startOfWeek(monthStart);
-  const calendarEnd = endOfWeek(monthEnd);
+  const startDate = startOfWeek(monthStart);
+  const endDate = endOfWeek(monthEnd);
 
-  // Get all the days in the range
-  const calendarDays = eachDayOfInterval({
-    start: calendarStart,
-    end: calendarEnd,
-  });
+  const dateFormat = "EEE";
+  const rows: React.ReactNode[] = [];
+  
+  // Generate header with day names
+  const days: React.ReactNode[] = [];
+  let day = startDate;
+  
+  for (let i = 0; i < 7; i++) {
+    days.push(
+      <div key={i} className="month-day-header">
+        {format(addDays(day, i), dateFormat)}
+      </div>
+    );
+  }
 
-  // Create week rows
-  const weeks: Date[][] = [];
-  let week: Date[] = [];
-
-  calendarDays.forEach((day) => {
-    week.push(day);
-    if (week.length === 7) {
-      weeks.push(week);
-      week = [];
-    }
-  });
-
-  // Filter events for a specific day
-  const getEventsForDay = (day: Date) => {
-    return events.filter((event) => {
-      const eventStart = new Date(event.startDate);
-      const eventEnd = new Date(event.endDate);
+  // Generate weeks
+  let dates: React.ReactNode[] = [];
+  day = startDate;
+  
+  while (day <= endDate) {
+    for (let i = 0; i < 7; i++) {
+      const cloneDay = new Date(day);
+      const dayEvents = filterEventsForDay(events, cloneDay);
       
-      return (
-        (day >= eventStart && day <= eventEnd) ||
-        format(day, 'yyyy-MM-dd') === format(eventStart, 'yyyy-MM-dd') ||
-        format(day, 'yyyy-MM-dd') === format(eventEnd, 'yyyy-MM-dd')
+      dates.push(
+        <div key={day.toString()} className="month-day-container">
+          <CalendarDayCell 
+            day={cloneDay} 
+            currentMonth={monthStart} 
+            events={dayEvents}
+            onEventClick={onEventClick}
+          />
+        </div>
       );
-    });
-  };
+      
+      day = addDays(day, 1);
+    }
+    
+    rows.push(
+      <div key={day.toString()} className="month-row">
+        {dates}
+      </div>
+    );
+    
+    dates = [];
+  }
 
   return (
-    <div className="month-container">
-      <div className="month-grid">
-        {/* Day headers */}
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-          <div key={day} className="month-day-header">
-            {day}
-          </div>
-        ))}
-      
-        {/* Calendar grid */}
-        {weeks.map((week, weekIndex) => (
-          <React.Fragment key={`week-${weekIndex}`}>
-            {week.map((day) => {
-              const dayEvents = getEventsForDay(day);
-              return (
-                <CalendarDayCell 
-                  key={format(day, 'yyyy-MM-dd')}
-                  day={day}
-                  currentMonth={monthStart}
-                  events={dayEvents}
-                  onEventClick={onEventClick}
-                />
-              );
-            })}
-          </React.Fragment>
-        ))}
+    <div className="month-view">
+      <div className="month-header">
+        {days}
+      </div>
+      <div className="month-body">
+        {rows}
       </div>
     </div>
   );
-} 
+};
+
+export default MonthView; 

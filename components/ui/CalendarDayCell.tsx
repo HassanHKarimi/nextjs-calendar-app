@@ -1,6 +1,6 @@
 import { format, isSameMonth, isToday } from 'date-fns';
 import React from 'react';
-import { Event } from '@/types/Event';
+import { Event } from '@/utils/event/event-utils';
 import CalendarEvent from './CalendarEvent';
 
 interface CalendarDayCellProps {
@@ -40,8 +40,7 @@ export default function CalendarDayCell({ day, currentMonth, events, onEventClic
                 key={event.id}
                 event={event}
                 onClick={onEventClick}
-                maxTitleLength={18}
-                showTime={false}
+                isCompact={true}
               />
             ))}
             {events.length > 3 && (

@@ -7,140 +7,105 @@ import { EventModal } from "./utils/event-modal";
 import MonthView from "../../components/MonthView";
 import WeekView from "../../components/WeekView";
 import DayView from "../../components/DayView";
+import { Event, createSampleEvent } from "../../utils/event/event-utils";
 
-// Sample event data
-const SAMPLE_EVENTS = [
+// Sample event data - updated to match event-utils Event interface
+const SAMPLE_EVENTS: Event[] = [
   {
     id: "event-1",
     title: "Client Meeting",
     description: "Meeting with client to discuss project requirements",
-    startDate: new Date(2025, 3, 2, 10, 0), // April 2, 2025, 10:00 AM
-    endDate: new Date(2025, 3, 2, 11, 30), // April 2, 2025, 11:30 AM
-    location: "Conference Room A",
-    isAllDay: false,
-    color: "bg-green-100 text-green-800 hover:bg-green-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 2, 10, 0), // April 2, 2025, 10:00 AM
+    end: new Date(2025, 3, 2, 11, 30), // April 2, 2025, 11:30 AM
+    location: "Conference Room A"
   },
   {
     id: "event-2", 
     title: "Team Standup",
     description: "Daily team standup meeting",
-    startDate: new Date(2025, 3, 5, 9, 0), // April 5, 2025, 9:00 AM
-    endDate: new Date(2025, 3, 5, 9, 30), // April 5, 2025, 9:30 AM
-    location: "Main Office",
-    isAllDay: false,
-    color: "bg-red-100 text-red-800 hover:bg-red-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 5, 9, 0), // April 5, 2025, 9:00 AM
+    end: new Date(2025, 3, 5, 9, 30), // April 5, 2025, 9:30 AM
+    location: "Main Office"
   },
   {
     id: "event-3",
     title: "Code Review",
     description: "Review new features and code changes",
-    startDate: new Date(2025, 3, 8, 14, 0), // April 8, 2025, 2:00 PM
-    endDate: new Date(2025, 3, 8, 15, 0), // April 8, 2025, 3:00 PM
-    location: "Virtual",
-    isAllDay: false,
-    color: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 8, 14, 0), // April 8, 2025, 2:00 PM
+    end: new Date(2025, 3, 8, 15, 0), // April 8, 2025, 3:00 PM
+    location: "Virtual"
   },
   {
     id: "event-4",
     title: "Team Meeting",
     description: "Weekly team sync-up",
-    startDate: new Date(2025, 3, 12, 11, 0), // April 12, 2025, 11:00 AM
-    endDate: new Date(2025, 3, 12, 12, 0), // April 12, 2025, 12:00 PM
-    location: "Conference Room B",
-    isAllDay: false,
-    color: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 12, 11, 0), // April 12, 2025, 11:00 AM
+    end: new Date(2025, 3, 12, 12, 0), // April 12, 2025, 12:00 PM
+    location: "Conference Room B"
   },
   {
     id: "event-5",
     title: "Product Launch",
     description: "Launch of new product features",
-    startDate: new Date(2025, 3, 15, 9, 0), // April 15, 2025, 9:00 AM
-    endDate: new Date(2025, 3, 15, 16, 0), // April 15, 2025, 4:00 PM
-    location: "Main Conference Room",
-    isAllDay: false,
-    color: "bg-indigo-100 text-indigo-800 hover:bg-indigo-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 15, 9, 0), // April 15, 2025, 9:00 AM
+    end: new Date(2025, 3, 15, 16, 0), // April 15, 2025, 4:00 PM
+    location: "Main Conference Room"
   },
   {
     id: "event-6",
     title: "Project Review",
     description: "Review project progress and timeline",
-    startDate: new Date(2025, 3, 17, 13, 0), // April 17, 2025, 1:00 PM
-    endDate: new Date(2025, 3, 17, 15, 0), // April 17, 2025, 3:00 PM
-    location: "Meeting Room 3",
-    isAllDay: false,
-    color: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 17, 13, 0), // April 17, 2025, 1:00 PM
+    end: new Date(2025, 3, 17, 15, 0), // April 17, 2025, 3:00 PM
+    location: "Meeting Room 3"
   },
   {
     id: "event-7",
     title: "Project Deadline",
     description: "Final submission deadline",
-    startDate: new Date(2025, 3, 19, 0, 0), // April 19, 2025, all day
-    endDate: new Date(2025, 3, 19, 23, 59), // April 19, 2025, all day
-    location: "",
-    isAllDay: true,
-    color: "bg-red-100 text-red-800 hover:bg-red-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 19, 0, 0), // April 19, 2025, all day
+    end: new Date(2025, 3, 19, 23, 59), // April 19, 2025, all day
+    location: ""
   },
   {
     id: "event-8",
     title: "1:1 with Manager",
     description: "One-on-one meeting with manager",
-    startDate: new Date(2025, 3, 22, 10, 0), // April 22, 2025, 10:00 AM
-    endDate: new Date(2025, 3, 22, 10, 30), // April 22, 2025, 10:30 AM
-    location: "Manager's Office",
-    isAllDay: false,
-    color: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 22, 10, 0), // April 22, 2025, 10:00 AM
+    end: new Date(2025, 3, 22, 10, 30), // April 22, 2025, 10:30 AM
+    location: "Manager's Office"
   },
   {
     id: "event-9",
     title: "API Discussion",
     description: "Discussion about API design and implementation",
-    startDate: new Date(2025, 3, 24, 14, 0), // April 24, 2025, 2:00 PM
-    endDate: new Date(2025, 3, 24, 15, 30), // April 24, 2025, 3:30 PM
-    location: "Virtual",
-    isAllDay: false,
-    color: "bg-purple-100 text-purple-800 hover:bg-purple-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 24, 14, 0), // April 24, 2025, 2:00 PM
+    end: new Date(2025, 3, 24, 15, 30), // April 24, 2025, 3:30 PM
+    location: "Virtual"
   },
   {
     id: "event-10",
     title: "UI/UX Workshop",
     description: "Workshop on UI/UX design principles",
-    startDate: new Date(2025, 3, 26, 9, 0), // April 26, 2025, 9:00 AM
-    endDate: new Date(2025, 3, 26, 12, 0), // April 26, 2025, 12:00 PM
-    location: "Design Studio",
-    isAllDay: false,
-    color: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 26, 9, 0), // April 26, 2025, 9:00 AM
+    end: new Date(2025, 3, 26, 12, 0), // April 26, 2025, 12:00 PM
+    location: "Design Studio"
   },
   {
     id: "event-11",
     title: "Design Review",
     description: "Review of latest design changes",
-    startDate: new Date(2025, 3, 29, 13, 0), // April 29, 2025, 1:00 PM
-    endDate: new Date(2025, 3, 29, 14, 0), // April 29, 2025, 2:00 PM
-    location: "Design Office",
-    isAllDay: false,
-    color: "bg-purple-100 text-purple-800 hover:bg-purple-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 29, 13, 0), // April 29, 2025, 1:00 PM
+    end: new Date(2025, 3, 29, 14, 0), // April 29, 2025, 2:00 PM
+    location: "Design Office"
   },
   {
     id: "event-12",
     title: "Client Meeting",
     description: "Follow-up meeting with client",
-    startDate: new Date(2025, 4, 2, 11, 0), // May 2, 2025, 11:00 AM
-    endDate: new Date(2025, 4, 2, 12, 30), // May 2, 2025, 12:30 PM
-    location: "Conference Room A",
-    isAllDay: false,
-    color: "bg-green-100 text-green-800 hover:bg-green-200",
-    userId: "demo-user",
+    start: new Date(2025, 4, 2, 11, 0), // May 2, 2025, 11:00 AM
+    end: new Date(2025, 4, 2, 12, 30), // May 2, 2025, 12:30 PM
+    location: "Conference Room A"
   }
 ];
 

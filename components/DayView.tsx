@@ -1,6 +1,6 @@
 import React from 'react';
 import { format, isSameDay, addHours } from 'date-fns';
-import { Event } from '@/types/Event';
+import { Event } from '@/utils/event/event-utils';
 
 interface DayViewProps {
   currentDate: Date;
@@ -14,8 +14,8 @@ const HOURS = Array.from({ length: 14 }, (_, i) => i + 7);
 export default function DayView({ currentDate, events, onEventClick }: DayViewProps) {
   // Filter events for the current day
   const dayEvents = events.filter(event => {
-    const eventStart = new Date(event.startDate);
-    const eventEnd = new Date(event.endDate);
+    const eventStart = new Date(event.start);
+    const eventEnd = new Date(event.end);
     
     return (
       isSameDay(currentDate, eventStart) || 
@@ -26,8 +26,8 @@ export default function DayView({ currentDate, events, onEventClick }: DayViewPr
 
   // Event positioning helper
   const getEventPosition = (event: Event) => {
-    const startHour = new Date(event.startDate).getHours() + (new Date(event.startDate).getMinutes() / 60);
-    const endHour = new Date(event.endDate).getHours() + (new Date(event.endDate).getMinutes() / 60);
+    const startHour = new Date(event.start).getHours() + (new Date(event.start).getMinutes() / 60);
+    const endHour = new Date(event.end).getHours() + (new Date(event.end).getMinutes() / 60);
     const top = (startHour - 7) * 60; // 7 AM is the start of our grid (0px)
     const height = (endHour - startHour) * 60;
     return { top, height };
@@ -40,22 +40,6 @@ export default function DayView({ currentDate, events, onEventClick }: DayViewPr
         <div className={`day-number ${isSameDay(currentDate, new Date()) ? 'day-number-current' : ''}`}>
           {format(currentDate, 'd')}
         </div>
-      </div>
-      
-      {/* All day events */}
-      <div className="day-all-day-row">
-        {dayEvents
-          .filter(event => event.isAllDay)
-          .map(event => (
-            <div 
-              key={event.id}
-              onClick={() => onEventClick(event)}
-              className="day-event all-day"
-              title={event.title}
-            >
-              {event.title}
-            </div>
-          ))}
       </div>
       
       <div className="day-grid">
@@ -77,35 +61,33 @@ export default function DayView({ currentDate, events, onEventClick }: DayViewPr
           ))}
           
           {/* Events */}
-          {dayEvents
-            .filter(event => !event.isAllDay)
-            .map(event => {
-              const { top, height } = getEventPosition(event);
-              return (
-                <div
-                  key={event.id}
-                  onClick={() => onEventClick(event)}
-                  className="day-event"
-                  style={{
-                    top: `${top}px`,
-                    height: `${height}px`
-                  }}
-                  title={`${event.title} (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}
-                >
-                  <div className="day-event-title">{event.title}</div>
-                  {height > 50 && (
-                    <>
-                      <div className="day-event-time">
-                        {format(new Date(event.startDate), 'h:mm a')} - {format(new Date(event.endDate), 'h:mm a')}
-                      </div>
-                      {height > 80 && event.location && (
-                        <div className="day-event-location">{event.location}</div>
-                      )}
-                    </>
-                  )}
-                </div>
-              );
-            })}
+          {dayEvents.map(event => {
+            const { top, height } = getEventPosition(event);
+            return (
+              <div
+                key={event.id}
+                onClick={() => onEventClick(event)}
+                className="day-event"
+                style={{
+                  top: `${top}px`,
+                  height: `${height}px`
+                }}
+                title={`${event.title} (${format(new Date(event.start), 'h:mm a')} - ${format(new Date(event.end), 'h:mm a')})`}
+              >
+                <div className="day-event-title">{event.title}</div>
+                {height > 50 && (
+                  <>
+                    <div className="day-event-time">
+                      {format(new Date(event.start), 'h:mm a')} - {format(new Date(event.end), 'h:mm a')}
+                    </div>
+                    {height > 80 && event.location && (
+                      <div className="day-event-location">{event.location}</div>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
