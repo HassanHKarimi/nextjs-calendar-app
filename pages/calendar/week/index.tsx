@@ -15,18 +15,9 @@ import {
 } from "date-fns";
 import { EventModal } from "../utils/event-modal";
 import Head from "next/head";
-
-// Define Event interface
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  startDate: Date;
-  endDate: Date;
-  location?: string;
-  isAllDay: boolean;
-  color?: string;
-}
+import CalendarNavigation from '@/components/CalendarNavigation';
+import EventModal from '@/components/EventModal';
+import { Event } from '@/types/Event';
 
 // Sample event data for week view
 const createSampleWeekEvents = (weekStart: Date): Event[] => {
@@ -258,106 +249,23 @@ export default function WeekView() {
     return { top, height };
   };
 
+  const handleViewChange = (view: 'month' | 'week' | 'day') => {
+    router.push(`/calendar${view === 'month' ? '' : `/${view}`}?date=${format(currentDate, 'yyyy-MM-dd')}`);
+  };
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
       <Head>
         <title>Week View - Calendar App</title>
       </Head>
-      
-      <div style={{ padding: '1rem', backgroundColor: 'white', borderBottom: '1px solid #e5e7eb' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button
-              onClick={() => {
-                const newDate = subWeeks(currentDate, 1);
-                router.push(`/calendar/week?date=${format(newDate, 'yyyy-MM-dd')}`);
-              }}
-              style={{
-                padding: '0.5rem 1rem',
-                border: '1px solid #e5e7eb',
-                borderRadius: '0.375rem',
-                backgroundColor: 'white',
-                cursor: 'pointer'
-              }}
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => {
-                const newDate = addWeeks(currentDate, 1);
-                router.push(`/calendar/week?date=${format(newDate, 'yyyy-MM-dd')}`);
-              }}
-              style={{
-                padding: '0.5rem 1rem',
-                border: '1px solid #e5e7eb',
-                borderRadius: '0.375rem',
-                backgroundColor: 'white',
-                cursor: 'pointer'
-              }}
-            >
-              Next
-            </button>
-          </div>
-          
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <Link href="/calendar" style={{ textDecoration: 'none' }}>
-              <button
-                style={{
-                  padding: '0.5rem 1rem',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '0.375rem',
-                  backgroundColor: 'white',
-                  cursor: 'pointer'
-                }}
-              >
-                Month View
-              </button>
-            </Link>
-            <button
-              style={{
-                padding: '0.5rem 1rem',
-                border: '1px solid #e5e7eb',
-                borderRadius: '0.375rem',
-                backgroundColor: '#f3f4f6',
-                cursor: 'pointer'
-              }}
-            >
-              Week View
-            </button>
-            <Link href="/calendar/day" style={{ textDecoration: 'none' }}>
-              <button
-                style={{
-                  padding: '0.5rem 1rem',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '0.375rem',
-                  backgroundColor: 'white',
-                  cursor: 'pointer'
-                }}
-              >
-                Day View
-              </button>
-            </Link>
-          </div>
-          
-          <button
-            onClick={logout}
-            style={{
-              padding: '0.5rem 1rem',
-              border: '1px solid #e5e7eb',
-              borderRadius: '0.375rem',
-              backgroundColor: 'white',
-              cursor: 'pointer'
-            }}
-          >
-            Logout
-          </button>
-        </div>
-        
-        <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>
-          {format(startOfWeek(currentDate), 'MMMM d')} - {format(endOfWeek(currentDate), 'MMMM d, yyyy')}
-        </h2>
-      </div>
-      
+
+      <CalendarNavigation
+        currentView="week"
+        onViewChange={handleViewChange}
+        authUser={authUser}
+        onLogout={logout}
+      />
+
       <div style={{ 
         maxWidth: '100%', 
         width: '1200px', 
@@ -372,25 +280,29 @@ export default function WeekView() {
           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
           overflow: 'hidden'
         }}>
-          {/* Header section */}
-          <div style={{ 
-            padding: '1.5rem', 
-            borderBottom: '1px solid #e5e7eb'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-              <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>Weekly Calendar</h1>
-              <div>
-                <span style={{ fontSize: '0.875rem', color: '#4b5563' }}>
-                  Logged in as <span style={{ fontWeight: '500' }}>{authUser?.name || 'User'}</span>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Calendar content */}
           <div style={{ padding: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{formattedDateRange}</h2>
+              <button
+                onClick={() => {
+                  const newDate = subWeeks(currentDate, 1);
+                  router.push(`/calendar/week?date=${format(newDate, 'yyyy-MM-dd')}`);
+                }}
+                style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+              >
+                &larr; Previous
+              </button>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>
+                {format(startOfWeek(currentDate), 'MMMM d')} - {format(endOfWeek(currentDate), 'MMMM d, yyyy')}
+              </h2>
+              <button
+                onClick={() => {
+                  const newDate = addWeeks(currentDate, 1);
+                  router.push(`/calendar/week?date=${format(newDate, 'yyyy-MM-dd')}`);
+                }}
+                style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+              >
+                Next &rarr;
+              </button>
             </div>
             
             {/* Week view grid */}
