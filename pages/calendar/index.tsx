@@ -178,6 +178,13 @@ export default function CalendarPage() {
     }
   }, [router.query.view]);
 
+  // Use effect to load events
+  useEffect(() => {
+    // In a real app, this would fetch from an API
+    // For now, we'll use the sample events
+    setEvents(SAMPLE_EVENTS);
+  }, []);
+
   // Use effect to check auth status client-side
   useEffect(() => {
     // Only run this effect on the client-side
@@ -297,92 +304,36 @@ export default function CalendarPage() {
   }
 
   return (
-    <div style={{ 
-      width: '1200px', 
-      margin: '0 auto', 
-      padding: '2rem 1rem',
-      opacity: pageReady ? 1 : 0,
-      transition: 'opacity 0.3s ease-in-out'
-    }}>
-      <div style={{ 
-        borderRadius: '1rem', 
-        backgroundColor: 'white', 
-        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-        overflow: 'hidden'
-      }}>
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-opacity duration-300 ease-in-out" style={{ opacity: pageReady ? 1 : 0 }}>
+      <div className="rounded-lg bg-white shadow-md overflow-hidden">
         {/* Calendar Header */}
-        <div style={{ 
-          padding: '1.5rem', 
-          borderBottom: '1px solid #e5e7eb'
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '1.5rem'
-          }}>
-            <h1 style={{ 
-              fontSize: '1.875rem', 
-              fontWeight: 600, 
-              color: '#1f2937'
-            }}>
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+            <h1 className="text-2xl font-semibold text-gray-900">
               Your Calendar
             </h1>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem'
-            }}>
-              <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                Logged in as <span style={{ fontWeight: 500, color: '#1f2937' }}>{authUser.name}</span>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-500">
+                Logged in as <span className="font-medium text-gray-900">{authUser.name}</span>
               </span>
               <button 
                 onClick={logout}
-                style={{
-                  padding: '0.5rem 1rem',
-                  fontSize: '0.875rem',
-                  color: '#ef4444',
-                  backgroundColor: '#fee2e2',
-                  border: 'none',
-                  borderRadius: '0.375rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#fecaca'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fee2e2'}
+                className="px-4 py-2 text-sm text-red-600 bg-red-100 rounded-md transition-colors hover:bg-red-200"
               >
                 Logout
               </button>
             </div>
           </div>
 
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <div style={{
-              display: 'flex',
-              backgroundColor: '#f3f4f6',
-              borderRadius: '16px',
-              padding: '4px'
-            }}>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+            <div className="flex bg-gray-100 rounded-2xl p-1">
               <button 
                 onClick={() => handleViewChange('month')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
-                  backgroundColor: currentView === 'month' ? '#111827' : 'transparent',
-                  color: currentView === 'month' ? 'white' : '#111827',
-                  borderRadius: '12px',
-                  border: 'none',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl border-none text-sm font-medium transition-colors ${
+                  currentView === 'month' 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-transparent text-gray-900'
+                }`}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -394,20 +345,11 @@ export default function CalendarPage() {
               </button>
               <button 
                 onClick={() => handleViewChange('week')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
-                  backgroundColor: currentView === 'week' ? '#111827' : 'transparent',
-                  color: currentView === 'week' ? 'white' : '#111827',
-                  borderRadius: '12px',
-                  border: 'none',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl border-none text-sm font-medium transition-colors ${
+                  currentView === 'week' 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-transparent text-gray-900'
+                }`}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -419,20 +361,11 @@ export default function CalendarPage() {
               </button>
               <button 
                 onClick={() => handleViewChange('day')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
-                  backgroundColor: currentView === 'day' ? '#111827' : 'transparent',
-                  color: currentView === 'day' ? 'white' : '#111827',
-                  borderRadius: '12px',
-                  border: 'none',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl border-none text-sm font-medium transition-colors ${
+                  currentView === 'day' 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-transparent text-gray-900'
+                }`}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -446,19 +379,7 @@ export default function CalendarPage() {
 
             <Link 
               href="/calendar/new-event"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 16px',
-                backgroundColor: '#111827',
-                color: 'white',
-                borderRadius: '12px',
-                textDecoration: 'none',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s ease'
-              }}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium transition-colors"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -470,25 +391,25 @@ export default function CalendarPage() {
         </div>
 
         {/* Calendar Content */}
-        <div style={{ padding: '1.5rem' }}>
+        <div className="p-6">
           {currentView === 'month' && (
             <>
               {/* Month view navigation */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div className="flex items-center justify-between mb-4">
                 <Link
                   href={`/calendar?date=${prevMonth}&view=month`}
-                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <span className="flex items-center">
                     &larr; Previous
                   </span>
                 </Link>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{formattedDate}</h2>
+                <h2 className="text-xl font-semibold">{formattedDate}</h2>
                 <Link
                   href={`/calendar?date=${nextMonth}&view=month`}
-                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <span className="flex items-center">
                     Next &rarr;
                   </span>
                 </Link>
@@ -506,66 +427,70 @@ export default function CalendarPage() {
           {currentView === 'week' && (
             <>
               {/* Week view navigation */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div className="flex items-center justify-between mb-4">
                 <Link
                   href={`/calendar?date=${format(subWeeks(currentDate, 1), 'yyyy-MM-dd')}&view=week`}
-                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <span className="flex items-center">
                     &larr; Previous
                   </span>
                 </Link>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>
+                <h2 className="text-xl font-semibold">
                   {format(startOfWeek(currentDate), "MMM d")} - {format(endOfWeek(currentDate), "MMM d, yyyy")}
                 </h2>
                 <Link
                   href={`/calendar?date=${format(addWeeks(currentDate, 1), 'yyyy-MM-dd')}&view=week`}
-                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <span className="flex items-center">
                     Next &rarr;
                   </span>
                 </Link>
               </div>
               
               {/* Use the WeekView component */}
-              <WeekView 
-                currentDate={currentDate} 
-                events={events} 
-                onEventClick={(event) => setSelectedEvent(event)} 
-              />
+              <div className="overflow-x-auto">
+                <WeekView 
+                  currentDate={currentDate} 
+                  events={events} 
+                  onEventClick={(event) => setSelectedEvent(event)} 
+                />
+              </div>
             </>
           )}
 
           {currentView === 'day' && (
             <>
               {/* Day view navigation */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div className="flex items-center justify-between mb-4">
                 <Link
                   href={`/calendar?date=${format(subDays(currentDate, 1), 'yyyy-MM-dd')}&view=day`}
-                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <span className="flex items-center">
                     &larr; Previous
                   </span>
                 </Link>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{format(currentDate, 'EEEE, MMMM d, yyyy')}</h2>
+                <h2 className="text-xl font-semibold">{format(currentDate, 'EEEE, MMMM d, yyyy')}</h2>
                 <Link
                   href={`/calendar?date=${format(addDays(currentDate, 1), 'yyyy-MM-dd')}&view=day`}
-                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <span className="flex items-center">
                     Next &rarr;
                   </span>
                 </Link>
               </div>
               
               {/* Use the DayView component */}
-              <DayView 
-                currentDate={currentDate} 
-                events={events} 
-                onEventClick={(event) => setSelectedEvent(event)} 
-              />
+              <div className="overflow-x-auto">
+                <DayView 
+                  currentDate={currentDate} 
+                  events={events} 
+                  onEventClick={(event) => setSelectedEvent(event)} 
+                />
+              </div>
             </>
           )}
         </div>

@@ -1,5 +1,5 @@
 .month-container {
-  @apply overflow-hidden;
+  @apply overflow-hidden w-full;
 }
 
 .month-grid {
@@ -7,7 +7,7 @@
 }
 
 .month-day-cell {
-  @apply p-1 border-r border-b border-gray-200 min-h-[100px];
+  @apply p-1 border-r border-b border-gray-200 min-h-[60px] md:min-h-[100px];
 }
 
 .month-day-cell-current {
@@ -15,7 +15,7 @@
 }
 
 .month-day-header {
-  @apply text-xs text-gray-500 mb-1;
+  @apply text-xs text-gray-500 mb-1 hidden sm:block;
 }
 
 .month-day-number {

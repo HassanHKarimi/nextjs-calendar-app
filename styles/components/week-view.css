@@ -1,33 +1,81 @@
 .week-container {
-  @apply overflow-hidden;
+  @apply w-full overflow-x-auto;
 }
 
 .week-grid {
-  @apply flex;
+  @apply flex min-w-[800px];
+}
+
+.week-time-column {
+  @apply w-16 flex-shrink-0;
+}
+
+.week-time-header {
+  @apply h-16;
+}
+
+.week-time-label {
+  @apply h-[60px] text-xs text-gray-500 text-right pr-2 pt-0.5;
 }
 
 .week-day-column {
-  @apply flex-1 border-r border-gray-200;
+  @apply flex-1 min-w-[100px] border-l border-gray-200;
 }
 
 .week-day-header {
-  @apply text-sm text-center font-semibold p-2 border-b border-gray-200;
+  @apply h-16 p-1 flex flex-col items-center justify-center;
 }
 
-.week-day {
-  @apply min-h-[100px] relative bg-white border-b border-gray-200 p-1;
+.week-day-name {
+  @apply text-xs text-gray-500;
 }
 
-.week-day-gray {
-  @apply bg-gray-50 text-gray-400;
+.week-day-number {
+  @apply text-sm font-medium text-gray-900;
+}
+
+.week-day-number-current {
+  @apply bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center;
+}
+
+.week-all-day-row {
+  @apply h-6 border-b border-gray-200 bg-gray-50 p-1;
+}
+
+.week-event-container {
+  @apply relative;
+}
+
+.week-hour-cell {
+  @apply h-[60px] border-b border-gray-100;
+}
+
+.week-event {
+  @apply block w-full text-xs p-1 bg-blue-100 text-blue-800 rounded truncate mb-0.5;
+}
+
+.week-day-event {
+  @apply absolute w-[95%] left-[2.5%] bg-blue-100 text-blue-800 rounded p-1 text-xs overflow-hidden transition-all duration-200 ease-in-out;
+}
+
+.week-day-event:hover {
+  @apply transform scale-[1.02] shadow-md z-10;
+}
+
+.week-event-title {
+  @apply font-medium truncate;
+}
+
+.week-event-time {
+  @apply text-[10px] mt-0.5;
 }
 
 .week-day-current {
   @apply bg-blue-50;
 }
 
-.week-day-number {
-  @apply text-sm font-medium;
+.week-day-gray {
+  @apply bg-gray-50 text-gray-400;
 }
 
 .week-day-events {
