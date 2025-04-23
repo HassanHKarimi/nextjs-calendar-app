@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
 import { EventModal } from "./utils/event-modal";
+import MonthView from "../../components/MonthView";
 
 // Sample event data
 const SAMPLE_EVENTS = [
@@ -143,34 +144,35 @@ const SAMPLE_EVENTS = [
 
 export default function CalendarPage() {
   const router = useRouter();
-  // State hooks - always declare ALL hooks unconditionally
-  const [authUser, setAuthUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [authUser, setAuthUser] = useState<any>(null);
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [events, setEvents] = useState<any[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [currentView, setCurrentView] = useState<'month' | 'week' | 'day'>('month');
+  const dateParam = router.query.date as string | undefined;
   const [dataLoading, setDataLoading] = useState(true);
   const [pageReady, setPageReady] = useState(false);
-  const [currentView, setCurrentView] = useState('month');
-  const dateParam = router.query.date as string | undefined;
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 3, 17)); // April 17, 2025
-  const [events, setEvents] = useState(SAMPLE_EVENTS);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
   
   // Handle view changes
   const handleViewChange = (view: 'month' | 'week' | 'day') => {
-    if (view === 'month') {
-      router.push('/calendar');
-    } else if (view === 'week') {
-      router.push('/calendar/week');
-    } else if (view === 'day') {
-      router.push('/calendar/day');
-    }
     setCurrentView(view);
+    
+    // Update the URL
+    router.push({
+      pathname: '/calendar',
+      query: { 
+        date: format(currentDate, 'yyyy-MM-dd'),
+        view 
+      }
+    }, undefined, { shallow: true });
   };
 
   // Use effect to sync view with URL
   useEffect(() => {
     const view = router.query.view as string;
-    if (view) {
-      setCurrentView(view);
+    if (view && ['month', 'week', 'day'].includes(view)) {
+      setCurrentView(view as 'month' | 'week' | 'day');
     }
   }, [router.query.view]);
 
@@ -201,27 +203,43 @@ export default function CalendarPage() {
     }
   }, [router]);
   
-  // Effect to handle date parameter from URL
+  // Auth check
   useEffect(() => {
-    // Parse date from URL or use current date
-    if (dateParam) {
+    async function checkAuth() {
       try {
-        const parsedDate = new Date(dateParam);
-        if (!isNaN(parsedDate.getTime())) {
-          setCurrentDate(parsedDate);
+        // Get view from URL or use default
+        const viewParam = router.query.view as 'month' | 'week' | 'day' | undefined;
+        if (viewParam && ['month', 'week', 'day'].includes(viewParam)) {
+          setCurrentView(viewParam as 'month' | 'week' | 'day');
         }
+
+        // Parse date from URL or use default
+        if (dateParam) {
+          try {
+            const date = new Date(dateParam);
+            if (!isNaN(date.getTime())) {
+              setCurrentDate(date);
+            }
+          } catch {
+            // If date parsing fails, use default date
+            setCurrentDate(new Date(2025, 3, 17)); // April 17, 2025
+          }
+        }
+
+        // Simulate loading time for data
+        const timer = setTimeout(() => {
+          setDataLoading(false);
+          // Add a small delay before showing the page for smooth transition
+          setTimeout(() => setPageReady(true), 100);
+        }, 300);
+        return () => clearTimeout(timer);
       } catch (e) {
-        console.error("Invalid date in URL", e);
+        console.error("Auth check error:", e);
+        router.push('/');
       }
     }
-    // Simulate loading time for data
-    const timer = setTimeout(() => {
-      setDataLoading(false);
-      // Add a small delay before showing the page for smooth transition
-      setTimeout(() => setPageReady(true), 100);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [dateParam]);
+    checkAuth();
+  }, [router]);
   
   // Logout function
   const logout = () => {
@@ -453,7 +471,7 @@ export default function CalendarPage() {
         <div style={{ padding: '1.5rem' }}>
           {currentView === 'month' && (
             <>
-              {/* Existing month view content */}
+              {/* Month view navigation */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                 <Link
                   href={`/calendar?date=${prevMonth}&view=month`}
@@ -474,156 +492,12 @@ export default function CalendarPage() {
                 </Link>
               </div>
               
-              {/* Calendar grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', width: '100%' }}>
-                {/* Day names */}
-                {weekDays.map((day) => (
-                  <div
-                    key={day}
-                    style={{ padding: '0.75rem 0', textAlign: 'center', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderTop: '1px solid #e5e7eb', width: '100%' }}>
-                {days.map((day) => {
-                  // Get events for this day
-                  const dayEvents = events.filter((event) => {
-                    const eventStart = new Date(event.startDate);
-                    const eventEnd = new Date(event.endDate);
-                    
-                    return (
-                      (day >= eventStart && day <= eventEnd) ||
-                      isSameDay(day, eventStart) ||
-                      isSameDay(day, eventEnd)
-                    );
-                  });
-
-                  // Style based on month and current day
-                  const dayStyle = {
-                    height: '120px', 
-                    padding: '0.5rem',
-                    borderRight: '1px solid #e5e7eb',
-                    borderBottom: '1px solid #e5e7eb',
-                    backgroundColor: isToday(day) ? '#ebf5ff' : 
-                                    !isSameMonth(day, currentDate) ? '#f9fafb' : 'white',
-                    color: !isSameMonth(day, currentDate) ? '#9ca3af' : 'inherit',
-                    position: 'relative' as const
-                  };
-
-                  return (
-                    <div
-                      key={day.toString()}
-                      style={dayStyle}
-                    >
-                      <div style={{ fontSize: '0.875rem', padding: '0.25rem' }}>
-                        {format(day, "d")}
-                      </div>
-
-                      <div style={{ marginTop: '0.25rem', maxHeight: '80px', overflow: 'hidden' }}>
-                        {dayEvents.length > 0 && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                            {dayEvents.slice(0, 3).map((event) => {
-                              // Set event background colors based on event type/title
-                              let bgColor = '#e0f2fe'; // Default light blue
-                              let textColor = '#0c4a6e';
-                              
-                              if (event.title.includes('Client Meeting')) {
-                                bgColor = '#dcfce7'; // Light green
-                                textColor = '#166534';
-                              } else if (event.title.includes('Team Standup')) {
-                                bgColor = '#fee2e2'; // Light red
-                                textColor = '#991b1b';
-                              } else if (event.title.includes('Project')) {
-                                bgColor = '#fee2e2'; // Light red
-                                textColor = '#991b1b';
-                              } else if (event.title.includes('Design')) {
-                                bgColor = '#f5d0fe'; // Light purple
-                                textColor = '#86198f';
-                              } else if (event.title.includes('1:1')) {
-                                bgColor = '#dbeafe'; // Light blue
-                                textColor = '#1e40af';
-                              } else if (event.title.includes('Review')) {
-                                bgColor = '#fef9c3'; // Light yellow
-                                textColor = '#854d0e';
-                              } else if (event.title.includes('UI/UX')) {
-                                bgColor = '#fef9c3'; // Light yellow
-                                textColor = '#854d0e';
-                              } else if (event.title.includes('Team Meeting')) {
-                                bgColor = '#dbeafe'; // Light blue
-                                textColor = '#1e40af';
-                              } else if (event.title.includes('Product')) {
-                                bgColor = '#dbeafe'; // Light blue
-                                textColor = '#1e40af';
-                              } else if (event.title.includes('API')) {
-                                bgColor = '#e9d5ff'; // Light purple
-                                textColor = '#6b21a8';
-                              } else if (event.title.includes('Code')) {
-                                bgColor = '#fef9c3'; // Light yellow
-                                textColor = '#854d0e';
-                              }
-                              
-                              return (
-                                <div
-                                  key={event.id}
-                                  onClick={() => {
-                                    setSelectedEvent(event);
-                                  }}
-                                  style={{
-                                    display: 'block',
-                                    width: '100%',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    borderRadius: '0.25rem',
-                                    padding: '0.25rem 0.5rem',
-                                    fontSize: '0.75rem',
-                                    fontWeight: '500',
-                                    textAlign: 'left',
-                                    cursor: 'pointer',
-                                    border: 'none',
-                                    backgroundColor: bgColor,
-                                    color: textColor,
-                                    maxWidth: '100%',
-                                    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-                                  }}
-                                  onMouseOver={(e) => {
-                                    e.currentTarget.style.transform = 'scale(1.02)';
-                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
-                                    e.currentTarget.style.zIndex = '10';
-                                    e.currentTarget.style.position = 'relative';
-                                  }}
-                                  onMouseOut={(e) => {
-                                    e.currentTarget.style.transform = 'scale(1)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                    e.currentTarget.style.zIndex = 'auto';
-                                    e.currentTarget.style.position = 'static';
-                                  }}
-                                  title={`${event.title}${event.isAllDay ? ' (All day)' : ` (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}\n${event.description || ''}`}
-                                >
-                                  {event.title.length > 18 ? `${event.title.substring(0, 18)}...` : event.title}
-                                </div>
-                              );
-                            })}
-                            {dayEvents.length > 3 && (
-                              <div style={{ 
-                                fontSize: '0.75rem', 
-                                color: '#6b7280', 
-                                padding: '0.125rem 0.5rem',
-                                textAlign: 'left'
-                              }}>
-                                + {dayEvents.length - 3} more
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              {/* Use the new MonthView component */}
+              <MonthView 
+                currentDate={currentDate} 
+                events={events} 
+                onEventClick={(event) => setSelectedEvent(event)} 
+              />
             </>
           )}
 
