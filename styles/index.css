@@ -2,13 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import component styles */
-@import "./components/calendar-navigation.css";
-@import "./components/calendar-common.css";
-@import "./components/month-view.css";
-@import "./components/week-view.css";
-@import "./components/day-view.css";
-@import "./components/event-modal.css";
+@layer components {
+  /* Import all component styles */
+  @import "./components/calendar-navigation.css";
+  @import "./components/calendar-common.css";
+  @import "./components/month-view.css";
+  @import "./components/week-view.css";
+  @import "./components/day-view.css";
+  @import "./components/event-modal.css";
+}
 
 @layer base {
   :root {

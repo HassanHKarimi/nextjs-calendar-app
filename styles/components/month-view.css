@@ -1,37 +1,39 @@
-@layer components {
-  .month-container {
-    @apply overflow-hidden;
-  }
+.month-container {
+  @apply overflow-hidden;
+}
 
-  .month-header {
-    @apply text-sm text-center font-semibold p-2 border-b border-gray-200;
-  }
+.month-grid {
+  @apply grid grid-cols-7 border-l border-t border-gray-200;
+}
 
-  .month-day {
-    @apply min-h-[100px] relative bg-white border-r border-b border-gray-200 p-1;
-  }
+.month-day-cell {
+  @apply p-1 border-r border-b border-gray-200 min-h-[100px];
+}
 
-  .month-day-gray {
-    @apply bg-gray-50 text-gray-400;
-  }
+.month-day-cell-current {
+  @apply bg-blue-50;
+}
 
-  .month-day-current {
-    @apply bg-blue-50;
-  }
+.month-day-header {
+  @apply text-xs text-gray-500 mb-1;
+}
 
-  .month-day-number {
-    @apply text-sm font-medium;
-  }
+.month-day-number {
+  @apply text-sm font-medium text-gray-900;
+}
 
-  .month-day-events {
-    @apply mt-1 space-y-1;
-  }
+.month-day-number-current {
+  @apply bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center mx-auto;
+}
 
-  .month-day-event {
-    @apply text-xs p-0.5 rounded truncate cursor-pointer transition-all duration-200 ease-in-out;
-  }
+.month-event {
+  @apply text-xs p-1 rounded whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer transition-all duration-200 ease-in-out;
+}
 
-  .month-event-hover {
-    @apply transform scale-[1.01] shadow-sm z-10 relative;
-  }
+.month-event-hover {
+  @apply transform scale-[1.02] shadow-md z-10;
+}
+
+.month-event-more {
+  @apply text-xs text-gray-500 p-0 px-1;
 } 

@@ -1,61 +1,99 @@
-@layer components {
-  .event-modal-backdrop {
-    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
-  }
+.event-modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
 
-  .event-modal {
-    @apply bg-white rounded-lg shadow-xl w-full max-w-md p-6 relative;
-  }
+.event-modal {
+  @apply bg-white rounded-lg shadow-xl w-full max-w-md mx-4;
+}
 
-  .event-modal-header {
-    @apply text-xl font-bold mb-4;
-  }
+.event-modal-header {
+  @apply flex items-center justify-between p-4 border-b border-gray-200;
+}
 
-  .event-modal-close {
-    @apply absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer;
-  }
+.event-modal-title {
+  @apply text-xl font-semibold;
+}
 
-  .event-modal-content {
-    @apply space-y-4;
-  }
+.event-modal-close {
+  @apply text-gray-500 hover:text-gray-700 cursor-pointer;
+}
 
-  .event-modal-section {
-    @apply flex gap-2;
-  }
+.event-modal-content {
+  @apply p-4;
+}
 
-  .event-modal-icon {
-    @apply text-gray-500;
-  }
+.event-modal-form {
+  @apply space-y-4;
+}
 
-  .event-modal-text {
-    @apply flex-1;
-  }
+.event-modal-field {
+  @apply space-y-2;
+}
 
-  .event-modal-time {
-    @apply text-sm text-gray-700;
-  }
+.event-modal-label {
+  @apply block text-sm font-medium text-gray-700;
+}
 
-  .event-modal-location {
-    @apply text-sm text-gray-700;
-  }
+.event-modal-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
 
-  .event-modal-description {
-    @apply text-sm text-gray-700 mt-4;
-  }
+.event-modal-textarea {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+}
 
-  .event-modal-actions {
-    @apply flex justify-end gap-2 mt-6;
-  }
+.event-modal-footer {
+  @apply flex justify-end gap-2 p-4 border-t border-gray-200;
+}
 
-  .event-modal-button {
-    @apply px-4 py-2 rounded text-sm font-medium;
-  }
+.event-modal-button {
+  @apply px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-colors duration-200;
+}
 
-  .event-modal-edit {
-    @apply bg-blue-500 text-white;
-  }
+.event-modal-button-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700;
+}
 
-  .event-modal-delete {
-    @apply bg-red-500 text-white;
-  }
+.event-modal-button-secondary {
+  @apply bg-gray-100 text-gray-700 hover:bg-gray-200;
+}
+
+.event-modal-button-danger {
+  @apply bg-red-100 text-red-700 hover:bg-red-200;
+}
+
+.event-modal-section {
+  @apply flex gap-2;
+}
+
+.event-modal-icon {
+  @apply text-gray-500;
+}
+
+.event-modal-text {
+  @apply flex-1;
+}
+
+.event-modal-time {
+  @apply text-sm text-gray-700;
+}
+
+.event-modal-location {
+  @apply text-sm text-gray-700;
+}
+
+.event-modal-description {
+  @apply text-sm text-gray-700 mt-4;
+}
+
+.event-modal-actions {
+  @apply flex justify-end gap-2 mt-6;
+}
+
+.event-modal-edit {
+  @apply bg-blue-500 text-white;
+}
+
+.event-modal-delete {
+  @apply bg-red-500 text-white;
 } 

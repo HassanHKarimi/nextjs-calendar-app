@@ -1,45 +1,51 @@
-@layer components {
-  .calendar-navigation {
-    @apply flex justify-between items-center p-4 border-b border-gray-200;
-  }
+.calendar-navigation {
+  @apply flex justify-between items-center p-4 border-b border-gray-200;
+}
 
-  .calendar-navigation-title {
-    @apply text-2xl font-bold;
-  }
+.nav-button {
+  @apply text-gray-900 cursor-pointer bg-transparent border-none;
+}
 
-  .calendar-navigation-controls {
-    @apply flex items-center gap-4;
-  }
+.date-heading {
+  @apply text-xl font-semibold;
+}
 
-  .view-switcher {
-    @apply flex bg-gray-100 rounded-2xl p-1;
-  }
+.calendar-navigation-title {
+  @apply text-2xl font-bold;
+}
 
-  .view-button {
-    @apply flex items-center gap-1.5 py-2 px-4 rounded-xl border-none text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out;
-  }
+.calendar-navigation-controls {
+  @apply flex items-center gap-4;
+}
 
-  .view-button-active {
-    @apply bg-gray-900 text-white;
-  }
+.view-switcher {
+  @apply flex bg-gray-100 rounded-2xl p-1;
+}
 
-  .view-button-inactive {
-    @apply bg-transparent text-gray-900;
-  }
+.view-button {
+  @apply flex items-center gap-1.5 py-2 px-4 rounded-xl border-none text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out;
+}
 
-  .new-event-button {
-    @apply flex items-center gap-1.5 py-2 px-4 bg-gray-900 text-white rounded-xl border-none text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out;
-  }
+.view-button-active {
+  @apply bg-gray-900 text-white;
+}
 
-  .user-info {
-    @apply flex items-center gap-4;
-  }
+.view-button-inactive {
+  @apply bg-transparent text-gray-900;
+}
 
-  .user-name {
-    @apply text-gray-500;
-  }
+.new-event-button {
+  @apply flex items-center gap-1.5 py-2 px-4 bg-gray-900 text-white rounded-xl border-none text-sm font-medium cursor-pointer transition-all duration-200 ease-in-out;
+}
 
-  .logout-button {
-    @apply py-2 px-4 bg-red-100 text-red-700 rounded-xl border-none text-sm font-medium cursor-pointer;
-  }
+.user-info {
+  @apply flex items-center gap-4;
+}
+
+.user-name {
+  @apply text-gray-500;
+}
+
+.logout-button {
+  @apply py-2 px-4 bg-red-100 text-red-700 rounded-xl border-none text-sm font-medium cursor-pointer;
 } 
