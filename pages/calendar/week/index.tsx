@@ -13,7 +13,6 @@ import {
   isSameDay,
   eachDayOfInterval
 } from "date-fns";
-import { EventModal } from "../utils/event-modal";
 import Head from "next/head";
 import CalendarNavigation from '@/components/CalendarNavigation';
 import EventModal from '@/components/EventModal';
@@ -281,30 +280,6 @@ export default function WeekView() {
           overflow: 'hidden'
         }}>
           <div style={{ padding: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <button
-                onClick={() => {
-                  const newDate = subWeeks(currentDate, 1);
-                  router.push(`/calendar/week?date=${format(newDate, 'yyyy-MM-dd')}`);
-                }}
-                style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
-              >
-                &larr; Previous
-              </button>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>
-                {format(startOfWeek(currentDate), 'MMMM d')} - {format(endOfWeek(currentDate), 'MMMM d, yyyy')}
-              </h2>
-              <button
-                onClick={() => {
-                  const newDate = addWeeks(currentDate, 1);
-                  router.push(`/calendar/week?date=${format(newDate, 'yyyy-MM-dd')}`);
-                }}
-                style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
-              >
-                Next &rarr;
-              </button>
-            </div>
-            
             {/* Week view grid */}
             <div style={{ display: 'flex', marginTop: '1rem' }}>
               {/* Time column */}

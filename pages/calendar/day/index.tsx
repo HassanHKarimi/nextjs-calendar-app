@@ -274,30 +274,6 @@ export default function DayView() {
           overflow: 'hidden'
         }}>
           <div style={{ padding: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-              <button
-                onClick={() => {
-                  const newDate = subDays(currentDate, 1);
-                  router.push(`/calendar/day?date=${format(newDate, 'yyyy-MM-dd')}`);
-                }}
-                style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
-              >
-                &larr; Previous
-              </button>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>
-                {format(currentDate, 'EEEE, MMMM d, yyyy')}
-              </h2>
-              <button
-                onClick={() => {
-                  const newDate = addDays(currentDate, 1);
-                  router.push(`/calendar/day?date=${format(newDate, 'yyyy-MM-dd')}`);
-                }}
-                style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
-              >
-                Next &rarr;
-              </button>
-            </div>
-            
             {/* Day schedule view */}
             <div style={{ position: 'relative', marginTop: '1rem' }}>
               {/* Hour indicators */}
