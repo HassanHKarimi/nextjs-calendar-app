@@ -17,16 +17,35 @@
 ## Key Technical Decisions
 
 ### Routing Strategy
-- Using Next.js Pages Router for simplicity
-- Separate routes for each view:
-  - `/calendar` - Month view
-  - `/calendar/week` - Week view
-  - `/calendar/day` - Day view
-- URL parameters for date navigation
+- Single-page application with view state management
+- URL parameters for deep linking:
+  - `?view=month|week|day` - Current view
+  - `?date=yyyy-MM-dd` - Selected date
+- No page reloads during view transitions
+- History API for URL updates
 
 ### State Management
-- React useState for local state
-- URL parameters for shared state
+```typescript
+// View state management
+interface CalendarState {
+  currentView: 'month' | 'week' | 'day';
+  currentDate: Date;
+  events: Event[];
+  selectedEvent: Event | null;
+}
+
+// URL synchronization
+const syncUrlWithState = (view: string, date: Date) => {
+  const params = new URLSearchParams(window.location.search);
+  params.set('view', view);
+  params.set('date', format(date, 'yyyy-MM-dd'));
+  window.history.replaceState({}, '', `?${params.toString()}`);
+};
+```
+
+- Centralized state in main calendar component
+- View state controls content rendering
+- URL parameters for deep linking
 - Session storage for auth state
 - Props for component communication
 

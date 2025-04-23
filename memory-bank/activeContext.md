@@ -1,30 +1,31 @@
 # Active Context
 
 ## Current Focus
-- Day and Week views have been implemented and integrated with the main calendar
-- Navigation between views is now fully functional
-- Event display and interaction is consistent across all views
+- Implementing single-page calendar with view switching
+- Converting existing views to work within persistent container
+- Maintaining state and context across view changes
+- Ensuring smooth transitions between views
 
 ## Recent Changes
-- Added Day view with hourly grid and event display
-- Added Week view with daily columns and hourly grid
-- Implemented consistent navigation header across all views
-- Added view switcher buttons with consistent styling
-- Events now have hover effects and proper positioning in all views
+- Restructured navigation to use tab-based view switching
+- Implemented persistent calendar container
+- Consolidated view state management
+- Added URL synchronization without page navigation
+- Maintained consistent header across view changes
 
 ## Next Steps
-1. Implement event creation/editing in day and week views
-2. Add drag-and-drop functionality for events
-3. Improve event overlap handling in week view
-4. Add time indicators and current time marker
-5. Implement event recurrence
+1. Implement view components (Month/Week/Day) within container
+2. Add smooth transitions between views
+3. Implement shared event handling across views
+4. Add URL deep linking support
+5. Optimize view switching performance
 
 ## Active Decisions
-- Using inline styles for consistent styling across components
-- Maintaining separate routes for each view (/calendar, /calendar/week, /calendar/day)
-- Using consistent event color coding based on event type/title
-- Implementing hover effects for better event interaction
-- Using grid layout for time-based views
+- Using single-page architecture with view state management
+- Maintaining persistent navigation and header
+- Using URL parameters for deep linking without page navigation
+- Implementing shared state management across views
+- Using consistent styling across all view components
 
 ## Current Considerations
 - Need to optimize performance for large number of events

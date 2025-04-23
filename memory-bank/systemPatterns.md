@@ -5,6 +5,37 @@ The calendar app follows a component-based architecture using Next.js Pages Rout
 
 ## View Patterns
 
+### Single-Page Calendar Structure
+```typescript
+// Main Calendar Component Pattern
+const CalendarPage = () => {
+  const [currentView, setCurrentView] = useState<'month' | 'week' | 'day'>('month');
+  const [currentDate, setCurrentDate] = useState(new Date());
+  
+  return (
+    <div>
+      <Header />
+      <TabNavigation 
+        currentView={currentView}
+        onViewChange={setCurrentView}
+      />
+      <CalendarContainer>
+        {currentView === 'month' && <MonthView date={currentDate} />}
+        {currentView === 'week' && <WeekView date={currentDate} />}
+        {currentView === 'day' && <DayView date={currentDate} />}
+      </CalendarContainer>
+    </div>
+  );
+};
+```
+
+### View Navigation
+- Single page with persistent navigation tabs
+- View state controls content rendering
+- URL parameters for deep linking without page navigation
+- Shared state and context across all views
+- Smooth transitions between views
+
 ### Common View Structure
 ```typescript
 export default function CalendarView() {
@@ -33,12 +64,6 @@ export default function CalendarView() {
   );
 }
 ```
-
-### View Navigation
-- Each view (month/week/day) has its own route
-- Navigation preserves date context through URL parameters
-- Consistent header with view switcher across all views
-- Previous/Next navigation buttons for date changes
 
 ### Event Display Patterns
 1. Month View:
