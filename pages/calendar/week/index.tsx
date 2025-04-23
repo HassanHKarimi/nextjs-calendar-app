@@ -253,7 +253,7 @@ export default function WeekView() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
+    <div className="calendar-container">
       <Head>
         <title>Week View - Calendar App</title>
       </Head>
@@ -265,21 +265,60 @@ export default function WeekView() {
         onLogout={logout}
       />
 
-      <div style={{ 
-        maxWidth: '100%', 
-        width: '1200px', 
-        margin: '0 auto', 
-        padding: '2rem 1rem',
-        opacity: pageReady ? 1 : 0,
-        transition: 'opacity 0.3s ease-in-out'
-      }}>
-        <div style={{ 
-          borderRadius: '0.5rem', 
-          backgroundColor: 'white', 
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-          overflow: 'hidden'
-        }}>
-          <div style={{ padding: '1.5rem' }}>
+      <div className="calendar-content" style={{ opacity: pageReady ? 1 : 0 }}>
+        <div className="calendar-card">
+          <div className="calendar-card-inner">
+            {/* Date Navigation - Match the Month view style */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', position: 'relative' }}>
+              <Link
+                href={`/calendar/week?date=${prevWeek}`}
+                style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  &larr; Previous
+                </span>
+              </Link>
+              <h2 className="date-heading">{formattedDateRange}</h2>
+              <Link
+                href={`/calendar/week?date=${nextWeek}`}
+                style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  Next &rarr;
+                </span>
+              </Link>
+              
+              {/* Add New Event button for consistency */}
+              <div style={{ position: 'absolute', right: '0', top: '-2rem' }}>
+                <Link
+                  href={{
+                    pathname: "/calendar/event",
+                    query: { date: currentDate.toISOString(), view: "week" }
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#111827',
+                    color: 'white',
+                    borderRadius: '0.75rem',
+                    border: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  New Event
+                </Link>
+              </div>
+            </div>
+
             {/* Week view grid */}
             <div style={{ display: 'flex', marginTop: '1rem' }}>
               {/* Time column */}
@@ -343,12 +382,16 @@ export default function WeekView() {
                               transition: 'transform 0.2s ease, box-shadow 0.2s ease'
                             }}
                             onMouseOver={(e) => {
-                              e.currentTarget.style.transform = 'scale(1.01)';
+                              e.currentTarget.style.transform = 'scale(1.02)';
                               e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                              e.currentTarget.style.zIndex = '10';
+                              e.currentTarget.style.position = 'relative';
                             }}
                             onMouseOut={(e) => {
                               e.currentTarget.style.transform = 'scale(1)';
                               e.currentTarget.style.boxShadow = 'none';
+                              e.currentTarget.style.zIndex = 'auto';
+                              e.currentTarget.style.position = 'static';
                             }}
                             title={event.title}
                           >
@@ -423,12 +466,12 @@ export default function WeekView() {
             </div>
           </div>
         </div>
-        
-        {/* Event Modal */}
-        {selectedEvent && (
-          <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
-        )}
       </div>
+      
+      {/* Event Modal */}
+      {selectedEvent && (
+        <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      )}
     </div>
   );
 }

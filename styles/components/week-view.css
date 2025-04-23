@@ -1,41 +1,75 @@
 .week-container {
-  @apply overflow-hidden;
+  @apply overflow-x-auto w-full border border-gray-100 rounded-lg;
 }
 
 .week-grid {
-  @apply flex;
+  @apply grid grid-cols-8 min-w-[768px] border-t border-l border-gray-100;
+}
+
+.week-time-column {
+  @apply min-w-[60px] border-r border-gray-100;
+}
+
+.week-time-header {
+  @apply h-16 border-b border-gray-100;
+}
+
+.week-time-label {
+  @apply h-[60px] px-2 py-1 text-xs text-gray-500 text-center font-medium border-b border-gray-100;
 }
 
 .week-day-column {
-  @apply flex-1 border-r border-gray-200;
+  @apply flex-1 min-w-[100px] border-r border-gray-100 last:border-r-0;
 }
 
 .week-day-header {
-  @apply text-sm text-center font-semibold p-2 border-b border-gray-200;
+  @apply h-16 p-2 border-b border-gray-100 flex flex-col items-center justify-center;
 }
 
-.week-day {
-  @apply min-h-[100px] relative bg-white border-b border-gray-200 p-1;
+.week-day-name {
+  @apply text-xs text-gray-500 font-medium;
 }
 
-.week-day-gray {
-  @apply bg-gray-50 text-gray-400;
+.week-day-number {
+  @apply text-sm font-medium mt-1;
+}
+
+.week-day-number-current {
+  @apply bg-blue-100 text-blue-800 rounded-full w-6 h-6 flex items-center justify-center;
 }
 
 .week-day-current {
   @apply bg-blue-50;
 }
 
-.week-day-number {
-  @apply text-sm font-medium;
+.week-event-container {
+  @apply relative;
+}
+
+.week-hour-cell {
+  @apply h-[60px] border-b border-gray-100;
+}
+
+.week-day-event {
+  @apply absolute left-0 right-0 mx-1 p-1 text-xs rounded border-l-4
+         overflow-hidden cursor-pointer transition-all duration-200 
+         transform hover:scale-[1.02] hover:shadow-md z-[1] hover:z-[10];
+}
+
+.week-event-title {
+  @apply font-medium truncate;
+}
+
+.week-event-time {
+  @apply text-xs opacity-75 mt-1;
+}
+
+.week-day-gray {
+  @apply bg-gray-50 text-gray-400;
 }
 
 .week-day-events {
   @apply mt-1 space-y-1;
-}
-
-.week-day-event {
-  @apply text-xs p-0.5 rounded truncate cursor-pointer transition-all duration-200 ease-in-out;
 }
 
 .week-event-hover {

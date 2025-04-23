@@ -2,14 +2,20 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { format, addDays, subDays, parseISO } from "date-fns";
+import {
+  format,
+  addDays,
+  subDays,
+  parseISO,
+  isSameDay
+} from "date-fns";
 import Head from "next/head";
 import CalendarNavigation from '@/components/CalendarNavigation';
 import EventModal from '@/components/EventModal';
 import { Event } from '@/types/Event';
 
-// Constants for hour display
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
+// Hours array for the day view
+const HOURS = Array.from({ length: 14 }, (_, i) => i + 7); // 7 AM to 8 PM
 
 // Sample event data for day view
 const createSampleDayEvents = (date: Date): Event[] => {
@@ -117,7 +123,6 @@ export default function DayView() {
   const dateParam = router.query.date as string;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showEventModal, setShowEventModal] = useState(false);
   
@@ -247,7 +252,7 @@ export default function DayView() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
+    <div className="calendar-container">
       <Head>
         <title>Day View - Calendar App</title>
       </Head>
@@ -259,21 +264,60 @@ export default function DayView() {
         onLogout={logout}
       />
 
-      <div style={{ 
-        maxWidth: '100%', 
-        width: '1200px', 
-        margin: '0 auto', 
-        padding: '2rem 1rem',
-        opacity: pageReady ? 1 : 0,
-        transition: 'opacity 0.3s ease-in-out'
-      }}>
-        <div style={{ 
-          borderRadius: '0.5rem', 
-          backgroundColor: 'white', 
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-          overflow: 'hidden'
-        }}>
-          <div style={{ padding: '1.5rem' }}>
+      <div className="calendar-content" style={{ opacity: pageReady ? 1 : 0 }}>
+        <div className="calendar-card">
+          <div className="calendar-card-inner">
+            {/* Date Navigation - Match the Month view style */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', position: 'relative' }}>
+              <Link
+                href={`/calendar/day?date=${prevDay}`}
+                style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  &larr; Previous
+                </span>
+              </Link>
+              <h2 className="date-heading">{formattedDate}</h2>
+              <Link
+                href={`/calendar/day?date=${nextDay}`}
+                style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+              >
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  Next &rarr;
+                </span>
+              </Link>
+              
+              {/* Add New Event button for consistency */}
+              <div style={{ position: 'absolute', right: '0', top: '-2rem' }}>
+                <Link
+                  href={{
+                    pathname: "/calendar/event",
+                    query: { date: currentDate.toISOString(), view: "day" }
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#111827',
+                    color: 'white',
+                    borderRadius: '0.75rem',
+                    border: 'none',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  New Event
+                </Link>
+              </div>
+            </div>
+
             {/* Day schedule view */}
             <div style={{ position: 'relative', marginTop: '1rem' }}>
               {/* Hour indicators */}
@@ -316,7 +360,6 @@ export default function DayView() {
                         width: '100%',
                         padding: '0.5rem',
                         borderRadius: '0.375rem',
-                        borderLeft: '4px solid #3b82f6',
                         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
                         overflow: 'hidden',
                         cursor: 'pointer',
@@ -325,12 +368,14 @@ export default function DayView() {
                         transition: 'transform 0.2s ease, box-shadow 0.2s ease'
                       }}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-1px)';
+                        e.currentTarget.style.transform = 'scale(1.02)';
                         e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                        e.currentTarget.style.zIndex = '10';
                       }}
                       onMouseOut={(e) => {
-                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.transform = 'scale(1)';
                         e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                        e.currentTarget.style.zIndex = 'auto';
                       }}
                     >
                       <div style={{ fontWeight: '600', fontSize: '0.875rem', marginBottom: '0.25rem' }}>

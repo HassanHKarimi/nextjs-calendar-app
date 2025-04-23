@@ -2,177 +2,153 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, subDays, addWeeks, subWeeks, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
 import { EventModal } from "./utils/event-modal";
+import MonthView from "../../components/MonthView";
+import WeekView from "../../components/WeekView";
+import DayView from "../../components/DayView";
+import { Event, createSampleEvent } from "../../utils/event/event-utils";
 
-// Sample event data
-const SAMPLE_EVENTS = [
+// Sample event data - updated to match event-utils Event interface
+const SAMPLE_EVENTS: Event[] = [
   {
     id: "event-1",
     title: "Client Meeting",
     description: "Meeting with client to discuss project requirements",
-    startDate: new Date(2025, 3, 2, 10, 0), // April 2, 2025, 10:00 AM
-    endDate: new Date(2025, 3, 2, 11, 30), // April 2, 2025, 11:30 AM
-    location: "Conference Room A",
-    isAllDay: false,
-    color: "bg-green-100 text-green-800 hover:bg-green-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 2, 10, 0), // April 2, 2025, 10:00 AM
+    end: new Date(2025, 3, 2, 11, 30), // April 2, 2025, 11:30 AM
+    location: "Conference Room A"
   },
   {
     id: "event-2", 
     title: "Team Standup",
     description: "Daily team standup meeting",
-    startDate: new Date(2025, 3, 5, 9, 0), // April 5, 2025, 9:00 AM
-    endDate: new Date(2025, 3, 5, 9, 30), // April 5, 2025, 9:30 AM
-    location: "Main Office",
-    isAllDay: false,
-    color: "bg-red-100 text-red-800 hover:bg-red-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 5, 9, 0), // April 5, 2025, 9:00 AM
+    end: new Date(2025, 3, 5, 9, 30), // April 5, 2025, 9:30 AM
+    location: "Main Office"
   },
   {
     id: "event-3",
     title: "Code Review",
     description: "Review new features and code changes",
-    startDate: new Date(2025, 3, 8, 14, 0), // April 8, 2025, 2:00 PM
-    endDate: new Date(2025, 3, 8, 15, 0), // April 8, 2025, 3:00 PM
-    location: "Virtual",
-    isAllDay: false,
-    color: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 8, 14, 0), // April 8, 2025, 2:00 PM
+    end: new Date(2025, 3, 8, 15, 0), // April 8, 2025, 3:00 PM
+    location: "Virtual"
   },
   {
     id: "event-4",
     title: "Team Meeting",
     description: "Weekly team sync-up",
-    startDate: new Date(2025, 3, 12, 11, 0), // April 12, 2025, 11:00 AM
-    endDate: new Date(2025, 3, 12, 12, 0), // April 12, 2025, 12:00 PM
-    location: "Conference Room B",
-    isAllDay: false,
-    color: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 12, 11, 0), // April 12, 2025, 11:00 AM
+    end: new Date(2025, 3, 12, 12, 0), // April 12, 2025, 12:00 PM
+    location: "Conference Room B"
   },
   {
     id: "event-5",
     title: "Product Launch",
     description: "Launch of new product features",
-    startDate: new Date(2025, 3, 15, 9, 0), // April 15, 2025, 9:00 AM
-    endDate: new Date(2025, 3, 15, 16, 0), // April 15, 2025, 4:00 PM
-    location: "Main Conference Room",
-    isAllDay: false,
-    color: "bg-indigo-100 text-indigo-800 hover:bg-indigo-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 15, 9, 0), // April 15, 2025, 9:00 AM
+    end: new Date(2025, 3, 15, 16, 0), // April 15, 2025, 4:00 PM
+    location: "Main Conference Room"
   },
   {
     id: "event-6",
     title: "Project Review",
     description: "Review project progress and timeline",
-    startDate: new Date(2025, 3, 17, 13, 0), // April 17, 2025, 1:00 PM
-    endDate: new Date(2025, 3, 17, 15, 0), // April 17, 2025, 3:00 PM
-    location: "Meeting Room 3",
-    isAllDay: false,
-    color: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 17, 13, 0), // April 17, 2025, 1:00 PM
+    end: new Date(2025, 3, 17, 15, 0), // April 17, 2025, 3:00 PM
+    location: "Meeting Room 3"
   },
   {
     id: "event-7",
     title: "Project Deadline",
     description: "Final submission deadline",
-    startDate: new Date(2025, 3, 19, 0, 0), // April 19, 2025, all day
-    endDate: new Date(2025, 3, 19, 23, 59), // April 19, 2025, all day
-    location: "",
-    isAllDay: true,
-    color: "bg-red-100 text-red-800 hover:bg-red-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 19, 0, 0), // April 19, 2025, all day
+    end: new Date(2025, 3, 19, 23, 59), // April 19, 2025, all day
+    location: ""
   },
   {
     id: "event-8",
     title: "1:1 with Manager",
     description: "One-on-one meeting with manager",
-    startDate: new Date(2025, 3, 22, 10, 0), // April 22, 2025, 10:00 AM
-    endDate: new Date(2025, 3, 22, 10, 30), // April 22, 2025, 10:30 AM
-    location: "Manager's Office",
-    isAllDay: false,
-    color: "bg-blue-100 text-blue-800 hover:bg-blue-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 22, 10, 0), // April 22, 2025, 10:00 AM
+    end: new Date(2025, 3, 22, 10, 30), // April 22, 2025, 10:30 AM
+    location: "Manager's Office"
   },
   {
     id: "event-9",
     title: "API Discussion",
     description: "Discussion about API design and implementation",
-    startDate: new Date(2025, 3, 24, 14, 0), // April 24, 2025, 2:00 PM
-    endDate: new Date(2025, 3, 24, 15, 30), // April 24, 2025, 3:30 PM
-    location: "Virtual",
-    isAllDay: false,
-    color: "bg-purple-100 text-purple-800 hover:bg-purple-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 24, 14, 0), // April 24, 2025, 2:00 PM
+    end: new Date(2025, 3, 24, 15, 30), // April 24, 2025, 3:30 PM
+    location: "Virtual"
   },
   {
     id: "event-10",
     title: "UI/UX Workshop",
     description: "Workshop on UI/UX design principles",
-    startDate: new Date(2025, 3, 26, 9, 0), // April 26, 2025, 9:00 AM
-    endDate: new Date(2025, 3, 26, 12, 0), // April 26, 2025, 12:00 PM
-    location: "Design Studio",
-    isAllDay: false,
-    color: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 26, 9, 0), // April 26, 2025, 9:00 AM
+    end: new Date(2025, 3, 26, 12, 0), // April 26, 2025, 12:00 PM
+    location: "Design Studio"
   },
   {
     id: "event-11",
     title: "Design Review",
     description: "Review of latest design changes",
-    startDate: new Date(2025, 3, 29, 13, 0), // April 29, 2025, 1:00 PM
-    endDate: new Date(2025, 3, 29, 14, 0), // April 29, 2025, 2:00 PM
-    location: "Design Office",
-    isAllDay: false,
-    color: "bg-purple-100 text-purple-800 hover:bg-purple-200",
-    userId: "demo-user",
+    start: new Date(2025, 3, 29, 13, 0), // April 29, 2025, 1:00 PM
+    end: new Date(2025, 3, 29, 14, 0), // April 29, 2025, 2:00 PM
+    location: "Design Office"
   },
   {
     id: "event-12",
     title: "Client Meeting",
     description: "Follow-up meeting with client",
-    startDate: new Date(2025, 4, 2, 11, 0), // May 2, 2025, 11:00 AM
-    endDate: new Date(2025, 4, 2, 12, 30), // May 2, 2025, 12:30 PM
-    location: "Conference Room A",
-    isAllDay: false,
-    color: "bg-green-100 text-green-800 hover:bg-green-200",
-    userId: "demo-user",
+    start: new Date(2025, 4, 2, 11, 0), // May 2, 2025, 11:00 AM
+    end: new Date(2025, 4, 2, 12, 30), // May 2, 2025, 12:30 PM
+    location: "Conference Room A"
   }
 ];
 
 export default function CalendarPage() {
   const router = useRouter();
-  // State hooks - always declare ALL hooks unconditionally
-  const [authUser, setAuthUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [authUser, setAuthUser] = useState<any>(null);
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [events, setEvents] = useState<any[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [currentView, setCurrentView] = useState<'month' | 'week' | 'day'>('month');
+  const dateParam = router.query.date as string | undefined;
   const [dataLoading, setDataLoading] = useState(true);
   const [pageReady, setPageReady] = useState(false);
-  const [currentView, setCurrentView] = useState('month');
-  const dateParam = router.query.date as string | undefined;
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 3, 17)); // April 17, 2025
-  const [events, setEvents] = useState(SAMPLE_EVENTS);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
   
   // Handle view changes
   const handleViewChange = (view: 'month' | 'week' | 'day') => {
-    if (view === 'month') {
-      router.push('/calendar');
-    } else if (view === 'week') {
-      router.push('/calendar/week');
-    } else if (view === 'day') {
-      router.push('/calendar/day');
-    }
     setCurrentView(view);
+    
+    // Update the URL
+    router.push({
+      pathname: '/calendar',
+      query: { 
+        date: format(currentDate, 'yyyy-MM-dd'),
+        view 
+      }
+    }, undefined, { shallow: true });
   };
 
   // Use effect to sync view with URL
   useEffect(() => {
     const view = router.query.view as string;
-    if (view) {
-      setCurrentView(view);
+    if (view && ['month', 'week', 'day'].includes(view)) {
+      setCurrentView(view as 'month' | 'week' | 'day');
     }
   }, [router.query.view]);
+
+  // Use effect to load events
+  useEffect(() => {
+    // In a real app, this would fetch from an API
+    // For now, we'll use the sample events
+    setEvents(SAMPLE_EVENTS);
+  }, []);
 
   // Use effect to check auth status client-side
   useEffect(() => {
@@ -201,27 +177,43 @@ export default function CalendarPage() {
     }
   }, [router]);
   
-  // Effect to handle date parameter from URL
+  // Auth check
   useEffect(() => {
-    // Parse date from URL or use current date
-    if (dateParam) {
+    async function checkAuth() {
       try {
-        const parsedDate = new Date(dateParam);
-        if (!isNaN(parsedDate.getTime())) {
-          setCurrentDate(parsedDate);
+        // Get view from URL or use default
+        const viewParam = router.query.view as 'month' | 'week' | 'day' | undefined;
+        if (viewParam && ['month', 'week', 'day'].includes(viewParam)) {
+          setCurrentView(viewParam as 'month' | 'week' | 'day');
         }
+
+        // Parse date from URL or use default
+        if (dateParam) {
+          try {
+            const date = new Date(dateParam);
+            if (!isNaN(date.getTime())) {
+              setCurrentDate(date);
+            }
+          } catch {
+            // If date parsing fails, use default date
+            setCurrentDate(new Date(2025, 3, 17)); // April 17, 2025
+          }
+        }
+
+        // Simulate loading time for data
+        const timer = setTimeout(() => {
+          setDataLoading(false);
+          // Add a small delay before showing the page for smooth transition
+          setTimeout(() => setPageReady(true), 100);
+        }, 300);
+        return () => clearTimeout(timer);
       } catch (e) {
-        console.error("Invalid date in URL", e);
+        console.error("Auth check error:", e);
+        router.push('/');
       }
     }
-    // Simulate loading time for data
-    const timer = setTimeout(() => {
-      setDataLoading(false);
-      // Add a small delay before showing the page for smooth transition
-      setTimeout(() => setPageReady(true), 100);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [dateParam]);
+    checkAuth();
+  }, [router]);
   
   // Logout function
   const logout = () => {
@@ -277,92 +269,36 @@ export default function CalendarPage() {
   }
 
   return (
-    <div style={{ 
-      width: '1200px', 
-      margin: '0 auto', 
-      padding: '2rem 1rem',
-      opacity: pageReady ? 1 : 0,
-      transition: 'opacity 0.3s ease-in-out'
-    }}>
-      <div style={{ 
-        borderRadius: '1rem', 
-        backgroundColor: 'white', 
-        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-        overflow: 'hidden'
-      }}>
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-opacity duration-300 ease-in-out" style={{ opacity: pageReady ? 1 : 0 }}>
+      <div className="rounded-lg bg-white shadow-md overflow-hidden">
         {/* Calendar Header */}
-        <div style={{ 
-          padding: '1.5rem', 
-          borderBottom: '1px solid #e5e7eb'
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '1.5rem'
-          }}>
-            <h1 style={{ 
-              fontSize: '1.875rem', 
-              fontWeight: 600, 
-              color: '#1f2937'
-            }}>
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+            <h1 className="text-2xl font-semibold text-gray-900">
               Your Calendar
             </h1>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem'
-            }}>
-              <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                Logged in as <span style={{ fontWeight: 500, color: '#1f2937' }}>{authUser.name}</span>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-500">
+                Logged in as <span className="font-medium text-gray-900">{authUser.name}</span>
               </span>
               <button 
                 onClick={logout}
-                style={{
-                  padding: '0.5rem 1rem',
-                  fontSize: '0.875rem',
-                  color: '#ef4444',
-                  backgroundColor: '#fee2e2',
-                  border: 'none',
-                  borderRadius: '0.375rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#fecaca'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#fee2e2'}
+                className="px-4 py-2 text-sm text-red-600 bg-red-100 rounded-md transition-colors hover:bg-red-200"
               >
                 Logout
               </button>
             </div>
           </div>
 
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <div style={{
-              display: 'flex',
-              backgroundColor: '#f3f4f6',
-              borderRadius: '16px',
-              padding: '4px'
-            }}>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+            <div className="flex bg-gray-100 rounded-2xl p-1">
               <button 
                 onClick={() => handleViewChange('month')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
-                  backgroundColor: currentView === 'month' ? '#111827' : 'transparent',
-                  color: currentView === 'month' ? 'white' : '#111827',
-                  borderRadius: '12px',
-                  border: 'none',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl border-none text-sm font-medium transition-colors ${
+                  currentView === 'month' 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-transparent text-gray-900'
+                }`}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -374,20 +310,11 @@ export default function CalendarPage() {
               </button>
               <button 
                 onClick={() => handleViewChange('week')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
-                  backgroundColor: currentView === 'week' ? '#111827' : 'transparent',
-                  color: currentView === 'week' ? 'white' : '#111827',
-                  borderRadius: '12px',
-                  border: 'none',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl border-none text-sm font-medium transition-colors ${
+                  currentView === 'week' 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-transparent text-gray-900'
+                }`}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -399,20 +326,11 @@ export default function CalendarPage() {
               </button>
               <button 
                 onClick={() => handleViewChange('day')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '8px 16px',
-                  backgroundColor: currentView === 'day' ? '#111827' : 'transparent',
-                  color: currentView === 'day' ? 'white' : '#111827',
-                  borderRadius: '12px',
-                  border: 'none',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-xl border-none text-sm font-medium transition-colors ${
+                  currentView === 'day' 
+                    ? 'bg-gray-900 text-white' 
+                    : 'bg-transparent text-gray-900'
+                }`}
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -426,19 +344,7 @@ export default function CalendarPage() {
 
             <Link 
               href="/calendar/new-event"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 16px',
-                backgroundColor: '#111827',
-                color: 'white',
-                borderRadius: '12px',
-                textDecoration: 'none',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s ease'
-              }}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium transition-colors"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -450,195 +356,107 @@ export default function CalendarPage() {
         </div>
 
         {/* Calendar Content */}
-        <div style={{ padding: '1.5rem' }}>
+        <div className="p-6">
           {currentView === 'month' && (
             <>
-              {/* Existing month view content */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              {/* Month view navigation */}
+              <div className="flex items-center justify-between mb-4">
                 <Link
                   href={`/calendar?date=${prevMonth}&view=month`}
-                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <span className="flex items-center">
                     &larr; Previous
                   </span>
                 </Link>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '600' }}>{formattedDate}</h2>
+                <h2 className="text-xl font-semibold">{formattedDate}</h2>
                 <Link
                   href={`/calendar?date=${nextMonth}&view=month`}
-                  style={{ color: '#111827', cursor: 'pointer', background: 'none', border: 'none' }}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
                 >
-                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <span className="flex items-center">
                     Next &rarr;
                   </span>
                 </Link>
               </div>
               
-              {/* Calendar grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', width: '100%' }}>
-                {/* Day names */}
-                {weekDays.map((day) => (
-                  <div
-                    key={day}
-                    style={{ padding: '0.75rem 0', textAlign: 'center', fontSize: '0.875rem', fontWeight: '600', color: '#4b5563' }}
-                  >
-                    {day}
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderTop: '1px solid #e5e7eb', width: '100%' }}>
-                {days.map((day) => {
-                  // Get events for this day
-                  const dayEvents = events.filter((event) => {
-                    const eventStart = new Date(event.startDate);
-                    const eventEnd = new Date(event.endDate);
-                    
-                    return (
-                      (day >= eventStart && day <= eventEnd) ||
-                      isSameDay(day, eventStart) ||
-                      isSameDay(day, eventEnd)
-                    );
-                  });
-
-                  // Style based on month and current day
-                  const dayStyle = {
-                    height: '120px', 
-                    padding: '0.5rem',
-                    borderRight: '1px solid #e5e7eb',
-                    borderBottom: '1px solid #e5e7eb',
-                    backgroundColor: isToday(day) ? '#ebf5ff' : 
-                                    !isSameMonth(day, currentDate) ? '#f9fafb' : 'white',
-                    color: !isSameMonth(day, currentDate) ? '#9ca3af' : 'inherit',
-                    position: 'relative' as const
-                  };
-
-                  return (
-                    <div
-                      key={day.toString()}
-                      style={dayStyle}
-                    >
-                      <div style={{ fontSize: '0.875rem', padding: '0.25rem' }}>
-                        {format(day, "d")}
-                      </div>
-
-                      <div style={{ marginTop: '0.25rem', maxHeight: '80px', overflow: 'hidden' }}>
-                        {dayEvents.length > 0 && (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                            {dayEvents.slice(0, 3).map((event) => {
-                              // Set event background colors based on event type/title
-                              let bgColor = '#e0f2fe'; // Default light blue
-                              let textColor = '#0c4a6e';
-                              
-                              if (event.title.includes('Client Meeting')) {
-                                bgColor = '#dcfce7'; // Light green
-                                textColor = '#166534';
-                              } else if (event.title.includes('Team Standup')) {
-                                bgColor = '#fee2e2'; // Light red
-                                textColor = '#991b1b';
-                              } else if (event.title.includes('Project')) {
-                                bgColor = '#fee2e2'; // Light red
-                                textColor = '#991b1b';
-                              } else if (event.title.includes('Design')) {
-                                bgColor = '#f5d0fe'; // Light purple
-                                textColor = '#86198f';
-                              } else if (event.title.includes('1:1')) {
-                                bgColor = '#dbeafe'; // Light blue
-                                textColor = '#1e40af';
-                              } else if (event.title.includes('Review')) {
-                                bgColor = '#fef9c3'; // Light yellow
-                                textColor = '#854d0e';
-                              } else if (event.title.includes('UI/UX')) {
-                                bgColor = '#fef9c3'; // Light yellow
-                                textColor = '#854d0e';
-                              } else if (event.title.includes('Team Meeting')) {
-                                bgColor = '#dbeafe'; // Light blue
-                                textColor = '#1e40af';
-                              } else if (event.title.includes('Product')) {
-                                bgColor = '#dbeafe'; // Light blue
-                                textColor = '#1e40af';
-                              } else if (event.title.includes('API')) {
-                                bgColor = '#e9d5ff'; // Light purple
-                                textColor = '#6b21a8';
-                              } else if (event.title.includes('Code')) {
-                                bgColor = '#fef9c3'; // Light yellow
-                                textColor = '#854d0e';
-                              }
-                              
-                              return (
-                                <div
-                                  key={event.id}
-                                  onClick={() => {
-                                    setSelectedEvent(event);
-                                  }}
-                                  style={{
-                                    display: 'block',
-                                    width: '100%',
-                                    whiteSpace: 'nowrap',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    borderRadius: '0.25rem',
-                                    padding: '0.25rem 0.5rem',
-                                    fontSize: '0.75rem',
-                                    fontWeight: '500',
-                                    textAlign: 'left',
-                                    cursor: 'pointer',
-                                    border: 'none',
-                                    backgroundColor: bgColor,
-                                    color: textColor,
-                                    maxWidth: '100%',
-                                    transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-                                  }}
-                                  onMouseOver={(e) => {
-                                    e.currentTarget.style.transform = 'scale(1.02)';
-                                    e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
-                                    e.currentTarget.style.zIndex = '10';
-                                    e.currentTarget.style.position = 'relative';
-                                  }}
-                                  onMouseOut={(e) => {
-                                    e.currentTarget.style.transform = 'scale(1)';
-                                    e.currentTarget.style.boxShadow = 'none';
-                                    e.currentTarget.style.zIndex = 'auto';
-                                    e.currentTarget.style.position = 'static';
-                                  }}
-                                  title={`${event.title}${event.isAllDay ? ' (All day)' : ` (${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')})`}\n${event.description || ''}`}
-                                >
-                                  {event.title.length > 18 ? `${event.title.substring(0, 18)}...` : event.title}
-                                </div>
-                              );
-                            })}
-                            {dayEvents.length > 3 && (
-                              <div style={{ 
-                                fontSize: '0.75rem', 
-                                color: '#6b7280', 
-                                padding: '0.125rem 0.5rem',
-                                textAlign: 'left'
-                              }}>
-                                + {dayEvents.length - 3} more
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              {/* Use the MonthView component */}
+              <MonthView 
+                currentDate={currentDate} 
+                events={events} 
+                onEventClick={(event) => setSelectedEvent(event)} 
+              />
             </>
           )}
 
           {currentView === 'week' && (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Week View</h2>
-              <p style={{ color: '#6b7280' }}>Week view is coming soon!</p>
-            </div>
+            <>
+              {/* Week view navigation */}
+              <div className="flex items-center justify-between mb-4">
+                <Link
+                  href={`/calendar?date=${format(subWeeks(currentDate, 1), 'yyyy-MM-dd')}&view=week`}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
+                >
+                  <span className="flex items-center">
+                    &larr; Previous
+                  </span>
+                </Link>
+                <h2 className="text-xl font-semibold">
+                  {format(startOfWeek(currentDate), "MMM d")} - {format(endOfWeek(currentDate), "MMM d, yyyy")}
+                </h2>
+                <Link
+                  href={`/calendar?date=${format(addWeeks(currentDate, 1), 'yyyy-MM-dd')}&view=week`}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
+                >
+                  <span className="flex items-center">
+                    Next &rarr;
+                  </span>
+                </Link>
+              </div>
+              
+              {/* Use the WeekView component */}
+              <div className="overflow-x-auto">
+                <WeekView 
+                  currentDate={currentDate} 
+                  events={events} 
+                  onEventClick={(event) => setSelectedEvent(event)} 
+                />
+              </div>
+            </>
           )}
 
           {currentView === 'day' && (
-            <div style={{ textAlign: 'center', padding: '2rem' }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem' }}>Day View</h2>
-              <p style={{ color: '#6b7280' }}>Day view is coming soon!</p>
-            </div>
+            <>
+              {/* Day view navigation */}
+              <div className="flex items-center justify-between mb-4">
+                <Link
+                  href={`/calendar?date=${format(subDays(currentDate, 1), 'yyyy-MM-dd')}&view=day`}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
+                >
+                  <span className="flex items-center">
+                    &larr; Previous
+                  </span>
+                </Link>
+                <h2 className="text-xl font-semibold">{format(currentDate, 'EEEE, MMMM d, yyyy')}</h2>
+                <Link
+                  href={`/calendar?date=${format(addDays(currentDate, 1), 'yyyy-MM-dd')}&view=day`}
+                  className="text-gray-900 hover:text-gray-600 transition-colors"
+                >
+                  <span className="flex items-center">
+                    Next &rarr;
+                  </span>
+                </Link>
+              </div>
+              
+              {/* Use the DayView component */}
+              <div className="overflow-x-auto">
+                <DayView 
+                  currentDate={currentDate} 
+                  events={events} 
+                  onEventClick={(event) => setSelectedEvent(event)} 
+                />
+              </div>
+            </>
           )}
         </div>
       </div>

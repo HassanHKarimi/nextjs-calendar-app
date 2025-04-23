@@ -1,13 +1,13 @@
 .month-container {
-  @apply overflow-hidden;
+  @apply overflow-hidden w-full border border-gray-100 rounded-lg;
 }
 
 .month-grid {
-  @apply grid grid-cols-7 border-l border-t border-gray-200;
+  @apply grid grid-cols-7 border-l border-t border-gray-100;
 }
 
 .month-day-cell {
-  @apply p-1 border-r border-b border-gray-200 min-h-[100px];
+  @apply p-2 border-r border-b border-gray-100 aspect-square;
 }
 
 .month-day-cell-current {
@@ -15,11 +15,11 @@
 }
 
 .month-day-header {
-  @apply text-xs text-gray-500 mb-1;
+  @apply text-xs text-gray-500 py-2 text-center font-medium hidden sm:block;
 }
 
 .month-day-number {
-  @apply text-sm font-medium text-gray-900;
+  @apply text-sm font-medium text-gray-900 mb-1;
 }
 
 .month-day-number-current {
@@ -27,7 +27,8 @@
 }
 
 .month-event {
-  @apply text-xs p-1 rounded whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer transition-all duration-200 ease-in-out;
+  @apply text-xs p-1 rounded whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer 
+         transition-all duration-200 ease-in-out border-l-4;
 }
 
 .month-event-hover {
@@ -36,4 +37,58 @@
 
 .month-event-more {
   @apply text-xs text-gray-500 p-0 px-1;
+}
+
+/* Colors for events */
+.event-blue {
+  @apply bg-blue-100 text-blue-800 border-blue-400 hover:bg-blue-200;
+}
+
+.event-green {
+  @apply bg-green-100 text-green-800 border-green-400 hover:bg-green-200;
+}
+
+.event-yellow {
+  @apply bg-yellow-100 text-yellow-800 border-yellow-400 hover:bg-yellow-200;
+}
+
+.event-red {
+  @apply bg-red-100 text-red-800 border-red-400 hover:bg-red-200;
+}
+
+.event-purple {
+  @apply bg-purple-100 text-purple-800 border-purple-400 hover:bg-purple-200;
+}
+
+.event-indigo {
+  @apply bg-indigo-100 text-indigo-800 border-indigo-400 hover:bg-indigo-200;
+}
+
+.event-pink {
+  @apply bg-pink-100 text-pink-800 border-pink-400 hover:bg-pink-200;
+}
+
+.event-gray {
+  @apply bg-gray-100 text-gray-800 border-gray-400 hover:bg-gray-200;
+}
+
+/* Added for new component structure */
+.month-view {
+  @apply flex flex-col h-full border border-gray-100 rounded-lg overflow-hidden;
+}
+
+.month-header {
+  @apply grid grid-cols-7 text-center border-b py-2 font-semibold text-gray-500;
+}
+
+.month-body {
+  @apply flex flex-col flex-1;
+}
+
+.month-row {
+  @apply grid grid-cols-7 flex-1 border-b border-gray-100 last:border-b-0;
+}
+
+.month-day-container {
+  @apply border-r border-gray-100 last:border-r-0 aspect-square;
 } 
