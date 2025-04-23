@@ -1,5 +1,128 @@
 # System Patterns
 
+## CSS Architecture
+
+### Tailwind CSS Structure
+- Centralized component styles in `index.css` using `@layer components`
+- Component-specific styles in dedicated CSS files under `styles/components/`
+- Global styles and theme configuration in `styles/index.css`
+- Consistent use of Tailwind utility classes across components
+
+### Component Styling
+- All component styles are imported into the main `@layer components` block
+- No individual `@layer components` directives in component files
+- Consistent naming conventions for component classes
+- Semantic color coding for events based on their type/title
+
+### Development Tools
+- Context7 MCP for up-to-date documentation access
+- MCP configuration stored locally in `.cursor/` directory
+- Global installation of development tools for better accessibility
+
+## Component Organization
+
+### Calendar Views
+- Consistent structure across day, week, and month views
+- Shared navigation components for unified user experience
+- Standardized event display patterns
+- Reusable grid layouts and cell components
+
+### Event Handling
+- Consistent event styling across all views
+- Unified hover effects and interactions
+- Standardized modal components for event creation/editing
+- Shared event type definitions and utilities
+
+### Navigation
+- Centralized navigation controls
+- Consistent view switching mechanism
+- Unified date navigation patterns
+- Standardized button and control styling
+
+## State Management
+
+### Event State
+- Centralized event management
+- Consistent event creation/editing flow
+- Unified event display logic
+- Standardized event type handling
+
+### View State
+- Consistent view switching mechanism
+- Unified date navigation
+- Standardized view-specific state management
+- Shared view configuration
+
+## Error Handling
+
+### Component Errors
+- Consistent error boundary implementation
+- Unified error display patterns
+- Standardized error recovery mechanisms
+- Shared error logging and reporting
+
+### Data Errors
+- Centralized data validation
+- Consistent error messaging
+- Unified error recovery flows
+- Standardized error state handling
+
+## Performance Optimization
+
+### CSS Optimization
+- Centralized style management
+- Efficient Tailwind utility usage
+- Consistent class naming
+- Optimized style imports
+
+### Component Optimization
+- Efficient event rendering
+- Optimized view switching
+- Consistent performance patterns
+- Standardized optimization techniques
+
+## Development Workflow
+
+### Tool Integration
+- Context7 MCP for documentation
+- Local development tools configuration
+- Consistent tool usage patterns
+- Standardized development practices
+
+### Code Organization
+- Clear component hierarchy
+- Consistent file structure
+- Unified naming conventions
+- Standardized import patterns
+
+## Testing Strategy
+
+### Component Testing
+- Consistent test patterns
+- Unified test utilities
+- Standardized test organization
+- Shared test helpers
+
+### Integration Testing
+- Centralized test configuration
+- Consistent test coverage
+- Unified test reporting
+- Standardized test patterns
+
+## Deployment Strategy
+
+### Build Process
+- Optimized CSS compilation
+- Consistent build configuration
+- Unified deployment patterns
+- Standardized build artifacts
+
+### Environment Configuration
+- Local development setup
+- Consistent environment variables
+- Unified configuration patterns
+- Standardized deployment process
+
 ## Navigation Architecture
 - Shared CalendarNavigation component for consistent UI
 - View switching handled through router

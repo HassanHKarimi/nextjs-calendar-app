@@ -1,35 +1,30 @@
 # Active Context
 
 ## Current Focus
-- Implementing and refining day and week views
-- Improving navigation consistency across views
-- Enhancing user experience with shared components
+- Resolved Tailwind CSS compilation issues in Vercel deployment
+- Added Context7 MCP integration for improved documentation access
+- Optimized CSS structure for better maintainability
 
 ## Recent Changes
-- Implemented shared CalendarNavigation component for consistent navigation
-- Removed duplicate navigation elements from week and day views
-- Cleaned up imports and component organization
-- Standardized navigation patterns across all calendar views
-
-## Next Steps
-- Complete implementation of week view functionality
-- Complete implementation of day view functionality
-- Add event creation/editing in week and day views
-- Implement event dragging and resizing
-- Add visual indicators for current time in day/week views
+- Moved all component styles into a single `@layer components` block in `index.css`
+- Removed individual `@layer components` directives from component CSS files
+- Added `.cursor/` to `.gitignore` to prevent MCP configuration from being pushed
+- Installed Context7 MCP globally for better documentation access
 
 ## Active Decisions
-- Using shared navigation component for consistent UI/UX
-- Maintaining single source of truth for view switching
-- Following consistent event display patterns across views
-- Using standardized styling for interactive elements
+- Using a centralized approach for Tailwind component styles
+- Keeping MCP configuration local to avoid deployment issues
+- Maintaining consistent styling patterns across all calendar views
+
+## Next Steps
+- Monitor Vercel deployment for any remaining CSS issues
+- Consider implementing additional MCP tools for development
+- Review and optimize component styles for better performance
 
 ## Current Considerations
-- Event overlap handling in week/day views
-- Performance optimization for large numbers of events
-- Mobile responsiveness of week/day views
-- Accessibility improvements needed for navigation
-- Need to implement proper error boundaries
+- Ensuring all Tailwind utilities are properly scoped
+- Maintaining consistent styling across different calendar views
+- Balancing development tools with deployment requirements
 
 ## Open Questions
 - How to best handle hover effects for overlapping events
