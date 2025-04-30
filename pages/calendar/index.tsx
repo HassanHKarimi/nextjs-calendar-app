@@ -115,11 +115,12 @@ export default function CalendarPage() {
   const [authUser, setAuthUser] = useState<any>(null);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [events, setEvents] = useState<any[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [currentView, setCurrentView] = useState<'month' | 'week' | 'day'>('month');
   const dateParam = router.query.date as string | undefined;
   const [dataLoading, setDataLoading] = useState(true);
   const [pageReady, setPageReady] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
   
   // Handle view changes
   const handleViewChange = (view: 'month' | 'week' | 'day') => {
@@ -258,6 +259,12 @@ export default function CalendarPage() {
   // Weekday headers
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  const handleEventClick = (event: Event, clickEvent: React.MouseEvent) => {
+    setSelectedEvent(event);
+    const rect = clickEvent.currentTarget.getBoundingClientRect();
+    setModalPosition({ x: rect.left, y: rect.top });
+  };
+
   // Show data loading state
   if (dataLoading) {
     return (
@@ -384,7 +391,7 @@ export default function CalendarPage() {
               <MonthView 
                 currentDate={currentDate} 
                 events={events} 
-                onEventClick={(event) => setSelectedEvent(event)} 
+                onEventClick={(event, clickEvent) => handleEventClick(event, clickEvent)} 
               />
             </>
           )}
@@ -419,7 +426,7 @@ export default function CalendarPage() {
                 <WeekView 
                   currentDate={currentDate} 
                   events={events} 
-                  onEventClick={(event) => setSelectedEvent(event)} 
+                  onEventClick={(event, clickEvent) => handleEventClick(event, clickEvent)} 
                 />
               </div>
             </>
@@ -453,7 +460,7 @@ export default function CalendarPage() {
                 <DayView 
                   currentDate={currentDate} 
                   events={events} 
-                  onEventClick={(event) => setSelectedEvent(event)} 
+                  onEventClick={(event, clickEvent) => handleEventClick(event, clickEvent)} 
                 />
               </div>
             </>
@@ -463,7 +470,11 @@ export default function CalendarPage() {
       
       {/* Event Modal */}
       {selectedEvent && (
-        <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+        <EventModal 
+          event={selectedEvent} 
+          onClose={() => setSelectedEvent(null)} 
+          position={modalPosition}
+        />
       )}
     </div>
   );

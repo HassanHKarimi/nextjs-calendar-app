@@ -12,7 +12,7 @@ import { Event } from '@/utils/event/event-utils';
 interface WeekViewProps {
   currentDate: Date;
   events: Event[];
-  onEventClick: (event: Event) => void;
+  onEventClick: (event: Event, clickEvent: React.MouseEvent) => void;
 }
 
 // Hours for the week view (8 AM to 7 PM)
@@ -87,7 +87,7 @@ export default function WeekView({ currentDate, events, onEventClick }: WeekView
                 return (
                   <div
                     key={event.id}
-                    onClick={() => onEventClick(event)}
+                    onClick={(e) => onEventClick(event, e)}
                     className="week-day-event"
                     style={{
                       top: `${top}px`,

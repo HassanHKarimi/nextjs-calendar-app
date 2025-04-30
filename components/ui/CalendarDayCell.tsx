@@ -7,7 +7,7 @@ interface CalendarDayCellProps {
   day: Date;
   currentMonth: Date;
   events: Event[];
-  onEventClick: (event: Event) => void;
+  onEventClick: (event: Event, clickEvent: React.MouseEvent) => void;
 }
 
 export default function CalendarDayCell({ day, currentMonth, events, onEventClick }: CalendarDayCellProps) {
@@ -40,7 +40,7 @@ export default function CalendarDayCell({ day, currentMonth, events, onEventClic
               <CalendarEvent 
                 key={event.id}
                 event={event}
-                onClick={onEventClick}
+                onClick={(e) => onEventClick(event, e)}
                 isCompact={true}
               />
             ))}

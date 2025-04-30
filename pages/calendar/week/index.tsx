@@ -137,6 +137,7 @@ export default function WeekView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
   
   // Use effect to check auth status client-side
   useEffect(() => {
@@ -250,6 +251,12 @@ export default function WeekView() {
 
   const handleViewChange = (view: 'month' | 'week' | 'day') => {
     router.push(`/calendar${view === 'month' ? '' : `/${view}`}?date=${format(currentDate, 'yyyy-MM-dd')}`);
+  };
+
+  const handleEventClick = (event: Event, clickEvent: React.MouseEvent) => {
+    setSelectedEvent(event);
+    const rect = clickEvent.currentTarget.getBoundingClientRect();
+    setModalPosition({ x: rect.left, y: rect.top });
   };
 
   return (
@@ -368,7 +375,7 @@ export default function WeekView() {
                         .map(event => (
                           <div 
                             key={event.id} 
-                            onClick={() => setSelectedEvent(event)}
+                            onClick={(e) => handleEventClick(event, e)}
                             style={{ 
                               fontSize: '0.75rem', 
                               padding: '0.25rem', 
@@ -419,7 +426,7 @@ export default function WeekView() {
                           return (
                             <div
                               key={event.id}
-                              onClick={() => setSelectedEvent(event)}
+                              onClick={(e) => handleEventClick(event, e)}
                               style={{ 
                                 position: 'absolute',
                                 top: `${top}px`, 
@@ -470,7 +477,11 @@ export default function WeekView() {
       
       {/* Event Modal */}
       {selectedEvent && (
-        <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+        <EventModal 
+          event={selectedEvent} 
+          onClose={() => setSelectedEvent(null)} 
+          position={modalPosition}
+        />
       )}
     </div>
   );

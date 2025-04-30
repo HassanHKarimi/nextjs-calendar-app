@@ -6,7 +6,7 @@ import CalendarDayCell from './ui/CalendarDayCell';
 interface MonthViewProps {
   currentDate: Date;
   events: Event[];
-  onEventClick: (event: Event) => void;
+  onEventClick: (event: Event, clickEvent: React.MouseEvent) => void;
 }
 
 const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick }) => {

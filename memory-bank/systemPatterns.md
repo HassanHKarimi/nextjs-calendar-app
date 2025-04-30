@@ -337,4 +337,120 @@ useEffect(() => {
 - `/context`: React context providers
 - `/utils`: Utility functions (including date handling)
 - `/lib`: Core functionality libraries
-- `/data`: Data models and schemas 
+- `/data`: Data models and schemas
+
+## Component Architecture
+
+### Calendar Views
+- Single main calendar page with conditional rendering based on view parameter
+- View-specific components (MonthView, WeekView, DayView) share common patterns
+- Consistent component hierarchy across all views
+- URL-based navigation with format: `/calendar?view=month|week|day&date=yyyy-MM-dd`
+
+### Event Dialog System
+- Position-aware rendering based on click location
+- Smooth animations using Framer Motion
+- Sequential animations for dialog elements
+- Keyboard navigation support (Escape key)
+- Consistent styling with shadows and borders
+- Lighter dimmer with blur effect for better visual hierarchy
+
+### UI Components
+- Reusable components for calendar elements:
+  - `CalendarDayCell` for day cells in month view
+  - `CalendarEvent` for event display across views
+  - `EventModal` for event details and interactions
+- Consistent styling patterns using Tailwind CSS
+- Component-specific CSS files for custom styling
+
+## State Management
+
+### View State
+- URL parameters for view type and date
+- React state for UI interactions
+- Context API for global state (auth, events)
+- Position state for event dialog placement
+
+### Event State
+- Event data stored in context
+- Event creation/editing handled through dialog
+- Color coding based on event type/title
+- Position-aware dialog rendering
+
+## Styling Patterns
+
+### Layout
+- CSS Grid for calendar layout
+- Flexbox for component alignment
+- Responsive design considerations
+- Consistent spacing and sizing
+
+### Visual Design
+- Modern, clean UI with minimal borders
+- Subtle shadows for depth
+- Color coding for event types
+- Smooth animations for interactions
+- Blur effects for visual hierarchy
+
+### Event Display
+- Consistent event styling across views
+- Hover effects for better interaction
+- Color coding based on event type
+- Optimized display for limited space
+
+## Animation Patterns
+
+### Event Dialog
+- Smooth entrance/exit animations
+- Sequential element animations
+- Position-aware rendering
+- Keyboard interaction support
+- Blur effect for background
+
+### Event Interactions
+- Scale transform on hover
+- Shadow enhancement on hover
+- Z-index management for overlapping
+- Smooth transitions for all effects
+
+## Navigation Patterns
+
+### View Switching
+- URL parameter-based navigation
+- Consistent navigation controls
+- Date-based routing
+- View-specific layouts
+
+### Event Interaction
+- Click to open event dialog
+- Position-aware dialog placement
+- Keyboard navigation support
+- Smooth transitions between states
+
+## Error Handling
+
+### Event Creation
+- Validation before creation
+- Error feedback in dialog
+- Graceful fallbacks
+- User-friendly error messages
+
+### View Rendering
+- Fallback for invalid dates
+- Error boundaries for components
+- Loading states for data
+- Graceful degradation
+
+## Performance Considerations
+
+### Rendering
+- Optimized event rendering
+- Efficient state updates
+- Memoization where beneficial
+- Lazy loading of components
+
+### Animations
+- Hardware-accelerated animations
+- Optimized transition effects
+- Performance monitoring
+- Mobile-specific optimizations 

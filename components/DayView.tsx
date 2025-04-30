@@ -5,7 +5,7 @@ import { Event } from '@/utils/event/event-utils';
 interface DayViewProps {
   currentDate: Date;
   events: Event[];
-  onEventClick: (event: Event) => void;
+  onEventClick: (event: Event, clickEvent: React.MouseEvent) => void;
 }
 
 // Hours array for the day view (7 AM to 8 PM)
@@ -66,7 +66,7 @@ export default function DayView({ currentDate, events, onEventClick }: DayViewPr
             return (
               <div
                 key={event.id}
-                onClick={() => onEventClick(event)}
+                onClick={(clickEvent) => onEventClick(event, clickEvent)}
                 className="day-event"
                 style={{
                   top: `${top}px`,

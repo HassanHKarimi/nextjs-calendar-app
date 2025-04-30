@@ -3,7 +3,7 @@ import { Event, getEventColorClass } from '../../utils/event/event-utils';
 
 export interface CalendarEventProps {
   event: Event;
-  onClick?: (event: Event) => void;
+  onClick?: (event: React.MouseEvent) => void;
   isCompact?: boolean;
 }
 
@@ -17,7 +17,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onClick) {
-      onClick(event);
+      onClick(e);
     }
   };
 

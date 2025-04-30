@@ -125,6 +125,7 @@ export default function DayView() {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showEventModal, setShowEventModal] = useState(false);
+  const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
   
   // Use effect to check auth status client-side
   useEffect(() => {
@@ -224,9 +225,12 @@ export default function DayView() {
     return { top, height };
   }
 
-  const handleEventClick = (event: Event) => {
+  const handleEventClick = (event: Event, clickEvent: React.MouseEvent) => {
     setSelectedEvent(event);
     setShowEventModal(true);
+    // Store click position for modal positioning
+    const rect = clickEvent.currentTarget.getBoundingClientRect();
+    setModalPosition({ x: rect.left, y: rect.top });
   };
 
   const loadEvents = async () => {
@@ -351,7 +355,7 @@ export default function DayView() {
                   return (
                     <div
                       key={event.id}
-                      onClick={() => setSelectedEvent(event)}
+                      onClick={(e) => handleEventClick(event, e)}
                       style={{ 
                         position: 'absolute',
                         top: `${top}px`, 
@@ -404,7 +408,11 @@ export default function DayView() {
       </div>
       
       {selectedEvent && (
-        <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+        <EventModal 
+          event={selectedEvent} 
+          onClose={() => setSelectedEvent(null)} 
+          position={modalPosition}
+        />
       )}
     </div>
   );
