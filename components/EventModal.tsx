@@ -23,20 +23,6 @@ export default function EventModal({ event, onClose, position, layoutId }: Event
     };
     window.addEventListener('keydown', handleEscape);
 
-    // Find the source event title element
-    const sourceElement = document.querySelector(`[data-event-id="${event.id}"]`);
-    const sourceRect = sourceElement?.getBoundingClientRect();
-    const targetElement = titleRef.current;
-    
-    if (sourceElement && sourceRect && targetElement) {
-      // Set initial position to match source
-      gsap.set(targetElement, {
-        fontSize: window.getComputedStyle(sourceElement).fontSize,
-        lineHeight: window.getComputedStyle(sourceElement).lineHeight,
-        opacity: 0
-      });
-    }
-
     // Animate modal in
     if (overlayRef.current && modalRef.current) {
       gsap.set(overlayRef.current, { opacity: 0 });
@@ -64,14 +50,15 @@ export default function EventModal({ event, onClose, position, layoutId }: Event
         ease: "back.out(1.7)"
       }, "-=0.1");
 
-      // Animate title if we have source and target
-      if (sourceElement && sourceRect && targetElement) {
-        tl.to(targetElement, {
+      // Set initial title opacity to 0
+      if (titleRef.current) {
+        gsap.set(titleRef.current, { opacity: 0 });
+        // Fade in title after animation completes
+        tl.to(titleRef.current, {
           opacity: 1,
-          fontSize: "1.5rem",
-          duration: 0.3,
-          ease: "power2.inOut"
-        }, "-=0.2");
+          duration: 0.2,
+          delay: 0.3
+        });
       }
     }
 
@@ -85,14 +72,8 @@ export default function EventModal({ event, onClose, position, layoutId }: Event
 
     const tl = gsap.timeline();
     
-    // Find the source event title element
-    const sourceElement = document.querySelector(`[data-event-id="${event.id}"]`);
-    const sourceRect = sourceElement?.getBoundingClientRect();
-    const targetElement = titleRef.current;
-
-    if (sourceElement && sourceRect && targetElement) {
-      tl.to(targetElement, {
-        fontSize: window.getComputedStyle(sourceElement).fontSize,
+    if (titleRef.current) {
+      tl.to(titleRef.current, {
         opacity: 0,
         duration: 0.2,
         ease: "power2.in"
@@ -129,45 +110,43 @@ export default function EventModal({ event, onClose, position, layoutId }: Event
     >
       <div
         ref={modalRef}
-        className="bg-white rounded-lg shadow-xl p-6 max-w-lg w-full mx-4 relative"
+        className="event-modal"
         style={modalStyle}
         onClick={e => e.stopPropagation()}
+        data-layout-id={layoutId}
       >
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          className="event-modal-close"
+          aria-label="Close modal"
         >
           ×
         </button>
+        
         <div>
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h2
-              ref={titleRef}
-              className="event-modal-title"
-              style={{
-                fontWeight: 'bold',
-                marginBottom: '0.5rem',
-                color: '#1a1a1a'
-              }}
-            >
-              {event.title}
-            </h2>
-            <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-              {event.isAllDay ? (
-                'All day'
-              ) : (
-                `${format(event.start, 'h:mm a')} - ${format(event.end, 'h:mm a')}`
-              )}
-            </p>
-          </div>
+          <h2
+            ref={titleRef}
+            className="event-modal-title"
+            data-event-id={event.id}
+          >
+            {event.title}
+          </h2>
+          <p className="event-modal-time">
+            {event.isAllDay ? (
+              'All day'
+            ) : (
+              `${format(event.start, 'h:mm a')} - ${format(event.end, 'h:mm a')}`
+            )}
+          </p>
           {event.description && (
-            <p style={{ color: '#4b5563', marginBottom: '1rem' }}>
+            <p className="event-modal-description">
               {event.description}
             </p>
           )}
           {event.location && (
-            <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-              📍 {event.location}
+            <p className="event-modal-location">
+              <span>📍</span>
+              <span>{event.location}</span>
             </p>
           )}
         </div>
@@ -180,37 +159,24 @@ export default function EventModal({ event, onClose, position, layoutId }: Event
 function getModalPosition(position: { x: number; y: number }): CSSProperties {
   const modalWidth = 500; // max-width of modal
   const modalHeight = 400; // approximate height
-  const monthGrid = document.querySelector('.month-grid');
-  const monthGridRect = monthGrid?.getBoundingClientRect();
+  const padding = 20; // padding from viewport edges
   
-  if (!monthGridRect) {
-    return {
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)'
-    };
-  }
-
-  // Calculate which quadrant the event is in
-  const isInRightHalf = position.x > monthGridRect.left + monthGridRect.width / 2;
-  const isInBottomHalf = position.y > monthGridRect.top + monthGridRect.height / 2;
+  // Get viewport dimensions
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
   
-  let top, left;
+  // Calculate initial position
+  let left = position.x;
+  let top = position.y;
   
-  if (isInRightHalf) {
-    // Right side
-    left = Math.min(position.x - modalWidth - 10, monthGridRect.right - modalWidth - 10);
-  } else {
-    // Left side
-    left = Math.max(position.x + 10, monthGridRect.left + 10);
+  // Adjust horizontal position if modal would overflow
+  if (left + modalWidth + padding > viewportWidth) {
+    left = Math.max(padding, left - modalWidth);
   }
   
-  if (isInBottomHalf) {
-    // Bottom half
-    top = Math.min(position.y - modalHeight - 10, monthGridRect.bottom - modalHeight - 10);
-  } else {
-    // Top half
-    top = Math.max(position.y + 10, monthGridRect.top + 10);
+  // Adjust vertical position if modal would overflow
+  if (top + modalHeight + padding > viewportHeight) {
+    top = Math.max(padding, top - modalHeight);
   }
   
   return {

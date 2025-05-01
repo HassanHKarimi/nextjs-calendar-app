@@ -63,34 +63,54 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         const clone = titleElement.cloneNode(true) as HTMLElement;
         const rect = titleElement.getBoundingClientRect();
         
-        // Style the clone
-        Object.assign(clone.style, {
-          position: 'fixed',
-          top: `${rect.top}px`,
-          left: `${rect.left}px`,
-          width: `${rect.width}px`,
-          height: `${rect.height}px`,
-          zIndex: '1000',
-          transformOrigin: 'left top',
-          pointerEvents: 'none',
-          backgroundColor: window.getComputedStyle(titleElement).backgroundColor,
-          borderRadius: window.getComputedStyle(titleElement).borderRadius,
-          padding: window.getComputedStyle(titleElement).padding
-        });
+        // Get the modal title position (this will be set in EventModal)
+        const modalTitleElement = document.querySelector('.event-modal-title');
+        const modalRect = modalTitleElement?.getBoundingClientRect();
+        
+        if (modalRect) {
+          // Style the clone
+          Object.assign(clone.style, {
+            position: 'fixed',
+            top: `${rect.top}px`,
+            left: `${rect.left}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+            zIndex: '1000',
+            transformOrigin: 'left top',
+            pointerEvents: 'none',
+            backgroundColor: window.getComputedStyle(titleElement).backgroundColor,
+            borderRadius: window.getComputedStyle(titleElement).borderRadius,
+            padding: window.getComputedStyle(titleElement).padding,
+            fontSize: window.getComputedStyle(titleElement).fontSize,
+            fontWeight: window.getComputedStyle(titleElement).fontWeight,
+            color: window.getComputedStyle(titleElement).color
+          });
 
-        // Add the clone to the body
-        document.body.appendChild(clone);
+          // Add the clone to the body
+          document.body.appendChild(clone);
 
-        // Trigger the click handler with the clone element
+          // Create the animation timeline
+          const tl = gsap.timeline({
+            onComplete: () => {
+              clone.remove();
+            }
+          });
+
+          // Animate the clone to the modal position
+          tl.to(clone, {
+            x: modalRect.left - rect.left,
+            y: modalRect.top - rect.top,
+            width: modalRect.width,
+            height: modalRect.height,
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            duration: 0.4,
+            ease: 'power2.inOut'
+          });
+        }
+
+        // Trigger the click handler
         onClick(e);
-
-        // Clean up the clone after animation completes
-        gsap.to(clone, {
-          opacity: 0,
-          duration: 0.3,
-          delay: 0.3,
-          onComplete: () => clone.remove()
-        });
       } else {
         onClick(e);
       }
