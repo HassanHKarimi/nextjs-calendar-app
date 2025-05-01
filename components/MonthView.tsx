@@ -2,7 +2,7 @@ import React from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, format, isSameMonth, isToday } from 'date-fns';
 import { Event, filterEventsForDay } from '@/utils/event/event-utils';
 import CalendarDayCell from './ui/CalendarDayCell';
-import { motion, LayoutGroup } from 'framer-motion';
+import gsap from 'gsap';
 
 interface MonthViewProps {
   currentDate: Date;
@@ -16,89 +16,74 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
   const startDate = startOfWeek(monthStart);
   const endDate = endOfWeek(monthEnd);
 
-  const dateFormat = "EEE";
-  const rows: React.ReactNode[] = [];
-  
-  // Generate header with day names
-  const days: React.ReactNode[] = [];
-  let day = startDate;
-  
-  for (let i = 0; i < 7; i++) {
-    days.push(
-      <div key={i} className="month-day-header">
-        {format(addDays(day, i), dateFormat)}
-      </div>
-    );
-  }
-
-  // Generate weeks
-  let dates: React.ReactNode[] = [];
-  day = startDate;
-  
-  while (day <= endDate) {
-    for (let i = 0; i < 7; i++) {
-      const cloneDay = new Date(day);
-      const dayEvents = filterEventsForDay(events, cloneDay);
+  const handleEventClick = (event: Event, clickEvent: React.MouseEvent) => {
+    const element = clickEvent.currentTarget as HTMLElement;
+    const rect = element.getBoundingClientRect();
+    const modalTitle = document.querySelector('.event-modal-title');
+    
+    if (modalTitle) {
+      const modalRect = modalTitle.getBoundingClientRect();
       
-      dates.push(
-        <div key={day.toString()} className="month-day-container">
-          <CalendarDayCell 
-            day={cloneDay} 
-            currentMonth={monthStart} 
-            events={dayEvents}
-            onEventClick={(event, e) => onEventClick(event, e)}
-            layoutIdPrefix={`event-${format(cloneDay, 'yyyy-MM-dd')}`}
-          />
-        </div>
-      );
+      // Create a clone of the title for the animation
+      const clone = element.cloneNode(true) as HTMLElement;
+      clone.style.position = 'fixed';
+      clone.style.top = rect.top + 'px';
+      clone.style.left = rect.left + 'px';
+      clone.style.width = rect.width + 'px';
+      clone.style.height = rect.height + 'px';
+      clone.style.zIndex = '100';
+      document.body.appendChild(clone);
       
-      day = addDays(day, 1);
+      // Animate the clone to the modal title position
+      gsap.to(clone, {
+        top: modalRect.top,
+        left: modalRect.left,
+        width: modalRect.width,
+        height: modalRect.height,
+        duration: 0.3,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          clone.remove();
+        }
+      });
     }
     
-    rows.push(
-      <div key={day.toString()} className="month-row">
-        {dates}
-      </div>
-    );
-    
-    dates = [];
-  }
+    onEventClick(event, clickEvent);
+  };
 
   return (
-    <LayoutGroup>
-      <div className="month-container">
-        <div className="month-grid">
-          {/* Weekday headers */}
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-            <div key={day} className="month-day-header">
-              {day}
-            </div>
-          ))}
+    <div className="month-container">
+      <div className="month-grid">
+        {/* Weekday headers */}
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+          <div key={day} className="month-day-header">
+            {day}
+          </div>
+        ))}
+        
+        {/* Calendar days */}
+        {Array.from({ length: 42 }, (_, i) => {
+          const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), i - currentDate.getDay() + 1);
+          const dayEvents = events.filter(event => {
+            const eventDate = event.start;
+            return eventDate.getDate() === date.getDate() &&
+                   eventDate.getMonth() === date.getMonth() &&
+                   eventDate.getFullYear() === date.getFullYear();
+          });
           
-          {/* Calendar days */}
-          {Array.from({ length: 42 }, (_, i) => {
-            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), i - currentDate.getDay() + 1);
-            const dayEvents = events.filter(event => {
-              const eventDate = new Date(event.startDate);
-              return eventDate.getDate() === date.getDate() &&
-                     eventDate.getMonth() === date.getMonth() &&
-                     eventDate.getFullYear() === date.getFullYear();
-            });
-            
-            return (
-              <CalendarDayCell
-                key={date.toString()}
-                day={date}
-                currentMonth={currentDate}
-                events={dayEvents}
-                onEventClick={(event, e) => onEventClick(event, e)}
-                layoutIdPrefix={`event-${format(date, 'yyyy-MM-dd')}`}
-              />
-            );
-          })}
-        </div>
+          return (
+            <CalendarDayCell
+              key={date.toString()}
+              day={date}
+              currentMonth={currentDate}
+              events={dayEvents}
+              onEventClick={(event, e) => handleEventClick(event, e)}
+              layoutIdPrefix={`event-${format(date, 'yyyy-MM-dd')}`}
+            />
+          );
+        })}
       </div>
-    </LayoutGroup>
+    </div>
   );
 };
 

@@ -3,10 +3,12 @@ import { isSameDay } from 'date-fns';
 export interface Event {
   id: string;
   title: string;
+  description?: string;
   start: Date;
   end: Date;
   location?: string;
-  description?: string;
+  isAllDay?: boolean;
+  color?: string;
 }
 
 /**
