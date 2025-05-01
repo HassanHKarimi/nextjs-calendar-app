@@ -121,6 +121,7 @@ export default function CalendarPage() {
   const [dataLoading, setDataLoading] = useState(true);
   const [pageReady, setPageReady] = useState(false);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   
   // Handle view changes
   const handleViewChange = (view: 'month' | 'week' | 'day') => {
@@ -261,6 +262,7 @@ export default function CalendarPage() {
 
   const handleEventClick = (event: Event, clickEvent: React.MouseEvent) => {
     setSelectedEvent(event);
+    setSelectedEventId(event.id);
     const rect = clickEvent.currentTarget.getBoundingClientRect();
     setModalPosition({ x: rect.left, y: rect.top });
   };
@@ -472,8 +474,12 @@ export default function CalendarPage() {
       {selectedEvent && (
         <EventModal 
           event={selectedEvent} 
-          onClose={() => setSelectedEvent(null)} 
+          onClose={() => {
+            setSelectedEvent(null);
+            setSelectedEventId(null);
+          }} 
           position={modalPosition}
+          layoutId={selectedEventId ? `event-${format(new Date(selectedEvent.startDate), 'yyyy-MM-dd')}-${selectedEventId}` : undefined}
         />
       )}
     </div>

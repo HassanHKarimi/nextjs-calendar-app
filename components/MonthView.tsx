@@ -1,7 +1,8 @@
 import React from 'react';
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, format } from 'date-fns';
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, format, isSameMonth, isToday } from 'date-fns';
 import { Event, filterEventsForDay } from '@/utils/event/event-utils';
 import CalendarDayCell from './ui/CalendarDayCell';
+import { motion, LayoutGroup } from 'framer-motion';
 
 interface MonthViewProps {
   currentDate: Date;
@@ -45,7 +46,8 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
             day={cloneDay} 
             currentMonth={monthStart} 
             events={dayEvents}
-            onEventClick={onEventClick}
+            onEventClick={(event, e) => onEventClick(event, e)}
+            layoutIdPrefix={`event-${format(cloneDay, 'yyyy-MM-dd')}`}
           />
         </div>
       );
@@ -63,14 +65,40 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
   }
 
   return (
-    <div className="month-view">
-      <div className="month-header">
-        {days}
+    <LayoutGroup>
+      <div className="month-container">
+        <div className="month-grid">
+          {/* Weekday headers */}
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            <div key={day} className="month-day-header">
+              {day}
+            </div>
+          ))}
+          
+          {/* Calendar days */}
+          {Array.from({ length: 42 }, (_, i) => {
+            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), i - currentDate.getDay() + 1);
+            const dayEvents = events.filter(event => {
+              const eventDate = new Date(event.startDate);
+              return eventDate.getDate() === date.getDate() &&
+                     eventDate.getMonth() === date.getMonth() &&
+                     eventDate.getFullYear() === date.getFullYear();
+            });
+            
+            return (
+              <CalendarDayCell
+                key={date.toString()}
+                day={date}
+                currentMonth={currentDate}
+                events={dayEvents}
+                onEventClick={(event, e) => onEventClick(event, e)}
+                layoutIdPrefix={`event-${format(date, 'yyyy-MM-dd')}`}
+              />
+            );
+          })}
+        </div>
       </div>
-      <div className="month-body">
-        {rows}
-      </div>
-    </div>
+    </LayoutGroup>
   );
 };
 

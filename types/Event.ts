@@ -1,10 +1,12 @@
 export interface Event {
   id: string;
   title: string;
-  description: string;
-  startDate: Date;
-  endDate: Date;
+  description?: string;
+  startDate: string | Date;
+  endDate: string | Date;
   location?: string;
-  isAllDay: boolean;
+  isAllDay?: boolean;
   color?: string;
+  start?: string | Date;  // For backward compatibility
+  end?: string | Date;    // For backward compatibility
 } 

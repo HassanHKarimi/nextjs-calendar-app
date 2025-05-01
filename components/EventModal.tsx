@@ -7,9 +7,10 @@ interface EventModalProps {
   event: Event;
   onClose: () => void;
   position?: { x: number; y: number };
+  layoutId?: string;
 }
 
-export default function EventModal({ event, onClose, position }: EventModalProps) {
+export default function EventModal({ event, onClose, position, layoutId }: EventModalProps) {
   const [isVisible, setIsVisible] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -81,10 +82,7 @@ export default function EventModal({ event, onClose, position }: EventModalProps
         >
           <motion.div
             ref={modalRef}
-            initial={{ scale: 0.95, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 20 }}
-            transition={{ type: 'spring', duration: 0.3 }}
+            layoutId={layoutId}
             style={{
               ...getModalPosition(),
               position: 'absolute',
@@ -99,16 +97,10 @@ export default function EventModal({ event, onClose, position }: EventModalProps
             }}
             onClick={e => e.stopPropagation()}
           >
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
+            <motion.div>
               <div style={{ marginBottom: '1.5rem' }}>
                 <motion.h2
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
+                  layoutId={`${layoutId}-title`}
                   style={{
                     fontSize: '1.5rem',
                     fontWeight: 'bold',
@@ -119,9 +111,7 @@ export default function EventModal({ event, onClose, position }: EventModalProps
                   {event.title}
                 </motion.h2>
                 <motion.p
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
+                  layoutId={`${layoutId}-time`}
                   style={{ color: '#6b7280', fontSize: '0.875rem' }}
                 >
                   {event.isAllDay ? (
@@ -133,9 +123,9 @@ export default function EventModal({ event, onClose, position }: EventModalProps
               </div>
 
               <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
               >
                 {event.location && (
                   <div style={{ marginBottom: '1rem' }}>
@@ -157,9 +147,9 @@ export default function EventModal({ event, onClose, position }: EventModalProps
               </motion.div>
 
               <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
                 style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}
               >
                 <button
