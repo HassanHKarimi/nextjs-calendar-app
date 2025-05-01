@@ -17,7 +17,7 @@
 }
 
 .event-title {
-  @apply font-medium truncate pr-2 transition-all duration-300;
+  @apply font-medium truncate pl-2 pr-2 transition-all duration-300;
 }
 
 .event-time {
