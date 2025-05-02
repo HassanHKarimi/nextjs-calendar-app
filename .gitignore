@@ -43,3 +43,9 @@ next-env.d.ts
 # Memory Bank - local only
 /memory-bank/
 *.cursorrules
+
+# Screenshots
+screenshots/
+.screenshots/
+docs/screenshots/
+**/screenshots/

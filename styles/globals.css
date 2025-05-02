@@ -4,7 +4,7 @@
 
 /* Calendar Event Styles */
 .calendar-event {
-  @apply px-2 py-1 mb-1 text-sm rounded cursor-pointer relative;
+  @apply px-4 py-2 mb-2 text-sm rounded-lg cursor-pointer relative;
   transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, z-index 0.2s ease-out;
 }
 
@@ -13,7 +13,7 @@
 }
 
 .calendar-event.compact {
-  @apply px-1 py-1 text-xs;
+  @apply px-3 py-1.5 text-xs rounded-md;
 }
 
 .event-title {
@@ -21,20 +21,27 @@
 }
 
 .event-time {
-  @apply text-xs opacity-75 truncate;
+  @apply text-xs opacity-75 truncate pl-2;
 }
 
 .event-location {
-  @apply text-xs opacity-75 truncate flex items-center gap-1;
+  @apply text-xs opacity-75 truncate flex items-center gap-1 pl-2;
 }
 
 .event-description {
-  @apply text-xs opacity-75 line-clamp-2 mt-1;
+  @apply text-xs opacity-75 line-clamp-2 mt-1 pl-2;
 }
 
 /* Event Modal Styles */
+.modal-backdrop {
+  @apply fixed inset-0 flex items-center justify-center z-50;
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+}
+
 .event-modal {
   @apply bg-white rounded-lg shadow-xl p-6 max-w-lg w-full mx-4 relative;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
 .event-modal-title {
@@ -92,16 +99,17 @@
 
 /* Calendar Grid */
 .month-grid {
-  @apply grid grid-cols-7 gap-1;
+  @apply grid grid-cols-7 gap-4 p-4;
 }
 
 .month-day {
-  @apply p-2 border rounded-lg;
-  min-height: 100px;
+  @apply p-3 border rounded-xl bg-white;
+  min-height: 120px;
+  border-color: #E5E7EB;
 }
 
 .month-day.today {
-  @apply border-blue-500;
+  @apply border-blue-500 border-2;
 }
 
 .month-day.other-month {

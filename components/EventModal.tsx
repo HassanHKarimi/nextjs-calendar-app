@@ -111,12 +111,16 @@ export default function EventModal({ event, onClose, position, layoutId }: Event
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="modal-backdrop"
       onClick={handleClose}
     >
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-black bg-opacity-50"
+        className="fixed inset-0"
+        style={{
+          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.2)'
+        }}
       />
       <div
         ref={modalRef}
