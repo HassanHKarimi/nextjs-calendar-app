@@ -17,7 +17,8 @@
 }
 
 .event-title {
-  @apply font-medium truncate transition-all duration-300;
+  @apply font-medium truncate pl-2 transition-all duration-300;
+  padding-left: 8px;
 }
 
 .event-time {
@@ -34,7 +35,7 @@
 
 /* Event Modal Styles */
 .modal-backdrop {
-  @apply fixed inset-0 flex items-center justify-center z-50;
+  @apply fixed inset-0 flex items-center justify-center z-50 pointer-events-auto;
   background-color: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(4px);
 }

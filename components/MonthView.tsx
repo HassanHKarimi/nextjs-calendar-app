@@ -26,10 +26,37 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
     setPendingEvent(event);
     setPendingClickEvent(clickEvent);
 
+    // Find the event title text node
     const element = clickEvent.currentTarget as HTMLElement;
-    const rect = element.getBoundingClientRect();
-    // Find where the modal title will be (simulate or use a placeholder)
-    // For now, animate to center of screen as a fallback
+    const titleElement = element.querySelector('.event-title');
+    if (!titleElement) {
+      setIsAnimating(false);
+      setPendingEvent(null);
+      setPendingClickEvent(null);
+      onEventClick(event, clickEvent);
+      return;
+    }
+    const rect = titleElement.getBoundingClientRect();
+
+    // Create a clone of the text node only
+    const textClone = document.createElement('span');
+    textClone.textContent = titleElement.textContent;
+    textClone.style.position = 'fixed';
+    textClone.style.top = rect.top + 'px';
+    textClone.style.left = rect.left + 'px';
+    textClone.style.width = rect.width + 'px';
+    textClone.style.height = rect.height + 'px';
+    textClone.style.font = window.getComputedStyle(titleElement).font;
+    textClone.style.fontWeight = window.getComputedStyle(titleElement).fontWeight;
+    textClone.style.fontSize = window.getComputedStyle(titleElement).fontSize;
+    textClone.style.color = window.getComputedStyle(titleElement).color;
+    textClone.style.background = 'transparent';
+    textClone.style.zIndex = '10000';
+    textClone.style.pointerEvents = 'none';
+    textClone.style.paddingLeft = window.getComputedStyle(titleElement).paddingLeft;
+    document.body.appendChild(textClone);
+
+    // Find or create a placeholder for the modal title position
     const modalTarget = document.createElement('div');
     modalTarget.style.position = 'fixed';
     modalTarget.style.top = '50%';
@@ -41,19 +68,8 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
     document.body.appendChild(modalTarget);
     const modalRect = modalTarget.getBoundingClientRect();
 
-    // Create a clone of the title for the animation
-    const clone = element.cloneNode(true) as HTMLElement;
-    clone.style.position = 'fixed';
-    clone.style.top = rect.top + 'px';
-    clone.style.left = rect.left + 'px';
-    clone.style.width = rect.width + 'px';
-    clone.style.height = rect.height + 'px';
-    clone.style.zIndex = '10000';
-    clone.style.pointerEvents = 'none';
-    document.body.appendChild(clone);
-
     await new Promise<void>(resolve => {
-      gsap.to(clone, {
+      gsap.to(textClone, {
         top: modalRect.top,
         left: modalRect.left,
         width: modalRect.width,
@@ -61,7 +77,7 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
         duration: 0.3,
         ease: 'power2.inOut',
         onComplete: () => {
-          clone.remove();
+          textClone.remove();
           modalTarget.remove();
           resolve();
         }
