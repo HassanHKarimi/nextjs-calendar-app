@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, format, isSameMonth, isToday } from 'date-fns';
 import { Event, filterEventsForDay } from '@/utils/event/event-utils';
 import CalendarDayCell from './ui/CalendarDayCell';
@@ -14,6 +14,8 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
   const [isAnimating, setIsAnimating] = useState(false);
   const [pendingEvent, setPendingEvent] = useState<Event | null>(null);
   const [pendingClickEvent, setPendingClickEvent] = useState<React.MouseEvent | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const modalTitlePlaceholderRef = useRef<HTMLDivElement>(null);
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
@@ -25,20 +27,24 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
     setIsAnimating(true);
     setPendingEvent(event);
     setPendingClickEvent(clickEvent);
+    setShowModal(false);
 
-    // Find the event title text node
+    // Wait for the placeholder to render
+    await new Promise(resolve => setTimeout(resolve, 10));
     const element = clickEvent.currentTarget as HTMLElement;
     const titleElement = element.querySelector('.event-title');
-    if (!titleElement) {
+    const placeholder = modalTitlePlaceholderRef.current;
+    if (!titleElement || !placeholder) {
       setIsAnimating(false);
       setPendingEvent(null);
       setPendingClickEvent(null);
+      setShowModal(true);
       onEventClick(event, clickEvent);
       return;
     }
     const rect = titleElement.getBoundingClientRect();
-
-    // Create a clone of the text node only
+    const modalRect = placeholder.getBoundingClientRect();
+    // Clone the text node only
     const textClone = document.createElement('span');
     textClone.textContent = titleElement.textContent;
     textClone.style.position = 'fixed';
@@ -55,19 +61,6 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
     textClone.style.pointerEvents = 'none';
     textClone.style.paddingLeft = window.getComputedStyle(titleElement).paddingLeft;
     document.body.appendChild(textClone);
-
-    // Find or create a placeholder for the modal title position
-    const modalTarget = document.createElement('div');
-    modalTarget.style.position = 'fixed';
-    modalTarget.style.top = '50%';
-    modalTarget.style.left = '50%';
-    modalTarget.style.width = rect.width + 'px';
-    modalTarget.style.height = rect.height + 'px';
-    modalTarget.style.zIndex = '10000';
-    modalTarget.style.pointerEvents = 'none';
-    document.body.appendChild(modalTarget);
-    const modalRect = modalTarget.getBoundingClientRect();
-
     await new Promise<void>(resolve => {
       gsap.to(textClone, {
         top: modalRect.top,
@@ -78,15 +71,14 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
         ease: 'power2.inOut',
         onComplete: () => {
           textClone.remove();
-          modalTarget.remove();
           resolve();
         }
       });
     });
-
     setIsAnimating(false);
     setPendingEvent(null);
     setPendingClickEvent(null);
+    setShowModal(true);
     onEventClick(event, clickEvent);
   };
 
@@ -122,6 +114,13 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
           );
         })}
       </div>
+      {isAnimating && (
+        <div style={{position: 'fixed', top: '-9999px', left: '-9999px', opacity: 0, pointerEvents: 'none'}}>
+          <div ref={modalTitlePlaceholderRef} className="event-modal-title">
+            {pendingEvent?.title}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

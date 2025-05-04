@@ -57,63 +57,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onClick) {
-      const titleElement = titleRef.current;
-      if (titleElement) {
-        // Create a clone of the title for animation
-        const clone = titleElement.cloneNode(true) as HTMLElement;
-        const rect = titleElement.getBoundingClientRect();
-        
-        // Get the modal title position (this will be set in EventModal)
-        const modalTitleElement = document.querySelector('.event-modal-title');
-        const modalRect = modalTitleElement?.getBoundingClientRect();
-        
-        if (modalRect) {
-          // Style the clone
-          Object.assign(clone.style, {
-            position: 'fixed',
-            top: `${rect.top}px`,
-            left: `${rect.left}px`,
-            width: `${rect.width}px`,
-            height: `${rect.height}px`,
-            zIndex: '1000',
-            transformOrigin: 'left top',
-            pointerEvents: 'none',
-            backgroundColor: window.getComputedStyle(titleElement).backgroundColor,
-            borderRadius: window.getComputedStyle(titleElement).borderRadius,
-            padding: window.getComputedStyle(titleElement).padding,
-            fontSize: window.getComputedStyle(titleElement).fontSize,
-            fontWeight: window.getComputedStyle(titleElement).fontWeight,
-            color: window.getComputedStyle(titleElement).color
-          });
-
-          // Add the clone to the body
-          document.body.appendChild(clone);
-
-          // Create the animation timeline
-          const tl = gsap.timeline({
-            onComplete: () => {
-              clone.remove();
-            }
-          });
-
-          // Animate the clone to the modal position
-          tl.to(clone, {
-            x: modalRect.left - rect.left,
-            y: modalRect.top - rect.top,
-            width: modalRect.width,
-            height: modalRect.height,
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            duration: 0.4,
-            ease: 'power2.inOut'
-          });
-        }
-
-        // Trigger the click handler
-        onClick(e);
-      } else {
-        onClick(e);
-      }
+      onClick(e);
     }
   };
 

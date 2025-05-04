@@ -49,3 +49,5 @@ screenshots/
 .screenshots/
 docs/screenshots/
 **/screenshots/
+
+modal-animation-debug.log
