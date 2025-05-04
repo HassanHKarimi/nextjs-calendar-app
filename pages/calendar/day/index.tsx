@@ -12,7 +12,9 @@ import {
 import Head from "next/head";
 import CalendarNavigation from '@/components/CalendarNavigation';
 import EventModal from '@/components/EventModal';
-import { Event } from '@/types/Event';
+import { Event } from '@/utils/event/event-utils';
+import React from 'react';
+import gsap from 'gsap';
 
 // Hours array for the day view
 const HOURS = Array.from({ length: 14 }, (_, i) => i + 7); // 7 AM to 8 PM
@@ -30,8 +32,8 @@ const createSampleDayEvents = (date: Date): Event[] => {
     id: "day-event-1",
     title: "Morning Standup",
     description: "Daily team standup meeting",
-    startDate: morning,
-    endDate: new Date(new Date(morning).setHours(9, 30, 0, 0)),
+    start: morning,
+    end: new Date(new Date(morning).setHours(9, 30, 0, 0)),
     location: "Conference Room A",
     isAllDay: false,
     color: "bg-blue-100 text-blue-800",
@@ -44,8 +46,8 @@ const createSampleDayEvents = (date: Date): Event[] => {
     id: "day-event-2",
     title: "Lunch with Client",
     description: "Discuss calendar app requirements",
-    startDate: lunch,
-    endDate: new Date(new Date(lunch).setHours(13, 0, 0, 0)),
+    start: lunch,
+    end: new Date(new Date(lunch).setHours(13, 0, 0, 0)),
     location: "Downtown Cafe",
     isAllDay: false,
     color: "bg-green-100 text-green-800",
@@ -58,8 +60,8 @@ const createSampleDayEvents = (date: Date): Event[] => {
     id: "day-event-3",
     title: "Product Demo",
     description: "Demo of the calendar app to stakeholders",
-    startDate: afternoon,
-    endDate: new Date(new Date(afternoon).setHours(15, 30, 0, 0)),
+    start: afternoon,
+    end: new Date(new Date(afternoon).setHours(15, 30, 0, 0)),
     location: "Main Conference Room",
     isAllDay: false,
     color: "bg-purple-100 text-purple-800",
@@ -92,9 +94,9 @@ const createSampleDayEvents = (date: Date): Event[] => {
     
     // Only add if not conflicting with existing events
     const conflicts = events.some(event => 
-      (startTime >= new Date(event.startDate) && startTime < new Date(event.endDate)) ||
-      (endTime > new Date(event.startDate) && endTime <= new Date(event.endDate)) ||
-      (startTime <= new Date(event.startDate) && endTime >= new Date(event.endDate))
+      (startTime >= new Date(event.start) && startTime < new Date(event.end)) ||
+      (endTime > new Date(event.start) && endTime <= new Date(event.end)) ||
+      (startTime <= new Date(event.start) && endTime >= new Date(event.end))
     );
     
     if (!conflicts) {
@@ -102,8 +104,8 @@ const createSampleDayEvents = (date: Date): Event[] => {
         id: `day-random-event-${i}`,
         title: titles[Math.floor(Math.random() * titles.length)],
         description: `Random event ${i}`,
-        startDate: startTime,
-        endDate: endTime,
+        start: startTime,
+        end: endTime,
         isAllDay: false,
         color: colors[Math.floor(Math.random() * colors.length)],
       });
@@ -126,6 +128,9 @@ export default function DayView() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [showEventModal, setShowEventModal] = useState(false);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [pendingEvent, setPendingEvent] = useState<Event | null>(null);
+  const [pendingClickEvent, setPendingClickEvent] = useState<React.MouseEvent | null>(null);
   
   // Use effect to check auth status client-side
   useEffect(() => {
@@ -218,19 +223,66 @@ export default function DayView() {
 
   // Event positioning helper
   const getEventPosition = (event: Event) => {
-    const startHour = new Date(event.startDate).getHours() + (new Date(event.startDate).getMinutes() / 60);
-    const endHour = new Date(event.endDate).getHours() + (new Date(event.endDate).getMinutes() / 60);
+    const startHour = new Date(event.start).getHours() + (new Date(event.start).getMinutes() / 60);
+    const endHour = new Date(event.end).getHours() + (new Date(event.end).getMinutes() / 60);
     const top = (startHour - 7) * 60; // 7 AM is the start of our grid (0px)
     const height = (endHour - startHour) * 60;
     return { top, height };
   }
 
-  const handleEventClick = (event: Event, clickEvent: React.MouseEvent) => {
+  const handleEventClick = async (event: Event, clickEvent: React.MouseEvent) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setPendingEvent(event);
+    setPendingClickEvent(clickEvent);
+
+    const element = clickEvent.currentTarget as HTMLElement;
+    const rect = element.getBoundingClientRect();
+    // For now, animate to center of screen as a fallback
+    const modalTarget = document.createElement('div');
+    modalTarget.style.position = 'fixed';
+    modalTarget.style.top = '50%';
+    modalTarget.style.left = '50%';
+    modalTarget.style.width = rect.width + 'px';
+    modalTarget.style.height = rect.height + 'px';
+    modalTarget.style.zIndex = '10000';
+    modalTarget.style.pointerEvents = 'none';
+    document.body.appendChild(modalTarget);
+    const modalRect = modalTarget.getBoundingClientRect();
+
+    const clone = element.cloneNode(true) as HTMLElement;
+    clone.style.position = 'fixed';
+    clone.style.top = rect.top + 'px';
+    clone.style.left = rect.left + 'px';
+    clone.style.width = rect.width + 'px';
+    clone.style.height = rect.height + 'px';
+    clone.style.zIndex = '10000';
+    clone.style.pointerEvents = 'none';
+    document.body.appendChild(clone);
+
+    await new Promise<void>(resolve => {
+      gsap.to(clone, {
+        top: modalRect.top,
+        left: modalRect.left,
+        width: modalRect.width,
+        height: modalRect.height,
+        duration: 0.3,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          clone.remove();
+          modalTarget.remove();
+          resolve();
+        }
+      });
+    });
+
+    setIsAnimating(false);
+    setPendingEvent(null);
+    setPendingClickEvent(null);
     setSelectedEvent(event);
     setShowEventModal(true);
-    // Store click position for modal positioning
-    const rect = clickEvent.currentTarget.getBoundingClientRect();
-    setModalPosition({ x: rect.left, y: rect.top });
+    const rect2 = clickEvent.currentTarget.getBoundingClientRect();
+    setModalPosition({ x: rect2.left, y: rect2.top });
   };
 
   const loadEvents = async () => {
@@ -386,7 +438,7 @@ export default function DayView() {
                         {event.title}
                       </div>
                       <div style={{ fontSize: '0.75rem' }}>
-                        {format(new Date(event.startDate), 'h:mm a')} - {format(new Date(event.endDate), 'h:mm a')}
+                        {format(new Date(event.start), 'h:mm a')} - {format(new Date(event.end), 'h:mm a')}
                       </div>
                       {height > 60 && event.location && (
                         <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>

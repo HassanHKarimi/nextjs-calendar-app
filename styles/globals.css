@@ -13,11 +13,11 @@
 }
 
 .calendar-event.compact {
-  @apply px-3 py-1.5 text-xs rounded-md;
+  @apply pl-2 pr-2 py-1.5 text-xs rounded-md;
 }
 
 .event-title {
-  @apply font-medium truncate pl-2 pr-2 transition-all duration-300;
+  @apply font-medium truncate transition-all duration-300;
 }
 
 .event-time {

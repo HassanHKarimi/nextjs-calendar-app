@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, format, isSameMonth, isToday } from 'date-fns';
 import { Event, filterEventsForDay } from '@/utils/event/event-utils';
 import CalendarDayCell from './ui/CalendarDayCell';
@@ -11,30 +11,48 @@ interface MonthViewProps {
 }
 
 const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick }) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [pendingEvent, setPendingEvent] = useState<Event | null>(null);
+  const [pendingClickEvent, setPendingClickEvent] = useState<React.MouseEvent | null>(null);
+
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(monthStart);
   const startDate = startOfWeek(monthStart);
   const endDate = endOfWeek(monthEnd);
 
-  const handleEventClick = (event: Event, clickEvent: React.MouseEvent) => {
+  const handleEventClick = async (event: Event, clickEvent: React.MouseEvent) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setPendingEvent(event);
+    setPendingClickEvent(clickEvent);
+
     const element = clickEvent.currentTarget as HTMLElement;
     const rect = element.getBoundingClientRect();
-    const modalTitle = document.querySelector('.event-modal-title');
-    
-    if (modalTitle) {
-      const modalRect = modalTitle.getBoundingClientRect();
-      
-      // Create a clone of the title for the animation
-      const clone = element.cloneNode(true) as HTMLElement;
-      clone.style.position = 'fixed';
-      clone.style.top = rect.top + 'px';
-      clone.style.left = rect.left + 'px';
-      clone.style.width = rect.width + 'px';
-      clone.style.height = rect.height + 'px';
-      clone.style.zIndex = '100';
-      document.body.appendChild(clone);
-      
-      // Animate the clone to the modal title position
+    // Find where the modal title will be (simulate or use a placeholder)
+    // For now, animate to center of screen as a fallback
+    const modalTarget = document.createElement('div');
+    modalTarget.style.position = 'fixed';
+    modalTarget.style.top = '50%';
+    modalTarget.style.left = '50%';
+    modalTarget.style.width = rect.width + 'px';
+    modalTarget.style.height = rect.height + 'px';
+    modalTarget.style.zIndex = '10000';
+    modalTarget.style.pointerEvents = 'none';
+    document.body.appendChild(modalTarget);
+    const modalRect = modalTarget.getBoundingClientRect();
+
+    // Create a clone of the title for the animation
+    const clone = element.cloneNode(true) as HTMLElement;
+    clone.style.position = 'fixed';
+    clone.style.top = rect.top + 'px';
+    clone.style.left = rect.left + 'px';
+    clone.style.width = rect.width + 'px';
+    clone.style.height = rect.height + 'px';
+    clone.style.zIndex = '10000';
+    clone.style.pointerEvents = 'none';
+    document.body.appendChild(clone);
+
+    await new Promise<void>(resolve => {
       gsap.to(clone, {
         top: modalRect.top,
         left: modalRect.left,
@@ -44,10 +62,15 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
         ease: 'power2.inOut',
         onComplete: () => {
           clone.remove();
+          modalTarget.remove();
+          resolve();
         }
       });
-    }
-    
+    });
+
+    setIsAnimating(false);
+    setPendingEvent(null);
+    setPendingClickEvent(null);
     onEventClick(event, clickEvent);
   };
 

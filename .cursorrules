@@ -116,4 +116,8 @@
 - Performance optimization for hover effects on mobile devices
 - Z-index management for overlapping events on hover
 - Inconsistent implementation between month and week/day views
-- Conflicts between URL parameters and separate page files 
+- Conflicts between URL parameters and separate page files
+
+## New Rule
+- Always ensure modal overlays have higher z-index and pointer-events than calendar events.
+- Run event title animation before rendering the modal to avoid interaction issues. 

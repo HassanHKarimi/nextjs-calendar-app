@@ -16,7 +16,9 @@ import {
 import Head from "next/head";
 import CalendarNavigation from '@/components/CalendarNavigation';
 import EventModal from '@/components/EventModal';
-import { Event } from '@/types/Event';
+import { Event } from '@/utils/event/event-utils';
+import React from 'react';
+import gsap from 'gsap';
 
 // Sample event data for week view
 const createSampleWeekEvents = (weekStart: Date): Event[] => {
@@ -29,8 +31,8 @@ const createSampleWeekEvents = (weekStart: Date): Event[] => {
     id: "week-event-1",
     title: "Weekly Planning",
     description: "Weekly team planning session",
-    startDate: monday,
-    endDate: new Date(new Date(monday).setHours(10, 0, 0, 0)),
+    start: monday,
+    end: new Date(new Date(monday).setHours(10, 0, 0, 0)),
     location: "Conference Room A",
     isAllDay: false,
     color: "bg-blue-100 text-blue-800",
@@ -43,8 +45,8 @@ const createSampleWeekEvents = (weekStart: Date): Event[] => {
     id: "week-event-2",
     title: "Lunch & Learn",
     description: "Technical presentation during lunch",
-    startDate: wednesday,
-    endDate: new Date(new Date(wednesday).setHours(13, 0, 0, 0)),
+    start: wednesday,
+    end: new Date(new Date(wednesday).setHours(13, 0, 0, 0)),
     location: "Cafeteria",
     isAllDay: false,
     color: "bg-green-100 text-green-800",
@@ -57,8 +59,8 @@ const createSampleWeekEvents = (weekStart: Date): Event[] => {
     id: "week-event-3",
     title: "Sprint Review",
     description: "End of sprint review and demo",
-    startDate: friday,
-    endDate: new Date(new Date(friday).setHours(15, 30, 0, 0)),
+    start: friday,
+    end: new Date(new Date(friday).setHours(15, 30, 0, 0)),
     location: "Main Conference Room",
     isAllDay: false,
     color: "bg-purple-100 text-purple-800",
@@ -70,8 +72,8 @@ const createSampleWeekEvents = (weekStart: Date): Event[] => {
     id: "week-event-4",
     title: "Company Offsite",
     description: "Annual company team building",
-    startDate: thursday,
-    endDate: thursday,
+    start: thursday,
+    end: thursday,
     isAllDay: true,
     color: "bg-yellow-100 text-yellow-800",
   });
@@ -112,8 +114,8 @@ const createSampleWeekEvents = (weekStart: Date): Event[] => {
         id: `week-random-event-${day}`,
         title: titles[Math.floor(Math.random() * titles.length)],
         description: `Random event for day ${day}`,
-        startDate: startTime,
-        endDate: endTime,
+        start: startTime,
+        end: endTime,
         isAllDay: Math.random() > 0.9, // 10% chance of all-day event
         color: colors[Math.floor(Math.random() * colors.length)],
       });
@@ -138,6 +140,9 @@ export default function WeekView() {
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [pendingEvent, setPendingEvent] = useState<Event | null>(null);
+  const [pendingClickEvent, setPendingClickEvent] = useState<React.MouseEvent | null>(null);
   
   // Use effect to check auth status client-side
   useEffect(() => {
@@ -231,8 +236,8 @@ export default function WeekView() {
   // Event positioning helper for a specific day
   const getDayEvents = (day: Date): Event[] => {
     return events.filter(event => {
-      const eventStart = new Date(event.startDate);
-      const eventEnd = new Date(event.endDate);
+      const eventStart = new Date(event.start);
+      const eventEnd = new Date(event.end);
       
       // Check if the event occurs on this day
       return isSameDay(day, eventStart) || isSameDay(day, eventEnd) ||
@@ -242,8 +247,8 @@ export default function WeekView() {
 
   // Position calculation for events
   const getEventPosition = (event: Event) => {
-    const startHour = new Date(event.startDate).getHours() + (new Date(event.startDate).getMinutes() / 60);
-    const endHour = new Date(event.endDate).getHours() + (new Date(event.endDate).getMinutes() / 60);
+    const startHour = new Date(event.start).getHours() + (new Date(event.start).getMinutes() / 60);
+    const endHour = new Date(event.end).getHours() + (new Date(event.end).getMinutes() / 60);
     const top = Math.max(0, (startHour - 8) * 60); // 8 AM is the start of our grid (0px)
     const height = Math.min(12 * 60, (endHour - startHour) * 60); // Cap at the bottom of our grid
     return { top, height };
@@ -253,10 +258,58 @@ export default function WeekView() {
     router.push(`/calendar${view === 'month' ? '' : `/${view}`}?date=${format(currentDate, 'yyyy-MM-dd')}`);
   };
 
-  const handleEventClick = (event: Event, clickEvent: React.MouseEvent) => {
+  const handleEventClick = async (event: Event, clickEvent: React.MouseEvent) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setPendingEvent(event);
+    setPendingClickEvent(clickEvent);
+
+    const element = clickEvent.currentTarget as HTMLElement;
+    const rect = element.getBoundingClientRect();
+    // For now, animate to center of screen as a fallback
+    const modalTarget = document.createElement('div');
+    modalTarget.style.position = 'fixed';
+    modalTarget.style.top = '50%';
+    modalTarget.style.left = '50%';
+    modalTarget.style.width = rect.width + 'px';
+    modalTarget.style.height = rect.height + 'px';
+    modalTarget.style.zIndex = '10000';
+    modalTarget.style.pointerEvents = 'none';
+    document.body.appendChild(modalTarget);
+    const modalRect = modalTarget.getBoundingClientRect();
+
+    const clone = element.cloneNode(true) as HTMLElement;
+    clone.style.position = 'fixed';
+    clone.style.top = rect.top + 'px';
+    clone.style.left = rect.left + 'px';
+    clone.style.width = rect.width + 'px';
+    clone.style.height = rect.height + 'px';
+    clone.style.zIndex = '10000';
+    clone.style.pointerEvents = 'none';
+    document.body.appendChild(clone);
+
+    await new Promise<void>(resolve => {
+      gsap.to(clone, {
+        top: modalRect.top,
+        left: modalRect.left,
+        width: modalRect.width,
+        height: modalRect.height,
+        duration: 0.3,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          clone.remove();
+          modalTarget.remove();
+          resolve();
+        }
+      });
+    });
+
+    setIsAnimating(false);
+    setPendingEvent(null);
+    setPendingClickEvent(null);
     setSelectedEvent(event);
-    const rect = clickEvent.currentTarget.getBoundingClientRect();
-    setModalPosition({ x: rect.left, y: rect.top });
+    const rect2 = clickEvent.currentTarget.getBoundingClientRect();
+    setModalPosition({ x: rect2.left, y: rect2.top });
   };
 
   return (
@@ -453,14 +506,14 @@ export default function WeekView() {
                                 e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.1)';
                                 e.currentTarget.style.zIndex = 'auto';
                               }}
-                              title={`${event.title}\n${format(new Date(event.startDate), 'h:mm a')} - ${format(new Date(event.endDate), 'h:mm a')}\n${event.description || ''}`}
+                              title={`${event.title}\n${format(new Date(event.start), 'h:mm a')} - ${format(new Date(event.end), 'h:mm a')}\n${event.description || ''}`}
                             >
                               <div style={{ fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {event.title}
                               </div>
                               {height >= 30 && (
                                 <div style={{ fontSize: '0.625rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  {format(new Date(event.startDate), 'h:mm a')}
+                                  {format(new Date(event.start), 'h:mm a')}
                                 </div>
                               )}
                             </div>
