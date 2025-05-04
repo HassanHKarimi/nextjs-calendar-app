@@ -23,7 +23,11 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
   const endDate = endOfWeek(monthEnd);
 
   const handleEventClick = async (event: Event, clickEvent: React.MouseEvent) => {
-    if (isAnimating) return;
+    console.log('[MonthView] Event clicked:', event.title);
+    if (isAnimating) {
+      console.log('[MonthView] Animation in progress, ignoring click.');
+      return;
+    }
     setIsAnimating(true);
     setPendingEvent(event);
     setPendingClickEvent(clickEvent);
@@ -35,6 +39,7 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
     const titleElement = element.querySelector('.event-title');
     const placeholder = modalTitlePlaceholderRef.current;
     if (!titleElement || !placeholder) {
+      console.log('[MonthView] Title element or placeholder missing, skipping animation.');
       setIsAnimating(false);
       setPendingEvent(null);
       setPendingClickEvent(null);
@@ -85,6 +90,7 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
     setPendingEvent(null);
     setPendingClickEvent(null);
     setShowModal(true);
+    console.log('[MonthView] Modal should now be visible.');
     onEventClick(event, clickEvent);
   };
 
