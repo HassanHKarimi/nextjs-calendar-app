@@ -42,39 +42,45 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
       onEventClick(event, clickEvent);
       return;
     }
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const rect = titleElement.getBoundingClientRect();
     const modalRect = placeholder.getBoundingClientRect();
     // Clone the text node only
     const textClone = document.createElement('span');
     textClone.textContent = titleElement.textContent;
+    // Copy all computed styles for visual match
+    const computed = window.getComputedStyle(titleElement);
+    for (let i = 0; i < computed.length; i++) {
+      const prop = computed[i];
+      textClone.style.setProperty(prop, computed.getPropertyValue(prop));
+    }
     textClone.style.position = 'fixed';
     textClone.style.top = rect.top + 'px';
     textClone.style.left = rect.left + 'px';
     textClone.style.width = rect.width + 'px';
     textClone.style.height = rect.height + 'px';
-    textClone.style.font = window.getComputedStyle(titleElement).font;
-    textClone.style.fontWeight = window.getComputedStyle(titleElement).fontWeight;
-    textClone.style.fontSize = window.getComputedStyle(titleElement).fontSize;
-    textClone.style.color = window.getComputedStyle(titleElement).color;
-    textClone.style.background = 'transparent';
     textClone.style.zIndex = '10000';
     textClone.style.pointerEvents = 'none';
-    textClone.style.paddingLeft = window.getComputedStyle(titleElement).paddingLeft;
     document.body.appendChild(textClone);
-    await new Promise<void>(resolve => {
-      gsap.to(textClone, {
-        top: modalRect.top,
-        left: modalRect.left,
-        width: modalRect.width,
-        height: modalRect.height,
-        duration: 0.3,
-        ease: 'power2.inOut',
-        onComplete: () => {
-          textClone.remove();
-          resolve();
-        }
+    if (!prefersReducedMotion) {
+      await new Promise<void>(resolve => {
+        gsap.to(textClone, {
+          top: modalRect.top,
+          left: modalRect.left,
+          width: modalRect.width,
+          height: modalRect.height,
+          duration: 0.3,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            textClone.remove();
+            resolve();
+          }
+        });
       });
-    });
+    } else {
+      textClone.remove();
+    }
     setIsAnimating(false);
     setPendingEvent(null);
     setPendingClickEvent(null);

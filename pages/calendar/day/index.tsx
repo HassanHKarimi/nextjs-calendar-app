@@ -132,6 +132,9 @@ export default function DayView() {
   const [pendingEvent, setPendingEvent] = useState<Event | null>(null);
   const [pendingClickEvent, setPendingClickEvent] = useState<React.MouseEvent | null>(null);
   
+  // Add a ref for the modal title placeholder
+  const modalTitlePlaceholderRef = React.useRef<HTMLDivElement>(null);
+
   // Use effect to check auth status client-side
   useEffect(() => {
     // Only run this effect on the client-side
@@ -236,53 +239,65 @@ export default function DayView() {
     setPendingEvent(event);
     setPendingClickEvent(clickEvent);
 
+    // Wait for the placeholder to render
+    await new Promise(resolve => setTimeout(resolve, 10));
     const element = clickEvent.currentTarget as HTMLElement;
-    const rect = element.getBoundingClientRect();
-    // For now, animate to center of screen as a fallback
-    const modalTarget = document.createElement('div');
-    modalTarget.style.position = 'fixed';
-    modalTarget.style.top = '50%';
-    modalTarget.style.left = '50%';
-    modalTarget.style.width = rect.width + 'px';
-    modalTarget.style.height = rect.height + 'px';
-    modalTarget.style.zIndex = '10000';
-    modalTarget.style.pointerEvents = 'none';
-    document.body.appendChild(modalTarget);
-    const modalRect = modalTarget.getBoundingClientRect();
-
-    const clone = element.cloneNode(true) as HTMLElement;
-    clone.style.position = 'fixed';
-    clone.style.top = rect.top + 'px';
-    clone.style.left = rect.left + 'px';
-    clone.style.width = rect.width + 'px';
-    clone.style.height = rect.height + 'px';
-    clone.style.zIndex = '10000';
-    clone.style.pointerEvents = 'none';
-    document.body.appendChild(clone);
-
-    await new Promise<void>(resolve => {
-      gsap.to(clone, {
-        top: modalRect.top,
-        left: modalRect.left,
-        width: modalRect.width,
-        height: modalRect.height,
-        duration: 0.3,
-        ease: 'power2.inOut',
-        onComplete: () => {
-          clone.remove();
-          modalTarget.remove();
-          resolve();
-        }
+    const titleElement = element.querySelector('.day-event-title, .week-event-title, .event-title');
+    const placeholder = modalTitlePlaceholderRef.current;
+    if (!titleElement || !placeholder) {
+      setIsAnimating(false);
+      setPendingEvent(null);
+      setPendingClickEvent(null);
+      setSelectedEvent(event);
+      setModalPosition({ x: 0, y: 0 });
+      setShowEventModal(true);
+      return;
+    }
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const rect = titleElement.getBoundingClientRect();
+    const modalRect = placeholder.getBoundingClientRect();
+    // Clone the text node only
+    const textClone = document.createElement('span');
+    textClone.textContent = titleElement.textContent;
+    // Copy all computed styles for visual match
+    const computed = window.getComputedStyle(titleElement);
+    for (let i = 0; i < computed.length; i++) {
+      const prop = computed[i];
+      textClone.style.setProperty(prop, computed.getPropertyValue(prop));
+    }
+    textClone.style.position = 'fixed';
+    textClone.style.top = rect.top + 'px';
+    textClone.style.left = rect.left + 'px';
+    textClone.style.width = rect.width + 'px';
+    textClone.style.height = rect.height + 'px';
+    textClone.style.zIndex = '10000';
+    textClone.style.pointerEvents = 'none';
+    document.body.appendChild(textClone);
+    if (!prefersReducedMotion) {
+      await new Promise<void>(resolve => {
+        gsap.to(textClone, {
+          top: modalRect.top,
+          left: modalRect.left,
+          width: modalRect.width,
+          height: modalRect.height,
+          duration: 0.3,
+          ease: 'power2.inOut',
+          onComplete: () => {
+            textClone.remove();
+            resolve();
+          }
+        });
       });
-    });
-
+    } else {
+      textClone.remove();
+    }
     setIsAnimating(false);
     setPendingEvent(null);
     setPendingClickEvent(null);
     setSelectedEvent(event);
+    setModalPosition({ x: modalRect.left, y: modalRect.top });
     setShowEventModal(true);
-    const rect2 = clickEvent.currentTarget.getBoundingClientRect();
-    setModalPosition({ x: rect2.left, y: rect2.top });
   };
 
   const loadEvents = async () => {
@@ -465,6 +480,15 @@ export default function DayView() {
           onClose={() => setSelectedEvent(null)} 
           position={modalPosition}
         />
+      )}
+
+      {/* Event Modal Title Placeholder for Animation */}
+      {isAnimating && (
+        <div style={{position: 'fixed', top: '-9999px', left: '-9999px', opacity: 0, pointerEvents: 'none'}}>
+          <div ref={modalTitlePlaceholderRef} className="event-modal-title">
+            {pendingEvent?.title}
+          </div>
+        </div>
       )}
     </div>
   );

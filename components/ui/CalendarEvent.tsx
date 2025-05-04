@@ -84,6 +84,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
           ref={titleRef} 
           className="event-title"
           data-event-id={event.id}
+          role="button"
+          tabIndex={0}
         >
           {event.title}
         </div>
@@ -102,6 +104,8 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         ref={titleRef} 
         className="event-title"
         data-event-id={event.id}
+        role="button"
+        tabIndex={0}
       >
         {event.title}
       </div>

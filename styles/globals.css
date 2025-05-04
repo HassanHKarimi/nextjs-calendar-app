@@ -16,7 +16,15 @@
   @apply pl-2 pr-2 py-1.5 text-xs rounded-md;
 }
 
+/* Context7: Ensure interactive event titles have pointer cursor and left padding in all views */
+.calendar-event.compact .event-title {
+  @apply pl-2 cursor-pointer;
+  padding-left: 8px;
+}
+
 .event-title {
+  @apply cursor-pointer;
+  cursor: pointer;
   @apply font-medium truncate pl-2 transition-all duration-300;
   padding-left: 8px;
 }
