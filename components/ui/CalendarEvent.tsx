@@ -55,6 +55,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   }, []);
   
   const handleClick = (e: React.MouseEvent) => {
+    console.log('[CalendarEvent] handleClick fired for event:', event.title);
     e.stopPropagation();
     if (onClick) {
       onClick(e);

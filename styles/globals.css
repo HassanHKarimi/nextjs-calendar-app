@@ -18,7 +18,7 @@
 
 /* Context7: Ensure interactive event titles have pointer cursor and left padding in all views */
 .calendar-event.compact .event-title {
-  @apply pl-2 cursor-pointer;
+  @apply pl-2 cursor-pointer w-full block;
   padding-left: 8px;
 }
 
