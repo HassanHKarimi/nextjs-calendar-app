@@ -32,66 +32,68 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
     setPendingEvent(event);
     setPendingClickEvent(clickEvent);
     setShowModal(false);
-
-    // Wait for the placeholder to render
-    await new Promise(resolve => setTimeout(resolve, 10));
-    const element = clickEvent.currentTarget as HTMLElement;
-    const titleElement = element.querySelector('.event-title');
-    const placeholder = modalTitlePlaceholderRef.current;
-    if (!titleElement || !placeholder) {
-      console.log('[MonthView] Title element or placeholder missing, skipping animation.');
-      setIsAnimating(false);
+    try {
+      // Wait for the placeholder to render
+      await new Promise(resolve => setTimeout(resolve, 10));
+      const element = clickEvent.currentTarget as HTMLElement;
+      const titleElement = element.querySelector('.event-title');
+      const placeholder = modalTitlePlaceholderRef.current;
+      if (!titleElement || !placeholder) {
+        console.log('[MonthView] Title element or placeholder missing, skipping animation.');
+        setPendingEvent(null);
+        setPendingClickEvent(null);
+        setShowModal(true);
+        onEventClick(event, clickEvent);
+        return;
+      }
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const rect = titleElement.getBoundingClientRect();
+      const modalRect = placeholder.getBoundingClientRect();
+      // Clone the text node only
+      const textClone = document.createElement('span');
+      textClone.textContent = titleElement.textContent;
+      // Copy all computed styles for visual match
+      const computed = window.getComputedStyle(titleElement);
+      for (let i = 0; i < computed.length; i++) {
+        const prop = computed[i];
+        textClone.style.setProperty(prop, computed.getPropertyValue(prop));
+      }
+      textClone.style.position = 'fixed';
+      textClone.style.top = rect.top + 'px';
+      textClone.style.left = rect.left + 'px';
+      textClone.style.width = rect.width + 'px';
+      textClone.style.height = rect.height + 'px';
+      textClone.style.zIndex = '10000';
+      textClone.style.pointerEvents = 'none';
+      document.body.appendChild(textClone);
+      if (!prefersReducedMotion) {
+        await new Promise<void>(resolve => {
+          gsap.to(textClone, {
+            top: modalRect.top,
+            left: modalRect.left,
+            width: modalRect.width,
+            height: modalRect.height,
+            duration: 0.3,
+            ease: 'power2.inOut',
+            onComplete: () => {
+              textClone.remove();
+              resolve();
+            }
+          });
+        });
+      } else {
+        textClone.remove();
+      }
       setPendingEvent(null);
       setPendingClickEvent(null);
       setShowModal(true);
+      console.log('[MonthView] Modal should now be visible.');
       onEventClick(event, clickEvent);
-      return;
+    } finally {
+      setIsAnimating(false);
+      console.log('[MonthView] isAnimating reset to false.');
     }
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const rect = titleElement.getBoundingClientRect();
-    const modalRect = placeholder.getBoundingClientRect();
-    // Clone the text node only
-    const textClone = document.createElement('span');
-    textClone.textContent = titleElement.textContent;
-    // Copy all computed styles for visual match
-    const computed = window.getComputedStyle(titleElement);
-    for (let i = 0; i < computed.length; i++) {
-      const prop = computed[i];
-      textClone.style.setProperty(prop, computed.getPropertyValue(prop));
-    }
-    textClone.style.position = 'fixed';
-    textClone.style.top = rect.top + 'px';
-    textClone.style.left = rect.left + 'px';
-    textClone.style.width = rect.width + 'px';
-    textClone.style.height = rect.height + 'px';
-    textClone.style.zIndex = '10000';
-    textClone.style.pointerEvents = 'none';
-    document.body.appendChild(textClone);
-    if (!prefersReducedMotion) {
-      await new Promise<void>(resolve => {
-        gsap.to(textClone, {
-          top: modalRect.top,
-          left: modalRect.left,
-          width: modalRect.width,
-          height: modalRect.height,
-          duration: 0.3,
-          ease: 'power2.inOut',
-          onComplete: () => {
-            textClone.remove();
-            resolve();
-          }
-        });
-      });
-    } else {
-      textClone.remove();
-    }
-    setIsAnimating(false);
-    setPendingEvent(null);
-    setPendingClickEvent(null);
-    setShowModal(true);
-    console.log('[MonthView] Modal should now be visible.');
-    onEventClick(event, clickEvent);
   };
 
   return (
