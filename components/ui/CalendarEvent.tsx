@@ -1,24 +1,29 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Event, getEventColorClass } from '../../utils/event/event-utils';
 import gsap from 'gsap';
 
-export interface CalendarEventProps {
+interface CalendarEventProps {
   event: Event;
-  onClick?: (event: React.MouseEvent) => void;
+  onClick?: (e: React.MouseEvent) => void;
   isCompact?: boolean;
   layoutId?: string;
+  hidden?: boolean;
 }
 
-const CalendarEvent: React.FC<CalendarEventProps> = ({ 
+// NOTE: We use 'any' for the ref type to allow exposing a custom object with a 'node' property for parent access.
+const CalendarEvent = forwardRef<any, CalendarEventProps>(({ 
   event, 
   onClick,
   isCompact = false,
-  layoutId
-}) => {
+  layoutId,
+  hidden = false
+}, ref) => {
   const eventRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const colorClass = getEventColorClass(event.title);
   
+  useImperativeHandle(ref, () => ({ node: eventRef.current, titleNode: titleRef.current }), []);
+
   useEffect(() => {
     const element = eventRef.current;
     if (!element) return;
@@ -77,17 +82,11 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
     return (
       <div 
         ref={eventRef}
+        className={`calendar-event-compact ${colorClass} ${hidden ? 'invisible' : ''}`}
         onClick={handleClick}
-        className={`calendar-event compact ${colorClass}`}
-        data-layout-id={layoutId}
+        data-event-id={event.id}
       >
-        <div 
-          ref={titleRef} 
-          className="event-title"
-          data-event-id={event.id}
-          role="button"
-          tabIndex={0}
-        >
+        <div ref={titleRef} className="calendar-event-title-compact">
           {event.title}
         </div>
       </div>
@@ -97,17 +96,11 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
   return (
     <div 
       ref={eventRef}
+      className={`calendar-event ${colorClass} ${hidden ? 'invisible' : ''}`}
       onClick={handleClick}
-      className={`calendar-event ${colorClass}`}
-      data-layout-id={layoutId}
+      data-event-id={event.id}
     >
-      <div 
-        ref={titleRef} 
-        className="event-title"
-        data-event-id={event.id}
-        role="button"
-        tabIndex={0}
-      >
+      <div ref={titleRef} className="calendar-event-title">
         {event.title}
       </div>
       <div className="event-time">
@@ -120,6 +113,6 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
       )}
     </div>
   );
-};
+});
 
 export default CalendarEvent; 

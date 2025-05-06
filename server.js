@@ -9,14 +9,12 @@ const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
 
 // If running on Vercel, we don't need to run this custom server
 if (isVercel) {
-  console.log('Running on Vercel, skipping custom server');
   process.exit(0);
 }
 
 // Load environment variables from .env.local file if it exists
 const envPath = path.resolve(process.cwd(), '.env.local');
 if (fs.existsSync(envPath)) {
-  console.log('Loading environment variables from .env.local');
   require('dotenv').config({ path: envPath });
 }
 
@@ -32,22 +30,18 @@ const handle = app.getRequestHandler();
 // Make sure required environment variables are set
 if (!process.env.NEXTAUTH_URL) {
   process.env.NEXTAUTH_URL = `http://${hostname}:${port}`;
-  console.log(`Setting NEXTAUTH_URL to ${process.env.NEXTAUTH_URL}`);
 }
 
 // Force NEXTAUTH_URL to use port 3000
 process.env.NEXTAUTH_URL = `http://${hostname}:${port}`;
-console.log(`Ensuring NEXTAUTH_URL is set to ${process.env.NEXTAUTH_URL}`);
 
 if (!process.env.NEXTAUTH_SECRET) {
-  console.warn('Warning: NEXTAUTH_SECRET is not set. Using a default for development.');
   process.env.NEXTAUTH_SECRET = 'development-secret-key-change-in-production';
 }
 
 // Set demo mode for testing
 if (!process.env.NEXT_PUBLIC_DEMO_MODE) {
   process.env.NEXT_PUBLIC_DEMO_MODE = "true";
-  console.log("Setting NEXT_PUBLIC_DEMO_MODE to true for easier testing");
 }
 
 app.prepare().then(() => {
@@ -59,19 +53,15 @@ app.prepare().then(() => {
       
       // Special handling for NextAuth API routes
       if (pathname.startsWith('/api/auth')) {
-        console.log(`Auth request: ${pathname}`);
         try {
           // Check if we need to redirect to the Pages Router API
           if (fs.existsSync(path.join(process.cwd(), 'pages/api/auth'))) {
-            console.log('Using Pages Router API route');
-            // Use the Pages Router version
             await app.render(req, res, `/api/auth/${pathname.replace('/api/auth/', '')}`, query);
           } else {
             // Use the App Router version
             await handle(req, res, parsedUrl);
           }
         } catch (err) {
-          console.error('Error handling auth request:', err);
           res.statusCode = 500;
           res.end('Authentication Error');
         }
@@ -80,21 +70,16 @@ app.prepare().then(() => {
       
       // Special handling for root path
       if (pathname === '/') {
-        console.log('Handling request for root path');
         try {
           // Try different variations to find the home page
           if (fs.existsSync(path.join(process.cwd(), 'src/app/page.tsx'))) {
-            console.log('Found home page at src/app/page.tsx');
             await app.render(req, res, '/', query);
           } else if (fs.existsSync(path.join(process.cwd(), 'pages/index.tsx'))) {
-            console.log('Found home page at pages/index.tsx');
             await app.render(req, res, '/', query);
           } else {
-            console.log('No home page found, rendering sign-in page');
             await app.render(req, res, '/sign-in', query);
           }
         } catch (err) {
-          console.error('Error rendering home page:', err);
           // Fallback to sign-in page
           await app.render(req, res, '/sign-in', query);
         }
@@ -103,22 +88,17 @@ app.prepare().then(() => {
       
       // Special handling for calendar path
       if (pathname.startsWith('/calendar')) {
-        console.log('Handling calendar request:', pathname);
         try {
           // Always prefer the App Router implementation
           if (fs.existsSync(path.join(process.cwd(), 'src/app/calendar'))) {
-            console.log('Using App Router calendar at src/app/calendar');
             await handle(req, res, parsedUrl);
           } else if (fs.existsSync(path.join(process.cwd(), 'pages/calendar'))) {
-            console.log('Using Pages Router calendar at pages/calendar');
             await app.render(req, res, pathname, query);
           } else {
-            console.log('No calendar page found, returning 404');
             res.statusCode = 404;
             res.end('Calendar Not Found');
           }
         } catch (err) {
-          console.error('Error rendering calendar page:', err);
           res.statusCode = 500;
           res.end('Calendar Error');
         }
@@ -128,12 +108,10 @@ app.prepare().then(() => {
       // Let Next.js handle the request
       await handle(req, res, parsedUrl);
     } catch (err) {
-      console.error('Error occurred handling request:', err);
       res.statusCode = 500;
       res.end('Internal Server Error');
     }
   }).listen(port, (err) => {
     if (err) throw err;
-    console.log(`> Ready on http://${hostname}:${port}`);
   });
 });

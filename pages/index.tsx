@@ -3,23 +3,13 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-// Diagnostic logging
-console.log("[DIAGNOSTIC] Index page component loaded");
-
 export default function Home() {
-  console.log("[DIAGNOSTIC] Home component rendering");
-  
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  // Log when component mounts
-  useEffect(() => {
-    console.log("[DIAGNOSTIC] Home component mounted");
-  }, []);
   
   // Check if already authenticated
   useEffect(() => {
@@ -29,21 +19,15 @@ export default function Home() {
         if (storedAuth) {
           const auth = JSON.parse(storedAuth);
           if (auth.isAuthenticated && auth.user) {
-            console.log('User already authenticated, redirecting to calendar');
-            // Short delay to ensure page is fully loaded
-            setTimeout(() => {
-              router.push('/calendar');
-            }, 100);
+            router.push('/calendar');
           }
         }
       } catch (err) {
-        console.error('Auth check error:', err);
         // Clear potentially corrupted storage
         if (typeof window !== 'undefined') {
           try {
             sessionStorage.removeItem('calendarAuth');
           } catch (clearErr) {
-            console.error('Failed to clear storage:', clearErr);
           }
         }
       }
@@ -81,18 +65,14 @@ export default function Home() {
               user: userData
             }));
             
-            console.log('Authentication successful, redirecting to calendar');
             router.push('/calendar');
           } catch (storageError) {
-            console.error('Storage error:', storageError);
-            // Still allow navigation even if storage fails
             router.push('/calendar');
           }
         } else {
           setError('Invalid credentials. Email must contain @ and password must be at least 6 characters.');
         }
       } catch (e) {
-        console.error('Login error:', e);
         setError('An unexpected error occurred. Please try again.');
       } finally {
         setIsLoading(false);

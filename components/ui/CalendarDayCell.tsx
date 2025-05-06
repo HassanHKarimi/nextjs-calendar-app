@@ -9,6 +9,8 @@ interface CalendarDayCellProps {
   events: Event[];
   onEventClick: (event: Event, clickEvent: React.MouseEvent) => void;
   layoutIdPrefix?: string;
+  eventRefs?: React.MutableRefObject<{ [key: string]: any }>;
+  animatingEventId?: string | null;
 }
 
 export default function CalendarDayCell({ 
@@ -16,7 +18,9 @@ export default function CalendarDayCell({
   currentMonth, 
   events, 
   onEventClick,
-  layoutIdPrefix 
+  layoutIdPrefix,
+  eventRefs,
+  animatingEventId
 }: CalendarDayCellProps) {
   const isCurrentMonth = isSameMonth(day, currentMonth);
   const isTodayDate = isToday(day);
@@ -50,6 +54,10 @@ export default function CalendarDayCell({
                 onClick={(e) => onEventClick(event, e)}
                 isCompact={true}
                 layoutId={`${layoutIdPrefix}-${event.id}`}
+                ref={ref => {
+                  if (eventRefs) eventRefs.current[event.id] = ref;
+                }}
+                hidden={animatingEventId === event.id}
               />
             ))}
             {events.length > 3 && (

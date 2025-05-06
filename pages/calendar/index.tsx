@@ -1,5 +1,5 @@
 // Fully functional calendar page (with auth required)
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, subDays, addWeeks, subWeeks, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
@@ -23,6 +23,7 @@ export default function CalendarPage() {
   const [pageReady, setPageReady] = useState(false);
   const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const eventRefs = useRef<{ [key: string]: any }>({});
   
   // Handle view changes
   const handleViewChange = (view: 'month' | 'week' | 'day') => {
@@ -164,8 +165,15 @@ export default function CalendarPage() {
   const handleEventClick = (event: Event, clickEvent: React.MouseEvent) => {
     setSelectedEvent(event);
     setSelectedEventId(event.id);
-    const rect = clickEvent.currentTarget.getBoundingClientRect();
-    setModalPosition({ x: rect.left, y: rect.top });
+    const eventRefObj = eventRefs.current[event.id];
+    const node = eventRefObj?.node as HTMLElement | null;
+    if (node) {
+      const rect = node.getBoundingClientRect();
+      setModalPosition({ x: rect.left, y: rect.top });
+    } else {
+      // fallback: use clickEvent position (less accurate)
+      setModalPosition({ x: clickEvent.clientX, y: clickEvent.clientY });
+    }
   };
 
   // Show data loading state
@@ -295,6 +303,7 @@ export default function CalendarPage() {
                 currentDate={currentDate} 
                 events={events} 
                 onEventClick={(event, clickEvent) => handleEventClick(event, clickEvent)} 
+                eventRefs={eventRefs}
               />
             </>
           )}

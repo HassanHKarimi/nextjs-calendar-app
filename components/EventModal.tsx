@@ -1,21 +1,27 @@
 import { Event } from '@/utils/event/event-utils';
 import { format } from 'date-fns';
-import { useEffect, useRef, CSSProperties } from 'react';
+import { useEffect, useRef, CSSProperties, forwardRef, useImperativeHandle } from 'react';
 import gsap from 'gsap';
+import { createPortal } from 'react-dom';
 
 interface EventModalProps {
   event: Event;
   onClose: () => void;
   position?: { x: number; y: number };
   layoutId?: string;
+  titleVisible?: boolean;
+  bodyVisible?: boolean;
+  onOverlayClick?: () => void;
 }
 
-export default function EventModal({ event, onClose, position, layoutId }: EventModalProps) {
+const EventModal = forwardRef<any, EventModalProps>(function EventModal({ event, onClose, position, layoutId, titleVisible = true, bodyVisible = true, onOverlayClick }, ref) {
   const modalRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(ref, () => ({ modalNode: modalRef.current, titleNode: titleRef.current }), []);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -114,23 +120,22 @@ export default function EventModal({ event, onClose, position, layoutId }: Event
     transform: 'translate(-50%, -50%)'
   };
 
-  return (
-    <div
-      ref={containerRef}
-      className="modal-backdrop"
-      onClick={handleClose}
-    >
+  // Render modal in a portal to guarantee stacking
+  const modalContent = (
+    <>
+      {/* Overlay: z-50 ensures it sits above all events. pointer-events-auto blocks interaction. */}
       <div
         ref={overlayRef}
-        className="fixed inset-0"
+        className="fixed inset-0 z-50 pointer-events-auto"
         style={{
           backdropFilter: 'blur(4px)',
           backgroundColor: 'rgba(255, 255, 255, 0.2)'
         }}
+        onClick={onOverlayClick}
       />
       <div
         ref={modalRef}
-        className="event-modal"
+        className="fixed z-50 event-modal"
         style={modalStyle}
         onClick={e => e.stopPropagation()}
         data-layout-id={layoutId}
@@ -142,16 +147,16 @@ export default function EventModal({ event, onClose, position, layoutId }: Event
         >
           ×
         </button>
-        
         <div>
           <h2
             ref={titleRef}
             className="event-modal-title"
             data-event-id={event.id}
+            style={{ opacity: titleVisible ? 1 : 0, transition: 'opacity 0.1s' }}
           >
             {event.title}
           </h2>
-          <div ref={bodyRef}>
+          <div ref={bodyRef} style={{ opacity: bodyVisible ? 1 : 0, transition: 'opacity 0.1s' }}>
             <p className="event-modal-time">
               {event.isAllDay ? (
                 'All day'
@@ -173,9 +178,18 @@ export default function EventModal({ event, onClose, position, layoutId }: Event
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
-}
+
+  // Use portal for guaranteed stacking
+  if (typeof window !== 'undefined') {
+    const portalRoot = document.getElementById('modal-root') || document.body;
+    return createPortal(modalContent, portalRoot);
+  }
+  return modalContent;
+});
+
+export default EventModal;
 
 // Helper function to calculate modal position
 function getModalPosition(position: { x: number; y: number }): CSSProperties {
