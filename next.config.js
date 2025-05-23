@@ -22,10 +22,13 @@ const nextConfig = {
     return config;
   },
   
-  // Set the output directory to match what's in vercel.json
+  // Set the output directory for the build
   distDir: 'dist',
   
-  // Configure static HTML output for better deployment
+  // Add trailing slash to URLs (fixes static export routing)
+  trailingSlash: true,
+  
+  // Enable static export mode
   output: 'export',
   
   // Important for static export - don't use image optimization

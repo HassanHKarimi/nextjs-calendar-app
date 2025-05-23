@@ -11,7 +11,7 @@ import {
 } from "date-fns";
 import Head from "next/head";
 import CalendarNavigation from '@/components/CalendarNavigation';
-import EventModal from '@/components/EventModal';
+import CleanEventModal from '@/components/CleanEventModal';
 import { Event } from '@/types/Event';
 
 // Hours array for the day view
@@ -30,8 +30,8 @@ const createSampleDayEvents = (date: Date): Event[] => {
     id: "day-event-1",
     title: "Morning Standup",
     description: "Daily team standup meeting",
-    startDate: morning,
-    endDate: new Date(new Date(morning).setHours(9, 30, 0, 0)),
+    start: morning,
+    end: new Date(new Date(morning).setHours(9, 30, 0, 0)),
     location: "Conference Room A",
     isAllDay: false,
     color: "bg-blue-100 text-blue-800",
@@ -44,8 +44,8 @@ const createSampleDayEvents = (date: Date): Event[] => {
     id: "day-event-2",
     title: "Lunch with Client",
     description: "Discuss calendar app requirements",
-    startDate: lunch,
-    endDate: new Date(new Date(lunch).setHours(13, 0, 0, 0)),
+    start: lunch,
+    end: new Date(new Date(lunch).setHours(13, 0, 0, 0)),
     location: "Downtown Cafe",
     isAllDay: false,
     color: "bg-green-100 text-green-800",
@@ -58,8 +58,8 @@ const createSampleDayEvents = (date: Date): Event[] => {
     id: "day-event-3",
     title: "Product Demo",
     description: "Demo of the calendar app to stakeholders",
-    startDate: afternoon,
-    endDate: new Date(new Date(afternoon).setHours(15, 30, 0, 0)),
+    start: afternoon,
+    end: new Date(new Date(afternoon).setHours(15, 30, 0, 0)),
     location: "Main Conference Room",
     isAllDay: false,
     color: "bg-purple-100 text-purple-800",
@@ -92,9 +92,9 @@ const createSampleDayEvents = (date: Date): Event[] => {
     
     // Only add if not conflicting with existing events
     const conflicts = events.some(event => 
-      (startTime >= new Date(event.startDate) && startTime < new Date(event.endDate)) ||
-      (endTime > new Date(event.startDate) && endTime <= new Date(event.endDate)) ||
-      (startTime <= new Date(event.startDate) && endTime >= new Date(event.endDate))
+      (startTime >= new Date(event.start || event.startDate || new Date()) && startTime < new Date(event.end || event.endDate || new Date())) ||
+      (endTime > new Date(event.start || event.startDate || new Date()) && endTime <= new Date(event.end || event.endDate || new Date())) ||
+      (startTime <= new Date(event.start || event.startDate || new Date()) && endTime >= new Date(event.end || event.endDate || new Date()))
     );
     
     if (!conflicts) {
@@ -102,8 +102,8 @@ const createSampleDayEvents = (date: Date): Event[] => {
         id: `day-random-event-${i}`,
         title: titles[Math.floor(Math.random() * titles.length)],
         description: `Random event ${i}`,
-        startDate: startTime,
-        endDate: endTime,
+        start: startTime,
+        end: endTime,
         isAllDay: false,
         color: colors[Math.floor(Math.random() * colors.length)],
       });
@@ -217,8 +217,8 @@ export default function DayView() {
 
   // Event positioning helper
   const getEventPosition = (event: Event) => {
-    const startHour = new Date(event.startDate).getHours() + (new Date(event.startDate).getMinutes() / 60);
-    const endHour = new Date(event.endDate).getHours() + (new Date(event.endDate).getMinutes() / 60);
+    const startHour = new Date(event.start || event.startDate || new Date()).getHours() + (new Date(event.start || event.startDate || new Date()).getMinutes() / 60);
+    const endHour = new Date(event.end || event.endDate || new Date()).getHours() + (new Date(event.end || event.endDate || new Date()).getMinutes() / 60);
     const top = (startHour - 7) * 60; // 7 AM is the start of our grid (0px)
     const height = (endHour - startHour) * 60;
     return { top, height };
@@ -382,7 +382,7 @@ export default function DayView() {
                         {event.title}
                       </div>
                       <div style={{ fontSize: '0.75rem' }}>
-                        {format(new Date(event.startDate), 'h:mm a')} - {format(new Date(event.endDate), 'h:mm a')}
+                        {format(new Date(event.start || event.startDate || new Date()), 'h:mm a')} - {format(new Date(event.end || event.endDate || new Date()), 'h:mm a')}
                       </div>
                       {height > 60 && event.location && (
                         <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -403,8 +403,13 @@ export default function DayView() {
         </div>
       </div>
       
+      {/* Event Modal */}
       {selectedEvent && (
-        <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+        <CleanEventModal 
+          event={selectedEvent} 
+          onClose={() => setSelectedEvent(null)} 
+          isOpen={!!selectedEvent} 
+        />
       )}
     </div>
   );

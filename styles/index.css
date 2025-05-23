@@ -10,6 +10,7 @@
   @import "./components/week-view.css";
   @import "./components/day-view.css";
   @import "./components/event-modal.css";
+  @import "./components/animation.css";
 }
 
 @layer base {

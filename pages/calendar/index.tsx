@@ -3,14 +3,26 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, addDays, subDays, addWeeks, subWeeks, eachDayOfInterval, startOfWeek, endOfWeek, isToday, isSameMonth, isSameDay } from 'date-fns';
-import { EventModal } from "./utils/event-modal";
+import CleanEventModal from "../../components/CleanEventModal";
 import MonthView from "../../components/MonthView";
 import WeekView from "../../components/WeekView";
 import DayView from "../../components/DayView";
-import { Event, createSampleEvent } from "../../utils/event/event-utils";
+import { Event as BaseEvent, createSampleEvent } from "../../utils/event/event-utils";
+import { Event } from "../../types/Event";
+
+// Debug flag
+const DEBUG = true;
+
+// Log timestamp for debugging
+const logWithTimestamp = (message: string, data?: any) => {
+  if (!DEBUG) return;
+  const now = new Date();
+  const timestamp = now.toISOString().split('T')[1].split('.')[0] + '.' + now.getMilliseconds();
+  console.log(`[${timestamp}] [CalendarPage] ${message}`, data || '');
+};
 
 // Sample event data - updated to match event-utils Event interface
-const SAMPLE_EVENTS: Event[] = [
+const SAMPLE_EVENTS: BaseEvent[] = [
   {
     id: "event-1",
     title: "Client Meeting",
@@ -268,6 +280,26 @@ export default function CalendarPage() {
     );
   }
 
+  // Handle event click
+  const handleEventClick = (event: Event) => {
+    logWithTimestamp('Event clicked', {
+      eventId: event.id,
+      eventTitle: event.title,
+      hasSourceElement: !!(event as any).sourceElement
+    });
+    
+    // Convert BaseEvent to Event with animation properties
+    const eventWithAnimation: Event = {
+      ...event,
+      startDate: event.start,
+      endDate: event.end,
+      sourceElement: event.sourceElement,
+      isAllDay: false
+    };
+    
+    setSelectedEvent(eventWithAnimation);
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-opacity duration-300 ease-in-out" style={{ opacity: pageReady ? 1 : 0 }}>
       <div className="rounded-lg bg-white shadow-md overflow-hidden">
@@ -384,7 +416,9 @@ export default function CalendarPage() {
               <MonthView 
                 currentDate={currentDate} 
                 events={events} 
-                onEventClick={(event) => setSelectedEvent(event)} 
+                onEventClick={(event: any) => {
+                  handleEventClick(event);
+                }} 
               />
             </>
           )}
@@ -419,7 +453,9 @@ export default function CalendarPage() {
                 <WeekView 
                   currentDate={currentDate} 
                   events={events} 
-                  onEventClick={(event) => setSelectedEvent(event)} 
+                  onEventClick={(event: any) => {
+                    handleEventClick(event);
+                  }} 
                 />
               </div>
             </>
@@ -453,7 +489,9 @@ export default function CalendarPage() {
                 <DayView 
                   currentDate={currentDate} 
                   events={events} 
-                  onEventClick={(event) => setSelectedEvent(event)} 
+                  onEventClick={(event: any) => {
+                    handleEventClick(event);
+                  }} 
                 />
               </div>
             </>
@@ -463,7 +501,11 @@ export default function CalendarPage() {
       
       {/* Event Modal */}
       {selectedEvent && (
-        <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+        <CleanEventModal 
+          event={selectedEvent} 
+          onClose={() => setSelectedEvent(null)} 
+          isOpen={!!selectedEvent} 
+        />
       )}
     </div>
   );

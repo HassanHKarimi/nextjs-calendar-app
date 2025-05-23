@@ -1,0 +1,81 @@
+/* Animation styles */
+.gsap-animation-target {
+  @apply opacity-0 pointer-events-none;
+}
+
+.modal-animation-wrapper {
+  @apply fixed inset-0 z-50 pointer-events-none;
+}
+
+.modal-title-clone {
+  @apply fixed bg-transparent z-[9999];
+}
+
+.modal-container-fadein {
+  @apply opacity-0;
+}
+
+.modal-content-fadein {
+  @apply opacity-0;
+}
+
+.shared-element-animation {
+  /* Ensure our shared element has proper stacking and visibility */
+  @apply fixed z-[9999] overflow-visible;
+  pointer-events: none !important;
+  will-change: transform, opacity;
+  /* Improve animation performance */
+  transform-origin: center;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+
+/* Event colors used in animations */
+.event-blue {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.event-green {
+  @apply bg-green-100 text-green-800;
+}
+
+.event-red {
+  @apply bg-red-100 text-red-800;
+}
+
+.event-yellow {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.event-purple {
+  @apply bg-purple-100 text-purple-800;
+}
+
+.event-pink {
+  @apply bg-pink-100 text-pink-800;
+}
+
+.event-indigo {
+  @apply bg-indigo-100 text-indigo-800;
+}
+
+.event-gray {
+  @apply bg-gray-100 text-gray-800;
+}
+
+/* Animation debug helpers */
+.animation-debug-outline {
+  @apply border-2 border-red-500;
+}
+
+/* Animation container */
+#animation-portal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+} 

@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import '../styles/index.css'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
+import useIsClient from '../hooks/useIsClient'
 
 // Log on module load
 console.log("[DIAGNOSTIC] _app.tsx module loaded");
@@ -37,11 +38,14 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const [loading, setLoading] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [prevPath, setPrevPath] = useState('');
+  const isClient = useIsClient();
   
   // Log on component render
-  console.log("[DIAGNOSTIC] MyApp rendering with route:", typeof window !== 'undefined' ? window.location.pathname : 'SSR');
+  console.log("[DIAGNOSTIC] MyApp rendering with route:", isClient ? window.location.pathname : 'SSR');
   
   useEffect(() => {
+    if (!isClient) return;
+    
     // Handle route change start
     const handleStart = (url: string) => {
       console.log("[DIAGNOSTIC] Route change starting to:", url);
@@ -113,7 +117,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       router.events.off('routeChangeError', handleError);
       window.onerror = originalOnError;
     };
-  }, [router]);
+  }, [router, isClient]);
   
   return (
     <Suspense fallback={<LoadingBar show={true} />}>
