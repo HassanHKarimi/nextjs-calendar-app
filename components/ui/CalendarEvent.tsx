@@ -81,7 +81,7 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         ref={eventRef}
         data-event-id={event.id}
         data-id={`event-${event.id}`}
-        className={`px-1 py-1 mb-1 text-xs rounded cursor-pointer truncate transition-all duration-200 
+        className={`px-1 py-1 mb-1 text-sm rounded cursor-pointer truncate transition-all duration-200 
                    transform hover:scale-[1.02] hover:shadow-sm z-[1] hover:z-[10] ${colorClass}`}
         onClick={handleClick}
         tabIndex={0}
