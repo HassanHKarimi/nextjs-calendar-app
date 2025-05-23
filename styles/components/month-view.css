@@ -27,7 +27,7 @@
 }
 
 .month-event {
-  @apply text-sm p-1 rounded whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer 
+  @apply text-base p-1 rounded whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer 
          transition-all duration-200 ease-in-out border-l-4;
 }
 
