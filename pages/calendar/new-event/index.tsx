@@ -78,15 +78,42 @@ export default function NewEventPage() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Create start and end dates
+      const startDate = new Date(`${formData.date}T${formData.startTime || '00:00'}`);
+      const endDate = new Date(`${formData.date}T${formData.endTime || '23:59'}`);
+      
+      // If all day event, set times appropriately
+      if (formData.isAllDay) {
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+      }
+      
+      // Import and use the createEvent function
+      const { createEvent } = await import('../../../utils/api/events');
+      
+      await createEvent({
+        title: formData.title,
+        description: formData.description || undefined,
+        start: startDate,
+        end: endDate,
+        location: formData.location || undefined,
+        isAllDay: formData.isAllDay,
+        color: formData.color
+      });
+      
       // Redirect back to calendar
       router.push("/calendar");
-    }, 1000);
+    } catch (error) {
+      console.error('Failed to create event:', error);
+      alert('Failed to create event. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -338,7 +365,7 @@ export default function NewEventPage() {
         {/* Footer */}
         <div className="p-6 border-t border-gray-200 bg-gray-50">
           <p className="text-center text-sm text-gray-500">
-            This is a demo form. Your events will not be saved.
+            Your events will be saved to the database and synced across all views.
           </p>
         </div>
       </div>

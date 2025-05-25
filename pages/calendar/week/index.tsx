@@ -171,11 +171,24 @@ export default function WeekView() {
     const date = dateParam ? parseISO(dateParam) : new Date();
     if (!isNaN(date.getTime())) {
       setCurrentDate(date);
-      const weekStart = startOfWeek(date, { weekStartsOn: 0 }); // Sunday as start of week
-      setEvents(createSampleWeekEvents(weekStart));
-    } else {
-      const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 });
-      setEvents(createSampleWeekEvents(weekStart));
+    }
+    
+    // Load events from database
+    const loadEvents = async () => {
+      try {
+        const { fetchEvents } = await import('../../../utils/api/events');
+        const dbEvents = await fetchEvents();
+        setEvents(dbEvents);
+      } catch (error) {
+        console.error('Failed to load events:', error);
+        // Fallback to sample events if database fails
+        const weekStart = startOfWeek(date, { weekStartsOn: 0 });
+        setEvents(createSampleWeekEvents(weekStart));
+      }
+    };
+    
+    if (authUser) {
+      loadEvents();
     }
     
     // Simulate loading time with smoother transitions

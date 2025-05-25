@@ -161,14 +161,28 @@ export default function DayView() {
         const parsedDate = parseISO(dateParam);
         if (!isNaN(parsedDate.getTime())) {
           setCurrentDate(parsedDate);
-          setEvents(createSampleDayEvents(parsedDate));
         }
       } catch (e) {
         console.error("Invalid date in URL", e);
-        setEvents(createSampleDayEvents(new Date()));
       }
-    } else {
-      setEvents(createSampleDayEvents(new Date()));
+    }
+    
+    // Load events from database
+    const loadEvents = async () => {
+      try {
+        const { fetchEvents } = await import('../../../utils/api/events');
+        const dbEvents = await fetchEvents();
+        setEvents(dbEvents);
+      } catch (error) {
+        console.error('Failed to load events:', error);
+        // Fallback to sample events if database fails
+        const currentDateForEvents = dateParam ? parseISO(dateParam) : new Date();
+        setEvents(createSampleDayEvents(currentDateForEvents));
+      }
+    };
+    
+    if (authUser) {
+      loadEvents();
     }
     
     // Simulate loading time with smoother transitions

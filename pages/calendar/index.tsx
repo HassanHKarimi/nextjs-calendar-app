@@ -156,12 +156,24 @@ export default function CalendarPage() {
     }
   }, [router.query.view]);
 
-  // Use effect to load events
+  // Use effect to load events from database
   useEffect(() => {
-    // In a real app, this would fetch from an API
-    // For now, we'll use the sample events
-    setEvents(SAMPLE_EVENTS);
-  }, []);
+    const loadEvents = async () => {
+      try {
+        const { fetchEvents } = await import('../../utils/api/events');
+        const dbEvents = await fetchEvents();
+        setEvents(dbEvents);
+      } catch (error) {
+        console.error('Failed to load events:', error);
+        // Fallback to sample events if database fails
+        setEvents(SAMPLE_EVENTS);
+      }
+    };
+    
+    if (authUser) {
+      loadEvents();
+    }
+  }, [authUser]);
 
   // Use effect to check auth status client-side
   useEffect(() => {
