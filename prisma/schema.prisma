@@ -59,16 +59,38 @@ model VerificationToken {
 }
 
 model Event {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  location    String?
-  isAllDay    Boolean  @default(false)
-  color       String?  @default("blue")
-  userId      String
-  user        User     @relation("UserEvents", fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  title           String
+  description     String?
+  startDate       DateTime
+  endDate         DateTime
+  location        String?
+  isAllDay        Boolean  @default(false)
+  color           String?  @default("blue")
+  
+  // Enhanced Tech Event Fields
+  category        String?  // Conference, Meetup, Workshop, Hackathon, Webinar, etc.
+  tags            String[] // Array of technology tags
+  eventType       String?  // In-person, Virtual, Hybrid
+  website         String?  // Official event website
+  registrationUrl String?  // Registration link
+  price           String?  // Free, Paid, or specific amount
+  organizer       String?  // Event organizer name
+  venue           String?  // Detailed venue information
+  city            String?  // City name
+  country         String?  // Country name
+  timezone        String?  // Event timezone
+  capacity        Int?     // Maximum attendees
+  difficulty      String?  // Beginner, Intermediate, Advanced
+  language        String?  // Primary language
+  cfpDeadline     DateTime? // Call for Papers deadline
+  isRecurring     Boolean  @default(false)
+  sourceUrl       String?  // Where we found this event
+  verified        Boolean  @default(false) // Whether event details are verified
+  
+  // Existing fields
+  userId          String
+  user            User     @relation("UserEvents", fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
