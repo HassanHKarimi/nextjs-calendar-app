@@ -81,14 +81,15 @@ const CalendarEvent: React.FC<CalendarEventProps> = ({
         ref={eventRef}
         data-event-id={event.id}
         data-id={`event-${event.id}`}
-        className={`px-2 py-1 mb-1 text-base rounded cursor-pointer truncate transition-all duration-200 
-                   transform hover:scale-[1.02] hover:shadow-sm z-[1] hover:z-[10] ${colorClass}`}
+        className={`px-1 sm:px-2 py-1 mb-1 rounded cursor-pointer transition-all duration-200 
+                   transform hover:scale-[1.02] hover:shadow-sm z-[1] hover:z-[10] ${colorClass}
+                   w-full overflow-hidden month-event`}
         onClick={handleClick}
         tabIndex={0}
         role="button"
         aria-label={`Event: ${event.title}`}
       >
-        <span className="font-medium">{event.title}</span>
+        <span className="font-medium block">{event.title}</span>
       </div>
     );
   }

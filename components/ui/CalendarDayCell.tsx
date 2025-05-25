@@ -19,7 +19,7 @@ export default function CalendarDayCell({ day, currentMonth, events, onEventClic
     month-day-cell 
     ${isTodayDate ? 'month-day-cell-current' : ''}
     ${!isCurrentMonth ? 'text-gray-300' : ''}
-    h-full
+    h-full flex flex-col
   `.trim();
 
   // Day number classes
@@ -33,10 +33,10 @@ export default function CalendarDayCell({ day, currentMonth, events, onEventClic
         {format(day, 'd')}
       </div>
       
-      <div className="mt-1 max-h-[calc(100%-30px)] overflow-hidden">
+      <div className="mt-1 flex-1 overflow-hidden">
         {events.length > 0 && (
-          <div className="flex flex-col gap-1">
-            {events.slice(0, 3).map((event) => (
+          <div className="flex flex-col gap-0 sm:gap-1 h-full">
+            {events.slice(0, 4).map((event) => (
               <CalendarEvent 
                 key={event.id}
                 event={event}
@@ -44,9 +44,9 @@ export default function CalendarDayCell({ day, currentMonth, events, onEventClic
                 isCompact={true}
               />
             ))}
-            {events.length > 3 && (
-              <div className="month-event-more">
-                + {events.length - 3} more
+            {events.length > 4 && (
+              <div className="month-event-more text-xs text-gray-500 px-1">
+                + {events.length - 4} more
               </div>
             )}
           </div>

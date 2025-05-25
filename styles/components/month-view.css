@@ -7,7 +7,17 @@
 }
 
 .month-day-cell {
-  @apply p-2 border-r border-b border-gray-100 aspect-square;
+  @apply p-1 sm:p-2 border-r border-b border-gray-100;
+  /* Mobile: taller cells, not square */
+  min-height: 80px;
+}
+
+/* Desktop: maintain square aspect ratio */
+@media (min-width: 640px) {
+  .month-day-cell {
+    aspect-ratio: 1;
+    min-height: auto;
+  }
 }
 
 .month-day-cell-current {
@@ -15,11 +25,20 @@
 }
 
 .month-day-header {
-  @apply text-xs text-gray-500 py-2 text-center font-medium hidden sm:block;
+  @apply text-xs text-gray-500 py-2 text-center font-medium;
+}
+
+/* Mobile: show only first letter */
+@media (max-width: 639px) {
+  .month-day-header {
+    font-size: 11px;
+    padding: 6px 2px;
+    font-weight: 600;
+  }
 }
 
 .month-day-number {
-  @apply text-sm font-medium text-gray-900 mb-1;
+  @apply text-sm font-medium text-gray-900 mb-1 flex-shrink-0;
 }
 
 .month-day-number-current {
@@ -27,8 +46,30 @@
 }
 
 .month-event {
-  @apply text-base px-2 py-1 rounded whitespace-nowrap overflow-hidden text-ellipsis cursor-pointer 
-         transition-all duration-200 ease-in-out border-l-4;
+  @apply px-2 py-1 rounded cursor-pointer transition-all duration-200 ease-in-out;
+  /* Mobile: 12px text, Desktop: 14px text */
+  font-size: 12px;
+  /* Mobile: no ellipsis, just cut off */
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Mobile: reduced height and no ellipsis */
+@media (max-width: 639px) {
+  .month-event {
+    padding: 2px 4px 2px 2px;
+    font-size: 11px;
+    line-height: 1.2;
+    margin-bottom: 1px;
+  }
+}
+
+@media (min-width: 640px) {
+  .month-event {
+    font-size: 14px;
+    /* Desktop: keep ellipsis for better UX */
+    text-overflow: ellipsis;
+  }
 }
 
 .month-event-hover {
@@ -36,45 +77,53 @@
 }
 
 .month-event-more {
-  @apply text-xs text-gray-500 p-0 px-1;
+  @apply text-xs text-gray-500 p-0 px-1 flex-shrink-0;
 }
 
 /* Colors for events */
 .event-blue {
-  @apply bg-blue-100 text-blue-800 border-blue-400 hover:bg-blue-200;
+  @apply bg-blue-100 text-blue-800 hover:bg-blue-200;
 }
 
 .event-green {
-  @apply bg-green-100 text-green-800 border-green-400 hover:bg-green-200;
+  @apply bg-green-100 text-green-800 hover:bg-green-200;
 }
 
 .event-yellow {
-  @apply bg-yellow-100 text-yellow-800 border-yellow-400 hover:bg-yellow-200;
+  @apply bg-yellow-100 text-yellow-800 hover:bg-yellow-200;
 }
 
 .event-red {
-  @apply bg-red-100 text-red-800 border-red-400 hover:bg-red-200;
+  @apply bg-red-100 text-red-800 hover:bg-red-200;
 }
 
 .event-purple {
-  @apply bg-purple-100 text-purple-800 border-purple-400 hover:bg-purple-200;
+  @apply bg-purple-100 text-purple-800 hover:bg-purple-200;
 }
 
 .event-indigo {
-  @apply bg-indigo-100 text-indigo-800 border-indigo-400 hover:bg-indigo-200;
+  @apply bg-indigo-100 text-indigo-800 hover:bg-indigo-200;
 }
 
 .event-pink {
-  @apply bg-pink-100 text-pink-800 border-pink-400 hover:bg-pink-200;
+  @apply bg-pink-100 text-pink-800 hover:bg-pink-200;
 }
 
 .event-gray {
-  @apply bg-gray-100 text-gray-800 border-gray-400 hover:bg-gray-200;
+  @apply bg-gray-100 text-gray-800 hover:bg-gray-200;
 }
 
 /* Added for new component structure */
 .month-view {
   @apply flex flex-col h-full border border-gray-100 rounded-lg overflow-hidden;
+  /* Mobile: bring calendar closer to edges */
+  margin: 0 -8px;
+}
+
+@media (min-width: 640px) {
+  .month-view {
+    margin: 0;
+  }
 }
 
 .month-header {
@@ -90,5 +139,15 @@
 }
 
 .month-day-container {
-  @apply border-r border-gray-100 last:border-r-0 aspect-square;
+  @apply border-r border-gray-100 last:border-r-0;
+  /* Mobile: taller cells, not square */
+  min-height: 80px;
+}
+
+/* Desktop: maintain square aspect ratio */
+@media (min-width: 640px) {
+  .month-day-container {
+    aspect-ratio: 1;
+    min-height: auto;
+  }
 } 

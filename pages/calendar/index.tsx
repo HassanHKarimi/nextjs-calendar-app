@@ -398,7 +398,7 @@ export default function CalendarPage() {
         </div>
 
         {/* Calendar Content */}
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           {currentView === 'month' && (
             <>
               {/* Month view navigation */}

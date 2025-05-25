@@ -23,9 +23,13 @@ const MonthView: React.FC<MonthViewProps> = ({ currentDate, events, onEventClick
   let day = startDate;
   
   for (let i = 0; i < 7; i++) {
+    const fullDayName = format(addDays(day, i), dateFormat);
+    const firstLetter = fullDayName.charAt(0);
+    
     days.push(
       <div key={i} className="month-day-header">
-        {format(addDays(day, i), dateFormat)}
+        <span className="hidden sm:inline">{fullDayName}</span>
+        <span className="sm:hidden">{firstLetter}</span>
       </div>
     );
   }
