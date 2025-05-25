@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import UserUtilityBar from "../../../components/UserUtilityBar";
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -93,21 +94,30 @@ export default function NewEventPage() {
       <div className="rounded-lg bg-white shadow-md overflow-hidden">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
-            <h1 className="text-2xl font-semibold text-gray-900">
+          <div className="mb-6">
+            {/* Mobile: Utility bar above title */}
+            <div className="flex justify-end mb-4 sm:hidden">
+              <UserUtilityBar 
+                userName={authUser?.name || 'User'} 
+                onLogout={logout} 
+              />
+            </div>
+            
+            {/* Desktop: Title and utility bar side by side */}
+            <div className="hidden sm:flex justify-between items-center">
+              <h1 className="text-2xl font-semibold text-gray-900">
+                Create New Event
+              </h1>
+              <UserUtilityBar 
+                userName={authUser?.name || 'User'} 
+                onLogout={logout} 
+              />
+            </div>
+            
+            {/* Mobile: Title below utility bar */}
+            <h1 className="text-2xl font-semibold text-gray-900 sm:hidden">
               Create New Event
             </h1>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500">
-                Logged in as <span className="font-medium text-gray-900">{authUser?.name || 'User'}</span>
-              </span>
-              <button 
-                onClick={logout}
-                className="px-4 py-2 text-sm text-red-600 bg-red-100 rounded-md transition-colors hover:bg-red-200"
-              >
-                Logout
-              </button>
-            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
