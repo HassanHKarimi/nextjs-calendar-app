@@ -28,8 +28,8 @@ const nextConfig = {
   // Add trailing slash to URLs (fixes static export routing)
   trailingSlash: true,
   
-  // Enable static export mode
-  output: 'export',
+  // Disable static export mode to enable API routes for database
+  // output: 'export',
   
   // Important for static export - don't use image optimization
   images: { unoptimized: true },
