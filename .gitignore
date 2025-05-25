@@ -18,7 +18,6 @@
 
 # misc
 .DS_Store
-*.pem
 .app-router-backup/
 
 # debug
@@ -30,6 +29,8 @@ yarn-error.log*
 .env*.local
 .env
 .env.production
+.env.backup
+.env.example.local
 
 # vercel
 .vercel
@@ -44,3 +45,45 @@ next-env.d.ts
 memory-bank/
 modal-animation-debug.log
 screenshots/
+
+# Security and sensitive data
+*.key
+*.p12
+*.p8
+*.pem
+*.crt
+*.cer
+*.pfx
+secrets/
+private/
+
+# Database and API keys
+database.db
+*.sqlite
+*.sqlite3
+.prisma/
+prisma/migrations/migration_lock.toml
+
+# Logs and temporary files
+logs/
+*.log
+temp/
+tmp/
+.cache/
+
+# IDE and editor files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Backup files
+*.backup
+*.bak
+*.orig

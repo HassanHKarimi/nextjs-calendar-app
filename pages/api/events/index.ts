@@ -36,7 +36,28 @@ export default async function handler(
         location: event.location,
         isAllDay: event.isAllDay,
         color: event.color,
-        userId: event.userId
+        userId: event.userId,
+        // Tech event fields
+        category: event.category,
+        tags: event.tags,
+        eventType: event.eventType,
+        website: event.website,
+        registrationUrl: event.registrationUrl,
+        price: event.price,
+        organizer: event.organizer,
+        venue: event.venue,
+        city: event.city,
+        country: event.country,
+        timezone: event.timezone,
+        capacity: event.capacity,
+        difficulty: event.difficulty,
+        language: event.language,
+        cfpDeadline: event.cfpDeadline,
+        isRecurring: event.isRecurring,
+        sourceUrl: event.sourceUrl,
+        verified: event.verified,
+        createdAt: event.createdAt,
+        updatedAt: event.updatedAt
       }));
 
       return res.status(200).json(transformedEvents);
@@ -44,7 +65,13 @@ export default async function handler(
 
     if (req.method === 'POST') {
       // Create a new event
-      const { title, description, start, end, location, isAllDay, color } = req.body;
+      const { 
+        title, description, start, end, location, isAllDay, color,
+        // Tech event fields
+        category, tags, eventType, website, registrationUrl, price,
+        organizer, venue, city, country, timezone, capacity, difficulty,
+        language, cfpDeadline, isRecurring, sourceUrl, verified
+      } = req.body;
 
       if (!title || !start || !end) {
         return res.status(400).json({ error: 'Title, start date, and end date are required' });
@@ -59,7 +86,26 @@ export default async function handler(
           location: location || null,
           isAllDay: isAllDay || false,
           color: color || 'blue',
-          userId: userId
+          userId: userId,
+          // Tech event fields
+          category: category || null,
+          tags: tags || [],
+          eventType: eventType || null,
+          website: website || null,
+          registrationUrl: registrationUrl || null,
+          price: price || null,
+          organizer: organizer || null,
+          venue: venue || null,
+          city: city || null,
+          country: country || null,
+          timezone: timezone || null,
+          capacity: capacity || null,
+          difficulty: difficulty || null,
+          language: language || null,
+          cfpDeadline: cfpDeadline ? new Date(cfpDeadline) : null,
+          isRecurring: isRecurring || false,
+          sourceUrl: sourceUrl || null,
+          verified: verified || false
         }
       });
 
@@ -73,7 +119,28 @@ export default async function handler(
         location: newEvent.location,
         isAllDay: newEvent.isAllDay,
         color: newEvent.color,
-        userId: newEvent.userId
+        userId: newEvent.userId,
+        // Tech event fields
+        category: newEvent.category,
+        tags: newEvent.tags,
+        eventType: newEvent.eventType,
+        website: newEvent.website,
+        registrationUrl: newEvent.registrationUrl,
+        price: newEvent.price,
+        organizer: newEvent.organizer,
+        venue: newEvent.venue,
+        city: newEvent.city,
+        country: newEvent.country,
+        timezone: newEvent.timezone,
+        capacity: newEvent.capacity,
+        difficulty: newEvent.difficulty,
+        language: newEvent.language,
+        cfpDeadline: newEvent.cfpDeadline,
+        isRecurring: newEvent.isRecurring,
+        sourceUrl: newEvent.sourceUrl,
+        verified: newEvent.verified,
+        createdAt: newEvent.createdAt,
+        updatedAt: newEvent.updatedAt
       };
 
       return res.status(201).json(transformedEvent);
