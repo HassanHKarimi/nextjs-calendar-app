@@ -42,7 +42,6 @@ next-env.d.ts
 .cursor/
 
 # local context and debug
-memory-bank/
 modal-animation-debug.log
 screenshots/
 
@@ -63,6 +62,23 @@ database.db
 *.sqlite3
 .prisma/
 prisma/migrations/migration_lock.toml
+
+# AI Scraper Service specific
+scraper-service/.env
+scraper-service/.env.local
+scraper-service/.env.production
+scraper-service/__pycache__/
+scraper-service/*.pyc
+scraper-service/logs/
+scraper-service/temp/
+
+# Ingestion Service specific
+ingestion-service/.env
+ingestion-service/.env.local
+ingestion-service/.env.production
+ingestion-service/node_modules/
+ingestion-service/logs/
+ingestion-service/temp/
 
 # Logs and temporary files
 logs/

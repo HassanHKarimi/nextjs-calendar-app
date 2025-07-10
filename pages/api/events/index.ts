@@ -56,6 +56,9 @@ export default async function handler(
         isRecurring: event.isRecurring,
         sourceUrl: event.sourceUrl,
         verified: event.verified,
+        // AI Scraper fields
+        source: event.source,
+        confidence: event.confidence,
         createdAt: event.createdAt,
         updatedAt: event.updatedAt
       }));
@@ -70,7 +73,9 @@ export default async function handler(
         // Tech event fields
         category, tags, eventType, website, registrationUrl, price,
         organizer, venue, city, country, timezone, capacity, difficulty,
-        language, cfpDeadline, isRecurring, sourceUrl, verified
+        language, cfpDeadline, isRecurring, sourceUrl, verified,
+        // AI Scraper fields
+        source, confidence
       } = req.body;
 
       if (!title || !start || !end) {
@@ -105,7 +110,10 @@ export default async function handler(
           cfpDeadline: cfpDeadline ? new Date(cfpDeadline) : null,
           isRecurring: isRecurring || false,
           sourceUrl: sourceUrl || null,
-          verified: verified || false
+          verified: verified || false,
+          // AI Scraper fields
+          source: source || null,
+          confidence: confidence || null
         }
       });
 
@@ -139,6 +147,9 @@ export default async function handler(
         isRecurring: newEvent.isRecurring,
         sourceUrl: newEvent.sourceUrl,
         verified: newEvent.verified,
+        // AI Scraper fields
+        source: newEvent.source,
+        confidence: newEvent.confidence,
         createdAt: newEvent.createdAt,
         updatedAt: newEvent.updatedAt
       };

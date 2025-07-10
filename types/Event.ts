@@ -32,6 +32,10 @@ export interface Event extends BaseEvent {
   sourceUrl?: string;      // Where we found this event
   verified?: boolean;      // Whether event details are verified
   
+  // AI Scraper Fields
+  source?: string;         // Source of event (eventbrite, meetup, blog, etc.)
+  confidence?: number;     // AI confidence score 0-1 for scraped events
+  
   // Database fields
   userId?: string;
   createdAt?: Date;
